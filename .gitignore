@@ -1,0 +1,30 @@
+# Maven build output
+target/
+.maven-home/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Java
+*.class
+hs_err_pid*
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+
+# Operating systems
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+application-local.yml
+application-local.yaml
+secrets/
