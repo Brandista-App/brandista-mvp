@@ -11,6 +11,7 @@ import com.brandista.brandista.product.service.DuplicateProductSlugException;
 import com.brandista.brandista.product.service.InactiveProductReferenceException;
 import com.brandista.brandista.product.service.ProductNotFoundException;
 import com.brandista.brandista.product.service.ProductReferenceNotFoundException;
+import com.brandista.brandista.address.service.AddressNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,13 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleAddressNotFound(
+            AddressNotFoundException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
 
     @ExceptionHandler(BrandNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleBrandNotFound(
