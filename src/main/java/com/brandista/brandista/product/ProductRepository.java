@@ -4,11 +4,14 @@ import com.brandista.brandista.brand.BrandStatus;
 import com.brandista.brandista.category.CategoryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
 
     boolean existsBySlug(String slug);
 
@@ -22,4 +25,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findBySlugAndPublicationStatusAndBrand_StatusAndCategory_Status(
             String slug, ProductPublicationStatus publicationStatus, BrandStatus brandStatus, CategoryStatus categoryStatus);
+
+    @Override
+    @EntityGraph(attributePaths = {"brand", "category"})
+    Page<Product> findAll(Specification<Product> specification, Pageable pageable);
 }

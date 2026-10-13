@@ -222,6 +222,46 @@ Products belong to exactly one active brand and one active category. Creation st
 | `GET` | `/api/v1/products?page=0&size=50` | Paginated public list of eligible published products |
 | `GET` | `/api/v1/products/{slug}` | Retrieve an eligible published product by slug |
 
-Every `/api/v1/admin/products/**` route requires an `ADMIN` bearer token. Public reads expose only products with `PUBLISHED` status and active brand/category records. Product prices use `DECIMAL(12,2)` and JSON decimal values; accepted prices are non-negative, with at most 10 integer digits and 2 decimal places. List endpoints default to 50 entries and accept page sizes from 1 to 100. Slugs are normalized to lowercase hyphen-separated text before uniqueness checks. Duplicate slugs return `409 Conflict`, invalid request data returns `400 Bad Request`, and missing products or related IDs return `404 Not Found`.
+Every `/api/v1/admin/products/**` route requires an `ADMIN` bearer token. Public reads expose only products with `PUBLISHED` status and active brand/category records. The public response includes product name, slug, description, brand/category IDs and names, PKR price, and availability; it omits publication state and persistence timestamps. Product prices use `DECIMAL(12,2)` and JSON decimal values; accepted prices are non-negative, with at most 10 integer digits and 2 decimal places. Slugs are normalized to lowercase hyphen-separated text before uniqueness checks. Duplicate slugs return `409 Conflict`, invalid request data returns `400 Bad Request`, and missing products or related IDs return `404 Not Found`.
+
+### Public product discovery
+
+`GET /api/v1/products` supports `page` (default `0`), `size` (default `50`, range `1`–`100`), optional `keyword` (up to 100 characters), positive `brandId` and `categoryId`, and `sort` (`default`, `price_asc`, or `price_desc`). The default order is product name ascending, then ID ascending. Price sorts use ID ascending to keep ties stable. Unknown but valid brand/category IDs produce an empty page; invalid values return a safe `400 Bad Request` response.
+
+Search is a case-insensitive substring match against product name and description. `%`, `_`, and `!` in a keyword are escaped and treated literally. Filters combine with the keyword using AND semantics. Only published products with currently active brand and category records are considered.
+
+Example request:
+
+```text
+GET /api/v1/products?keyword=linen&brandId=12&categoryId=4&sort=price_asc&page=0&size=20
+```
+
+Example response:
+
+```json
+{
+  "content": [
+    {
+      "id": 42,
+      "name": "Linen Shirt",
+      "slug": "linen-shirt",
+      "description": "Lightweight summer shirt",
+      "brandId": 12,
+      "brandName": "Example Atelier",
+      "categoryId": 4,
+      "categoryName": "Clothing",
+      "price": 1299.95,
+      "currency": "PKR",
+      "availability": "AVAILABLE"
+    }
+  ],
+  "page": 0,
+  "size": 20,
+  "totalElements": 1,
+  "totalPages": 1
+}
+```
+
+`GET /api/v1/products/{slug}` returns the same public product shape and returns `404 Not Found` for missing, unpublished, or ineligible products. Search uses database substring matching; its leading wildcard prevents ordinary B-tree indexes from accelerating keyword matches. The implementation keeps filtering and paging in SQL and adds indexes for publication/price and publication/brand/category query paths. It is intended for MVP catalogue scale; full-text search infrastructure is not included.
 
 The availability flag is not live inventory and does not reserve or decrement stock. Cart, checkout, purchase rejection, inventory reservation, and order-history snapshots are not implemented by this task.

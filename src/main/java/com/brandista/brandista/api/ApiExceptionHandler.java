@@ -12,6 +12,7 @@ import com.brandista.brandista.product.service.InactiveProductReferenceException
 import com.brandista.brandista.product.service.ProductNotFoundException;
 import com.brandista.brandista.product.service.ProductReferenceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -107,6 +108,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodValidation(
             HandlerMethodValidationException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "Request validation failed.", request, List.of());
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConstraintViolation(
+            ConstraintViolationException exception,
             HttpServletRequest request) {
         return response(HttpStatus.BAD_REQUEST, "Request validation failed.", request, List.of());
     }
