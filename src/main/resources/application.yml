@@ -16,6 +16,14 @@ spring:
 server:
   port: ${SERVER_PORT:8080}
 
+brandista:
+  security:
+    jwt:
+      secret-base64: ${JWT_SECRET_BASE64:}
+      issuer: ${JWT_ISSUER:brandista}
+      audience: ${JWT_AUDIENCE:brandista-api}
+      access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+
 management:
   endpoints:
     web:

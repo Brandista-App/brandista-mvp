@@ -7,7 +7,7 @@ Brandista is a multi-brand e-commerce platform initially targeting Pakistani bra
 - Java 21
 - Spring Boot 3.5
 - Maven with Maven Wrapper
-- Spring Web, Spring Boot Actuator, Spring Data JPA, Flyway, Bean Validation, and Spring Security BCrypt password hashing
+- Spring Web, Spring Boot Actuator, Spring Data JPA, Flyway, Bean Validation, Spring Security, BCrypt password hashing, and Nimbus JWT bearer-token support
 - MySQL 8.4 for local development
 - JUnit 5 and Spring Boot Starter Test
 
@@ -43,6 +43,14 @@ cp .env.example .env
 ```
 
 Edit `.env` and replace both placeholder passwords with local development values. The `.env` file is ignored by Git. Do not use production credentials here. Spring datasource settings are passed as environment variables; Compose points the backend at the MySQL service hostname `mysql`.
+
+Also replace `JWT_SECRET_BASE64` with a fresh, random Base64-encoded key of at least 32 bytes. For example, generate one in PowerShell with:
+
+```powershell
+[Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+```
+
+Keep that value in your ignored `.env` file or a secret manager; never commit it. The application refuses to start if the key is missing, invalid, or shorter than 32 decoded bytes. JWT issuer, audience, and access-token lifetime can also be configured in `.env`; the local default lifetime is 15 minutes.
 
 Build and start MySQL and the backend from the repository root:
 
@@ -107,7 +115,7 @@ Stop the running application with `Ctrl+C` in the terminal where it is running.
 - If port `8080` is already in use, stop the other process using it and retry.
 - Run commands from the repository root so the wrapper can find `pom.xml`.
 
-Flyway manages database schema changes. The initial `User` persistence model and customer registration endpoint are implemented. Login, JWT authentication, user-management endpoints, and marketplace entities have not been implemented yet.
+Flyway manages database schema changes. The initial `User` persistence model, customer registration, and email/password login are implemented. Marketplace entities and user-management endpoints have not been implemented yet.
 
 ## User account policy (proposal)
 
@@ -131,3 +139,19 @@ Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/v1/registrations -
 ```
 
 Registration does not yet have rate limiting. Add and verify rate limiting before exposing this endpoint in a pre-production or production environment.
+
+## Login and bearer-token authentication
+
+`POST /api/v1/auth/login` accepts the normalized email identifier and password. For example:
+
+```powershell
+$body = @{ email = "customer@example.com"; password = "your-account-password" } | ConvertTo-Json
+$login = Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/v1/auth/login -ContentType "application/json" -Body $body
+$login | Select-Object tokenType, expiresIn, account
+```
+
+The successful response contains an `accessToken`, `tokenType` (`Bearer`), `expiresIn` seconds, and safe account fields (`id`, `email`, and `role`). Send the access token to protected API routes using `Authorization: Bearer <accessToken>`. Invalid credentials and disabled accounts return the same generic `401 Unauthorized` body. Login does not log request bodies or return passwords or password hashes.
+
+Tokens are signed with HS256 using `JWT_SECRET_BASE64`; validation fixes the allowed algorithm and checks signature, issuer, audience, and expiration. The default access-token lifetime is 15 minutes, configurable with `JWT_ACCESS_TOKEN_TTL` (maximum one hour). A stateless access token can remain usable until it expires, including after a client deletes it at logout. There is no token revocation or refresh-token system yet, so logout currently means discarding the token client-side. Account status changes also do not invalidate a token that was already issued. Consider key rotation, rate limiting for registration and login, and an explicit revocation strategy before production use.
+
+The repository has no SRS authentication decision or web/mobile client guidance. This endpoint therefore follows the existing email-first account proposal; confirm the identifier policy against the SRS before treating it as final.
