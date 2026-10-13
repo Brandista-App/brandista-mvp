@@ -1,5 +1,6 @@
 package com.brandista.brandista;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +26,9 @@ class BrandistaApplicationTests {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private Flyway flyway;
+
     @Test
     void applicationContextStarts() {
         assertThat(port).isPositive();
@@ -37,5 +41,12 @@ class BrandistaApplicationTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("\"status\":\"UP\"");
+    }
+
+    @Test
+    void versionedMigrationRunsOnceAndIsRecorded() {
+        assertThat(flyway.info().applied()).hasSize(1);
+        assertThat(flyway.info().applied()[0].getVersion().getVersion()).isEqualTo("1");
+        assertThat(flyway.migrate().migrationsExecuted).isZero();
     }
 }

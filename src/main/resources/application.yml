@@ -2,9 +2,16 @@ spring:
   application:
     name: brandista
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/brandista}
-    username: ${SPRING_DATASOURCE_USERNAME:brandista}
-    password: ${SPRING_DATASOURCE_PASSWORD:brandista}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
 server:
   port: ${SERVER_PORT:8080}
