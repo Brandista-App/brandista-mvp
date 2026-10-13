@@ -107,4 +107,8 @@ Stop the running application with `Ctrl+C` in the terminal where it is running.
 - If port `8080` is already in use, stop the other process using it and retry.
 - Run commands from the repository root so the wrapper can find `pom.xml`.
 
-Flyway manages database schema changes. This task adds no marketplace entities or production schema migrations. Authentication and shopping features have not been implemented yet.
+Flyway manages database schema changes. The initial `User` persistence model is defined in a versioned migration. Registration, login, JWT authentication, user-management endpoints, and marketplace entities have not been implemented yet.
+
+## User account policy (proposal)
+
+No SRS or account-policy document is present in this repository, so whether phone login is required remains unresolved. The initial persistence model proposes email-first accounts with a normalized, unique email address. Phone login and phone verification are not part of this model; revisit this proposal when the SRS decision is available.
