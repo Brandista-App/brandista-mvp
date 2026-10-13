@@ -1,6 +1,7 @@
 package com.brandista.brandista.api;
 
 import com.brandista.brandista.registration.service.DuplicateAccountIdentifierException;
+import com.brandista.brandista.auth.service.LoginFailureException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,13 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(LoginFailureException.class)
+    public ResponseEntity<ApiErrorResponse> handleLoginFailure(
+            LoginFailureException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.UNAUTHORIZED, exception.getMessage(), request, List.of());
+    }
 
     @ExceptionHandler(DuplicateAccountIdentifierException.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicateIdentifier(
