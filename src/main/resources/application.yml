@@ -1,9 +1,13 @@
 spring:
   application:
     name: brandista
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/brandista}
+    username: ${SPRING_DATASOURCE_USERNAME:brandista}
+    password: ${SPRING_DATASOURCE_PASSWORD:brandista}
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 management:
   endpoints:
