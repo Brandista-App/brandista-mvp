@@ -15,7 +15,6 @@ import jakarta.persistence.UniqueConstraint;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Locale;
 import java.util.Objects;
 
 @Entity
@@ -53,7 +52,7 @@ public class User {
     }
 
     public User(String email, String passwordHash, UserRole role, AccountStatus status) {
-        this.email = normalizeEmail(email);
+        this.email = EmailNormalizer.normalize(email);
         this.passwordHash = passwordHash;
         this.role = role;
         this.status = status;
@@ -74,7 +73,7 @@ public class User {
     }
 
     private void normalizeFields() {
-        email = normalizeEmail(email);
+        email = EmailNormalizer.normalize(email);
         if (email == null || email.isBlank()) {
             throw new IllegalArgumentException("email is required");
         }
@@ -89,10 +88,6 @@ public class User {
         }
         role = Objects.requireNonNull(role, "role is required");
         status = Objects.requireNonNull(status, "status is required");
-    }
-
-    private static String normalizeEmail(String value) {
-        return value == null ? null : value.trim().toLowerCase(Locale.ROOT);
     }
 
     public Long getId() {
