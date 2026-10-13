@@ -30,6 +30,9 @@ import java.util.Objects;
         uniqueConstraints = @UniqueConstraint(name = "uk_products_slug", columnNames = "slug"),
         indexes = {
                 @Index(name = "idx_products_public_name", columnList = "publication_status, name"),
+                @Index(name = "idx_products_public_price", columnList = "publication_status, price, id"),
+                @Index(name = "idx_products_public_brand", columnList = "publication_status, brand_id"),
+                @Index(name = "idx_products_public_category", columnList = "publication_status, category_id"),
                 @Index(name = "idx_products_brand_id", columnList = "brand_id"),
                 @Index(name = "idx_products_category_id", columnList = "category_id")
         })
