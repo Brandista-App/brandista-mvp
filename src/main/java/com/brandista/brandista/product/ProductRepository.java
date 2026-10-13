@@ -2,6 +2,7 @@ package com.brandista.brandista.product;
 
 import com.brandista.brandista.brand.BrandStatus;
 import com.brandista.brandista.category.CategoryStatus;
+import com.brandista.brandista.brand.BrandStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,6 +26,11 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Optional<Product> findBySlugAndPublicationStatusAndBrand_StatusAndCategory_Status(
             String slug, ProductPublicationStatus publicationStatus, BrandStatus brandStatus, CategoryStatus categoryStatus);
+
+    @EntityGraph(attributePaths = {"brand", "category"})
+    Optional<Product> findByIdAndPublicationStatusAndAvailabilityAndBrand_StatusAndCategory_Status(
+            Long id, ProductPublicationStatus publicationStatus,
+            ProductAvailability availability, BrandStatus brandStatus, CategoryStatus categoryStatus);
 
     @Override
     @EntityGraph(attributePaths = {"brand", "category"})

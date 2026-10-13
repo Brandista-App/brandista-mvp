@@ -313,3 +313,47 @@ Example create response (`201 Created`):
 The response contains the address ID, those address fields, and creation/update timestamps. Recipient name, phone, address line 1, and city are required; line 2, province, and postal code are optional. `PUT` replaces every editable field. `PATCH` accepts any non-empty subset; send an empty string to clear an optional field. Phone values allow common punctuation and 7–15 digits; this is syntax validation only and does not verify ownership of a phone number. Requests require a `CUSTOMER` bearer token. Validation failures return `400`; missing or non-owned addresses return `404`; unauthenticated requests return `401`.
 
 The SRS calls for address selection and an order-time address snapshot but does not define a default-address rule, so this API has no default flag or default-selection endpoint. Address deletion removes the saved row; future order creation must copy delivery details into an immutable order snapshot rather than depend on this address record. Phone formatting, deliverable-city coverage, and postal-code requirements remain business decisions.
+
+## Customer cart
+
+Authenticated customers manage one persistent cart under `/api/v1/customers/me/cart`. The customer is derived from the signed bearer token; cart and customer IDs are not accepted to select ownership.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/v1/customers/me/cart` | Retrieve the current cart, creating an empty persistent cart if needed |
+| `POST` | `/api/v1/customers/me/cart/items` | Add a product and positive integer quantity (`201` for a new item, `200` when increasing an existing item) |
+| `PATCH` | `/api/v1/customers/me/cart/items/{itemId}` | Replace an item's quantity |
+| `DELETE` | `/api/v1/customers/me/cart/items/{itemId}` | Remove an owned item (`204 No Content`) |
+| `DELETE` | `/api/v1/customers/me/cart/items` | Clear this customer's items; returns the empty cart |
+
+Add request:
+
+```json
+{ "productId": 42, "quantity": 2 }
+```
+
+Cart response (`GET`, add/update, and clear):
+
+```json
+{
+  "id": 6,
+  "items": [
+    {
+      "itemId": 9,
+      "productId": 42,
+      "productName": "Linen Shirt",
+      "brandName": "Example Atelier",
+      "unitPrice": 1299.95,
+      "quantity": 2,
+      "lineSubtotal": 2599.90,
+      "available": true
+    }
+  ],
+  "subtotal": 2599.90,
+  "currency": "PKR"
+}
+```
+
+Cart reads return an empty `items` array and a zero subtotal when there are no items. Add accepts only currently published, available products whose brand and category are active; otherwise it returns `409 Conflict`. If a product becomes ineligible after being added, it remains visible with `available: false` so the customer can remove it. The server computes the displayed line subtotals and cart subtotal from current `BigDecimal` product prices. These are provisional display values, not checkout prices. Checkout must revalidate product eligibility and all prices.
+
+The SRS does not define a maximum item quantity; the API requires a positive 32-bit integer and rejects aggregate-add overflow, without inventing a business cap. Existing B010 uses simple products, with no variant or stock-count model; this cart therefore has no variant selection, stock enforcement, or inventory reservation. Carts can contain products from multiple brands. A `CUSTOMER` bearer token is required; a missing token returns `401`, a non-customer role returns `403`, invalid quantity returns `400`, and missing/non-owned item IDs return `404`. No price or owner field is accepted from the client.
