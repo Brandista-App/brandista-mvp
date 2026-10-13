@@ -2,6 +2,8 @@ package com.brandista.brandista.api;
 
 import com.brandista.brandista.registration.service.DuplicateAccountIdentifierException;
 import com.brandista.brandista.auth.service.LoginFailureException;
+import com.brandista.brandista.brand.service.BrandNotFoundException;
+import com.brandista.brandista.brand.service.DuplicateBrandSlugException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,20 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(BrandNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleBrandNotFound(
+            BrandNotFoundException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(DuplicateBrandSlugException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateBrandSlug(
+            DuplicateBrandSlugException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
 
     @ExceptionHandler(LoginFailureException.class)
     public ResponseEntity<ApiErrorResponse> handleLoginFailure(

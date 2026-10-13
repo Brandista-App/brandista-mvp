@@ -1,6 +1,6 @@
 # Brandista
 
-Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository currently contains only the Java backend foundation. The database and e-commerce features have not yet been implemented.
+Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and initial brand management. The broader catalogue and commerce features remain future work.
 
 ## Technology stack
 
@@ -157,3 +157,32 @@ Tokens are signed with HS256 using `JWT_SECRET_BASE64`; validation fixes the all
 The repository has no SRS authentication decision or web/mobile client guidance. This endpoint therefore follows the existing email-first account proposal; confirm the identifier policy against the SRS before treating it as final.
 
 See [SECURITY.md](SECURITY.md) for the route access policy, CORS configuration, CSRF decision, and remaining security gaps.
+
+## Brand management API
+
+Brand data is managed by Brandista administrators. The public `GET /api/v1/brands` endpoint returns active brands only. Admin endpoints require an `ADMIN` bearer token:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/admin/brands` | Create a brand; new brands start active |
+| `GET` | `/api/v1/admin/brands` | List active and inactive brands |
+| `GET` | `/api/v1/admin/brands/{id}` | Retrieve a brand by ID |
+| `PUT` | `/api/v1/admin/brands/{id}` | Replace metadata and set `ACTIVE` or `INACTIVE` status |
+| `PATCH` | `/api/v1/admin/brands/{id}/deactivate` | Deactivate without deleting the row |
+
+Slugs are trimmed, lowercased, and whitespace is converted to single hyphens before uniqueness checks. Names are limited to 150 characters, slugs to 160, descriptions to 2,000, and logo references to 2,048. Duplicate slugs return `409 Conflict`; invalid input returns `400 Bad Request`; missing IDs return `404 Not Found`. Inactive brands remain available to admin reads and are excluded from the public listing. The deactivation endpoint does not physically delete data.
+
+Example create request (replace the token with an administrator's access token):
+
+```powershell
+$headers = @{ Authorization = "Bearer $($login.accessToken)" }
+$body = @{
+    name = "Example Atelier"
+    slug = "Example Atelier"
+    description = "A local clothing label"
+    logoReference = "https://cdn.example.test/brands/example.svg"
+} | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/v1/admin/brands -Headers $headers -ContentType "application/json" -Body $body
+```
+
+The logo reference is metadata only. This task does not implement file upload, image validation, or image storage; the SRS leaves the storage provider open for a later decision.

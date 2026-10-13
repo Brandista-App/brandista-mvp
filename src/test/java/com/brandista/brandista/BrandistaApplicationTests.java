@@ -45,8 +45,9 @@ class BrandistaApplicationTests {
 
     @Test
     void versionedMigrationRunsOnceAndIsRecorded() {
-        assertThat(flyway.info().applied()).hasSize(1);
+        assertThat(flyway.info().applied()).hasSize(2);
         assertThat(flyway.info().applied()[0].getVersion().getVersion()).isEqualTo("1");
+        assertThat(flyway.info().applied()[1].getVersion().getVersion()).isEqualTo("2");
         assertThat(flyway.migrate().migrationsExecuted).isZero();
     }
 }
