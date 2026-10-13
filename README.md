@@ -1,6 +1,6 @@
 # Brandista
 
-Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and brand and category management. Product and commerce features remain future work.
+Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and brand, category, and initial product management. Cart and commerce features remain future work.
 
 ## Technology stack
 
@@ -203,3 +203,25 @@ Categories are flat for the MVP. The SRS treats hierarchy as requiring explicit 
 List endpoints default to 50 records per page and accept sizes from 1 to 100. Slugs are trimmed, lowercased, and whitespace is converted to single hyphens before uniqueness checks. Names are limited to 150 characters, slugs to 160, and descriptions to 2,000. Duplicate slugs return `409 Conflict`; invalid input returns `400 Bad Request`; missing IDs return `404 Not Found`. Inactive categories remain available to admin reads and are excluded from public discovery.
 
 Category deactivation only changes the category status; it does not delete or alter products. Product/category assignment is not implemented yet. When product selection is added, it must reject inactive categories for new assignments while retaining historical references.
+
+## Product management API
+
+The SRS leaves size/colour variants and their inventory model open (FR-PROD-007). This MVP proposes simple products without variants, SKU fields, or a quantity stock counter. Availability is an explicit `AVAILABLE` or `UNAVAILABLE` value; future cart and checkout operations must revalidate both publication and availability. Product images are omitted because the SRS has not selected an image storage provider; no upload or image storage is implemented.
+
+Products belong to exactly one active brand and one active category. Creation starts in `DRAFT`; publishing requires both related records to be active. Public product reads include only `PUBLISHED` products whose brand and category remain active. Deactivation is a soft, terminal state that retains the database row and its brand/category references. No order tables exist yet; future orders must store immutable product/brand/variant snapshots.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/admin/products` | Create a draft product |
+| `GET` | `/api/v1/admin/products?page=0&size=50` | Paginated list of products in every publication state |
+| `GET` | `/api/v1/admin/products/{id}` | Retrieve a product by ID |
+| `PUT` | `/api/v1/admin/products/{id}` | Update product details, PKR price, availability, and active relationships |
+| `PATCH` | `/api/v1/admin/products/{id}/publish` | Publish after checking active brand and category |
+| `PATCH` | `/api/v1/admin/products/{id}/unpublish` | Remove from public discovery while retaining the product |
+| `PATCH` | `/api/v1/admin/products/{id}/deactivate` | Soft-deactivate without deleting the row |
+| `GET` | `/api/v1/products?page=0&size=50` | Paginated public list of eligible published products |
+| `GET` | `/api/v1/products/{slug}` | Retrieve an eligible published product by slug |
+
+Every `/api/v1/admin/products/**` route requires an `ADMIN` bearer token. Public reads expose only products with `PUBLISHED` status and active brand/category records. Product prices use `DECIMAL(12,2)` and JSON decimal values; accepted prices are non-negative, with at most 10 integer digits and 2 decimal places. List endpoints default to 50 entries and accept page sizes from 1 to 100. Slugs are normalized to lowercase hyphen-separated text before uniqueness checks. Duplicate slugs return `409 Conflict`, invalid request data returns `400 Bad Request`, and missing products or related IDs return `404 Not Found`.
+
+The availability flag is not live inventory and does not reserve or decrement stock. Cart, checkout, purchase rejection, inventory reservation, and order-history snapshots are not implemented by this task.
