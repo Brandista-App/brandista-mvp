@@ -11,8 +11,9 @@ Only these current routes are public:
 | `GET /actuator/health` | Public; health details are disabled |
 | `POST /api/v1/registrations` | Public; creates a `CUSTOMER` account only |
 | `POST /api/v1/auth/login` | Public; issues a short-lived access token after successful authentication |
+| `GET /api/v1/brands` | Public; returns active brands only |
 
-Everything else requires a valid bearer token by default. A future published catalogue read may be made public only by adding an explicit, narrowly scoped route rule when that endpoint is implemented; no catalogue route is public today.
+Everything else requires a valid bearer token by default. Future public catalogue reads must be added as explicit, narrowly scoped route rules and must expose only published/active data.
 
 | Route namespace | Required access |
 | --- | --- |

@@ -106,6 +106,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/brands").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/customers/**").hasRole("CUSTOMER")
                         .anyRequest().authenticated())
