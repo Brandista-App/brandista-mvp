@@ -265,3 +265,51 @@ Example response:
 `GET /api/v1/products/{slug}` returns the same public product shape and returns `404 Not Found` for missing, unpublished, or ineligible products. Search uses database substring matching; its leading wildcard prevents ordinary B-tree indexes from accelerating keyword matches. The implementation keeps filtering and paging in SQL and adds indexes for publication/price and publication/brand/category query paths. It is intended for MVP catalogue scale; full-text search infrastructure is not included.
 
 The availability flag is not live inventory and does not reserve or decrement stock. Cart, checkout, purchase rejection, inventory reservation, and order-history snapshots are not implemented by this task.
+
+## Customer address management
+
+Authenticated customers manage only their own delivery addresses under `/api/v1/customers/me/addresses`. The API derives the customer ID from the signed JWT subject; clients cannot choose an owner ID. Attempts to read or mutate another customer's address return the same `404 Not Found` response as a missing address.
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/customers/me/addresses` | Create an address for the authenticated customer |
+| `GET` | `/api/v1/customers/me/addresses` | List the authenticated customer's addresses |
+| `GET` | `/api/v1/customers/me/addresses/{addressId}` | Retrieve one owned address |
+| `PUT` | `/api/v1/customers/me/addresses/{addressId}` | Replace all editable fields of one owned address |
+| `PATCH` | `/api/v1/customers/me/addresses/{addressId}` | Change only supplied fields of one owned address |
+| `DELETE` | `/api/v1/customers/me/addresses/{addressId}` | Delete one owned address |
+
+Example create/update body:
+
+```json
+{
+  "recipientName": "Ayesha Khan",
+  "phoneNumber": "+92 300 1234567",
+  "addressLine1": "House 12, Street 4",
+  "addressLine2": "Gulberg III",
+  "city": "Lahore",
+  "province": "Punjab",
+  "postalCode": "54660"
+}
+```
+
+Example create response (`201 Created`):
+
+```json
+{
+  "id": 8,
+  "recipientName": "Ayesha Khan",
+  "phoneNumber": "+92 300 1234567",
+  "addressLine1": "House 12, Street 4",
+  "addressLine2": "Gulberg III",
+  "city": "Lahore",
+  "province": "Punjab",
+  "postalCode": "54660",
+  "createdAt": "2026-10-14T12:30:00",
+  "updatedAt": "2026-10-14T12:30:00"
+}
+```
+
+The response contains the address ID, those address fields, and creation/update timestamps. Recipient name, phone, address line 1, and city are required; line 2, province, and postal code are optional. `PUT` replaces every editable field. `PATCH` accepts any non-empty subset; send an empty string to clear an optional field. Phone values allow common punctuation and 7–15 digits; this is syntax validation only and does not verify ownership of a phone number. Requests require a `CUSTOMER` bearer token. Validation failures return `400`; missing or non-owned addresses return `404`; unauthenticated requests return `401`.
+
+The SRS calls for address selection and an order-time address snapshot but does not define a default-address rule, so this API has no default flag or default-selection endpoint. Address deletion removes the saved row; future order creation must copy delivery details into an immutable order snapshot rather than depend on this address record. Phone formatting, deliverable-city coverage, and postal-code requirements remain business decisions.

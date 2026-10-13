@@ -21,7 +21,7 @@ Everything else requires a valid bearer token by default. Future public catalogu
 | Route namespace | Required access |
 | --- | --- |
 | `/api/v1/admin/**` | `ADMIN` role; administrative write routes must use this namespace |
-| `/api/v1/customers/**` | `CUSTOMER` role, plus resource ownership checks in the business/service layer |
+| `/api/v1/customers/**` | `CUSTOMER` role, plus resource ownership checks in the business/service layer; address routes derive the owner from the JWT subject |
 | Any other route | Authenticated bearer token; role-specific access must be explicitly added |
 
 Method security is enabled for sensitive operations to add a second authorization boundary when those operations are implemented. Do not rely on request path rules alone for sensitive business actions. Customer ownership must be checked against the authenticated subject in the service layer; a matching customer role does not prove ownership.
@@ -40,6 +40,6 @@ CORS is restricted to origins configured in `CORS_ALLOWED_ORIGINS` as a comma-se
 
 - The SRS authentication identifier decision is unavailable; email-first remains a proposal.
 - Registration and login rate limiting is not implemented.
-- Brand, category, and product administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Order and customer-private-resource endpoints are not implemented yet; ownership checks must be added with customer-specific resources.
+- Brand, category, and product administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Customer address routes are implemented with owner-scoped repository queries; cart, order, and other customer-private resources remain unimplemented.
 - No production deployment profile, secret rotation workflow, refresh-token system, or immediate token revocation exists.
 - Apply security review and operational monitoring before deployment; this baseline does not certify the application as production-ready.
