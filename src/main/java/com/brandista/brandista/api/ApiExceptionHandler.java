@@ -4,11 +4,14 @@ import com.brandista.brandista.registration.service.DuplicateAccountIdentifierEx
 import com.brandista.brandista.auth.service.LoginFailureException;
 import com.brandista.brandista.brand.service.BrandNotFoundException;
 import com.brandista.brandista.brand.service.DuplicateBrandSlugException;
+import com.brandista.brandista.category.service.CategoryNotFoundException;
+import com.brandista.brandista.category.service.DuplicateCategorySlugException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -27,6 +30,20 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DuplicateBrandSlugException.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicateBrandSlug(
             DuplicateBrandSlugException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleCategoryNotFound(
+            CategoryNotFoundException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(DuplicateCategorySlugException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateCategorySlug(
+            DuplicateCategorySlugException exception,
             HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
     }
@@ -58,6 +75,13 @@ public class ApiExceptionHandler {
                 .toList();
 
         return response(HttpStatus.BAD_REQUEST, "Request validation failed.", request, fieldErrors);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiErrorResponse> handleMethodValidation(
+            HandlerMethodValidationException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, "Request validation failed.", request, List.of());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)

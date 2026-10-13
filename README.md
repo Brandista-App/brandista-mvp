@@ -1,6 +1,6 @@
 # Brandista
 
-Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and initial brand management. The broader catalogue and commerce features remain future work.
+Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and brand and category management. Product and commerce features remain future work.
 
 ## Technology stack
 
@@ -186,3 +186,20 @@ Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/v1/admin/brands -H
 ```
 
 The logo reference is metadata only. This task does not implement file upload, image validation, or image storage; the SRS leaves the storage provider open for a later decision.
+
+## Category management API
+
+Categories are flat for the MVP. The SRS treats hierarchy as requiring explicit approval, so there are no parent/child fields or nested-category behaviours. The public `GET /api/v1/categories` endpoint returns active categories only. Admin endpoints require an `ADMIN` bearer token:
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/admin/categories` | Create an active category |
+| `GET` | `/api/v1/admin/categories?page=0&size=50` | Paginated list of active and inactive categories |
+| `GET` | `/api/v1/admin/categories/{id}` | Retrieve a category by ID |
+| `PUT` | `/api/v1/admin/categories/{id}` | Replace metadata and set `ACTIVE` or `INACTIVE` status |
+| `PATCH` | `/api/v1/admin/categories/{id}/deactivate` | Deactivate without deleting the row |
+| `GET` | `/api/v1/categories?page=0&size=50` | Paginated list of active categories for discovery |
+
+List endpoints default to 50 records per page and accept sizes from 1 to 100. Slugs are trimmed, lowercased, and whitespace is converted to single hyphens before uniqueness checks. Names are limited to 150 characters, slugs to 160, and descriptions to 2,000. Duplicate slugs return `409 Conflict`; invalid input returns `400 Bad Request`; missing IDs return `404 Not Found`. Inactive categories remain available to admin reads and are excluded from public discovery.
+
+Category deactivation only changes the category status; it does not delete or alter products. Product/category assignment is not implemented yet. When product selection is added, it must reject inactive categories for new assignments while retaining historical references.
