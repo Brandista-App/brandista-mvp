@@ -5,3 +5,5 @@ brandista:
       issuer: brandista-test
       audience: brandista-test-api
       access-token-ttl: PT15M
+    cors:
+      allowed-origins: https://client.brandista.test

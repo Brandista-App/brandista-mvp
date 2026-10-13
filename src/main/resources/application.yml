@@ -23,6 +23,8 @@ brandista:
       issuer: ${JWT_ISSUER:brandista}
       audience: ${JWT_AUDIENCE:brandista-api}
       access-token-ttl: ${JWT_ACCESS_TOKEN_TTL:PT15M}
+    cors:
+      allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 
 management:
   endpoints:

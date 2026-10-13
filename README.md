@@ -155,3 +155,5 @@ The successful response contains an `accessToken`, `tokenType` (`Bearer`), `expi
 Tokens are signed with HS256 using `JWT_SECRET_BASE64`; validation fixes the allowed algorithm and checks signature, issuer, audience, and expiration. The default access-token lifetime is 15 minutes, configurable with `JWT_ACCESS_TOKEN_TTL` (maximum one hour). A stateless access token can remain usable until it expires, including after a client deletes it at logout. There is no token revocation or refresh-token system yet, so logout currently means discarding the token client-side. Account status changes also do not invalidate a token that was already issued. Consider key rotation, rate limiting for registration and login, and an explicit revocation strategy before production use.
 
 The repository has no SRS authentication decision or web/mobile client guidance. This endpoint therefore follows the existing email-first account proposal; confirm the identifier policy against the SRS before treating it as final.
+
+See [SECURITY.md](SECURITY.md) for the route access policy, CORS configuration, CSRF decision, and remaining security gaps.
