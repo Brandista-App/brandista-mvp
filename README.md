@@ -7,7 +7,7 @@ Brandista is a multi-brand e-commerce platform initially targeting Pakistani bra
 - Java 21
 - Spring Boot 3.5
 - Maven with Maven Wrapper
-- Spring Web, Spring Boot Actuator, Spring Data JPA, and Flyway
+- Spring Web, Spring Boot Actuator, Spring Data JPA, Flyway, Bean Validation, and Spring Security BCrypt password hashing
 - MySQL 8.4 for local development
 - JUnit 5 and Spring Boot Starter Test
 
@@ -50,7 +50,7 @@ Build and start MySQL and the backend from the repository root:
 docker compose up --build
 ```
 
-Compose waits for MySQL's health check before starting the backend. Flyway runs versioned SQL migrations from `src/main/resources/db/migration` at application startup. The directory is intentionally empty until the first approved schema is ready; no marketplace tables are introduced by this task. Add new migrations with names such as `V1__create_approved_table.sql`, and add a new versioned migration for every later schema change. Never change the meaning of a migration after it has been applied. Hibernate uses `ddl-auto=validate`, so it checks mapped entities against the database without creating or updating tables. The backend is available at <http://localhost:8080>, and its health endpoint is <http://localhost:8080/actuator/health>. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using the service name `mysql`.
+Compose waits for MySQL's health check before starting the backend. Flyway runs versioned SQL migrations from `src/main/resources/db/migration` at application startup. The initial `V1` migration creates the User table; add a new versioned migration for every later schema change and never change the meaning of an applied migration. Hibernate uses `ddl-auto=validate`, so it checks mapped entities against the database without creating or updating tables. The backend is available at <http://localhost:8080>, and its health endpoint is <http://localhost:8080/actuator/health>. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using the service name `mysql`.
 
 Useful commands:
 
@@ -107,8 +107,27 @@ Stop the running application with `Ctrl+C` in the terminal where it is running.
 - If port `8080` is already in use, stop the other process using it and retry.
 - Run commands from the repository root so the wrapper can find `pom.xml`.
 
-Flyway manages database schema changes. The initial `User` persistence model is defined in a versioned migration. Registration, login, JWT authentication, user-management endpoints, and marketplace entities have not been implemented yet.
+Flyway manages database schema changes. The initial `User` persistence model and customer registration endpoint are implemented. Login, JWT authentication, user-management endpoints, and marketplace entities have not been implemented yet.
 
 ## User account policy (proposal)
 
 No SRS or account-policy document is present in this repository, so whether phone login is required remains unresolved. The initial persistence model proposes email-first accounts with a normalized, unique email address. Phone login and phone verification are not part of this model; revisit this proposal when the SRS decision is available.
+
+## Customer registration API
+
+The current email-first endpoint uses the proposed identifier from the account policy above; confirm it against the SRS when that decision is available. No phone or email verification integration is included.
+
+`POST /api/v1/registrations` accepts an email and password. The server trims and lowercases email addresses before validation, checking uniqueness, and persistence. Public requests do not accept a role; every new account is created with the `CUSTOMER` role and `ENABLED` status.
+
+Passwords must contain at least 12 Unicode characters and at most 72 UTF-8 bytes (the BCrypt input limit). They are hashed with Spring Security's BCrypt encoder before persistence. Passwords and hashes are never included in the registration response or application request logs.
+
+Successful registration returns `201 Created` with only the new account ID, normalized email, and creation timestamp. Invalid input returns `400 Bad Request`; a duplicate email returns `409 Conflict` with a generic message that does not include the submitted email or password.
+
+Test the endpoint while the local Compose services are running:
+
+```powershell
+$body = @{ email = "customer@example.com"; password = "replace-with-a-long-local-test-password" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://localhost:8080/api/v1/registrations -ContentType "application/json" -Body $body
+```
+
+Registration does not yet have rate limiting. Add and verify rate limiting before exposing this endpoint in a pre-production or production environment.
