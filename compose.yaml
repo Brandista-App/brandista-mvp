@@ -1,0 +1,46 @@
+services:
+  mysql:
+    image: mysql:8.4.11-oraclelinux9
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:?Copy .env.example to .env and set MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER:?Copy .env.example to .env and set MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Copy .env.example to .env and set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Copy .env.example to .env and set MYSQL_ROOT_PASSWORD}
+    ports:
+      - "127.0.0.1:${MYSQL_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - brandista
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --protocol=TCP --host=127.0.0.1 --user=root --password=\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: ${SERVER_PORT:-8080}
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8080}:${SERVER_PORT:-8080}"
+    networks:
+      - brandista
+
+volumes:
+  mysql_data:
+
+networks:
+  brandista:
+    driver: bridge
