@@ -7,7 +7,7 @@ Brandista is a multi-brand e-commerce platform initially targeting Pakistani bra
 - Java 21
 - Spring Boot 3.5
 - Maven with Maven Wrapper
-- Spring Web, Spring Boot Actuator, and Spring JDBC
+- Spring Web, Spring Boot Actuator, Spring Data JPA, and Flyway
 - MySQL 8.4 for local development
 - JUnit 5 and Spring Boot Starter Test
 
@@ -42,7 +42,7 @@ On macOS or Linux:
 cp .env.example .env
 ```
 
-Edit `.env` and replace both placeholder passwords with local development values. The `.env` file is ignored by Git. Do not use production credentials here.
+Edit `.env` and replace both placeholder passwords with local development values. The `.env` file is ignored by Git. Do not use production credentials here. Spring datasource settings are passed as environment variables; Compose points the backend at the MySQL service hostname `mysql`.
 
 Build and start MySQL and the backend from the repository root:
 
@@ -50,7 +50,7 @@ Build and start MySQL and the backend from the repository root:
 docker compose up --build
 ```
 
-Compose waits for MySQL's health check before starting the backend. The backend is available at <http://localhost:8080>, and its health endpoint is <http://localhost:8080/actuator/health>. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using the service name `mysql`.
+Compose waits for MySQL's health check before starting the backend. Flyway runs versioned SQL migrations from `src/main/resources/db/migration` at application startup. The directory is intentionally empty until the first approved schema is ready; no marketplace tables are introduced by this task. Add new migrations with names such as `V1__create_approved_table.sql`, and add a new versioned migration for every later schema change. Never change the meaning of a migration after it has been applied. Hibernate uses `ddl-auto=validate`, so it checks mapped entities against the database without creating or updating tables. The backend is available at <http://localhost:8080>, and its health endpoint is <http://localhost:8080/actuator/health>. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using the service name `mysql`.
 
 Useful commands:
 
@@ -82,7 +82,7 @@ On macOS or Linux:
 
 ## Start the application
 
-This direct run is useful when a MySQL server is already available at the configured URL. For a ready-to-use local database, use Docker Compose above.
+This direct run is useful when a MySQL server is already available. Set `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and `SPRING_DATASOURCE_PASSWORD` in the process environment first. For a ready-to-use local database, use Docker Compose above.
 
 On Windows:
 
@@ -96,7 +96,7 @@ On macOS or Linux:
 ./mvnw spring-boot:run
 ```
 
-The application listens on port `8080` by default. Its database URL, username, password, and port can be provided with `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and `SERVER_PORT`. Check health at <http://localhost:8080/actuator/health>; when MySQL is configured and reachable, a healthy response contains `"status":"UP"`.
+The application listens on port `8080` by default. Its database URL, username, password, and port are provided with `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and `SERVER_PORT`. Check health at <http://localhost:8080/actuator/health>; when MySQL is configured and reachable, a healthy response contains `"status":"UP"`.
 
 Stop the running application with `Ctrl+C` in the terminal where it is running.
 
@@ -107,4 +107,4 @@ Stop the running application with `Ctrl+C` in the terminal where it is running.
 - If port `8080` is already in use, stop the other process using it and retry.
 - Run commands from the repository root so the wrapper can find `pom.xml`.
 
-Docker Compose provides the local MySQL service and JDBC connectivity only. Database entities, migrations, authentication, and shopping features have not been implemented yet.
+Flyway manages database schema changes. This task adds no marketplace entities or production schema migrations. Authentication and shopping features have not been implemented yet.
