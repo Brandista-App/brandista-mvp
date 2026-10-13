@@ -6,6 +6,11 @@ import com.brandista.brandista.brand.service.BrandNotFoundException;
 import com.brandista.brandista.brand.service.DuplicateBrandSlugException;
 import com.brandista.brandista.category.service.CategoryNotFoundException;
 import com.brandista.brandista.category.service.DuplicateCategorySlugException;
+import com.brandista.brandista.product.service.DeactivatedProductException;
+import com.brandista.brandista.product.service.DuplicateProductSlugException;
+import com.brandista.brandista.product.service.InactiveProductReferenceException;
+import com.brandista.brandista.product.service.ProductNotFoundException;
+import com.brandista.brandista.product.service.ProductReferenceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +49,28 @@ public class ApiExceptionHandler {
     @ExceptionHandler(DuplicateCategorySlugException.class)
     public ResponseEntity<ApiErrorResponse> handleDuplicateCategorySlug(
             DuplicateCategorySlugException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleProductNotFound(
+            ProductNotFoundException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(ProductReferenceNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleProductReferenceNotFound(
+            ProductReferenceNotFoundException exception,
+            HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler({DuplicateProductSlugException.class, InactiveProductReferenceException.class,
+            DeactivatedProductException.class})
+    public ResponseEntity<ApiErrorResponse> handleProductConflict(
+            RuntimeException exception,
             HttpServletRequest request) {
         return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
     }

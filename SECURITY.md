@@ -13,6 +13,8 @@ Only these current routes are public:
 | `POST /api/v1/auth/login` | Public; issues a short-lived access token after successful authentication |
 | `GET /api/v1/brands` | Public; returns active brands only |
 | `GET /api/v1/categories` | Public; returns active categories only (paginated) |
+| `GET /api/v1/products` | Public; returns published products with active brand/category references (paginated) |
+| `GET /api/v1/products/{slug}` | Public; returns one eligible published product |
 
 Everything else requires a valid bearer token by default. Future public catalogue reads must be added as explicit, narrowly scoped route rules and must expose only published/active data.
 
@@ -38,6 +40,6 @@ CORS is restricted to origins configured in `CORS_ALLOWED_ORIGINS` as a comma-se
 
 - The SRS authentication identifier decision is unavailable; email-first remains a proposal.
 - Registration and login rate limiting is not implemented.
-- Brand and category administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Product, order, and customer-private-resource endpoints are not implemented yet; ownership checks must be added with customer-specific resources.
+- Brand, category, and product administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Order and customer-private-resource endpoints are not implemented yet; ownership checks must be added with customer-specific resources.
 - No production deployment profile, secret rotation workflow, refresh-token system, or immediate token revocation exists.
 - Apply security review and operational monitoring before deployment; this baseline does not certify the application as production-ready.
