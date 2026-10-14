@@ -82,6 +82,20 @@ If startup fails, check `docker compose ps` and `docker compose logs --tail 150 
 
 The liveness and readiness probes are enabled outside Kubernetes for local diagnostics. Each endpoint is public but only exposes the overall status. Check readiness before using customer-facing API routes. The Compose MySQL health check gates backend startup on the MySQL server, while readiness verifies the backend's application database connection.
 
+## Isolated F0.8 local staging rehearsal
+
+This is a local Compose rehearsal, not a remote staging deployment. Copy `.env.staging.example` to the ignored `.env.staging`, replace all placeholders with unique local-only credentials and a generated JWT key, and keep this project isolated from any existing/shared DB:
+
+```powershell
+Copy-Item .env.staging.example .env.staging
+docker compose --project-name brandista-f0-8-local --env-file .env.staging config --quiet
+docker compose --project-name brandista-f0-8-local --env-file .env.staging up --build -d
+docker compose --project-name brandista-f0-8-local --env-file .env.staging ps
+Invoke-RestMethod http://127.0.0.1:8082/actuator/health/readiness
+```
+
+The project name gives the local DB a separate Compose volume; normal `down` preserves its data. Do not use the local TLS-disabled MySQL URL against a remote DB. Frontend build/preview steps, remote deployment prerequisites and pilot operations are documented in the sibling `brandista-mobile/docs/deployment` folder. No public staging host is configured.
+
 ## Run tests
 
 From the repository root, run on Windows:
