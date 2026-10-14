@@ -7,3 +7,16 @@ brandista:
       access-token-ttl: PT15M
     cors:
       allowed-origins: https://client.brandista.test
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db

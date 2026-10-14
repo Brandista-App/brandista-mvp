@@ -9,6 +9,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(
@@ -41,6 +43,18 @@ class BrandistaApplicationTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains("\"status\":\"UP\"");
+    }
+
+    @Test
+    void livenessAndDatabaseReadinessProbesArePublicAndHideDetails() {
+        for (String probe : List.of("liveness", "readiness")) {
+            ResponseEntity<String> response = restTemplate.getForEntity(
+                    "http://localhost:" + port + "/actuator/health/" + probe, String.class);
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).contains("\"status\":\"UP\"");
+            assertThat(response.getBody()).doesNotContain("components", "details");
+        }
     }
 
     @Test
