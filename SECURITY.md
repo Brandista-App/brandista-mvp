@@ -40,6 +40,6 @@ CORS is restricted to origins configured in `CORS_ALLOWED_ORIGINS` as a comma-se
 
 - The SRS authentication identifier decision is unavailable; email-first remains a proposal.
 - Registration and login rate limiting is not implemented.
-- Brand, category, and product administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Customer address routes are implemented with owner-scoped repository queries; cart, order, and other customer-private resources remain unimplemented.
+- Brand, category, and product administration endpoints are protected by the `/api/v1/admin/**` ADMIN rule. Customer address and cart routes derive identity from the validated JWT subject and use owner-scoped persistence queries; missing and foreign-owned cart item IDs share a `404` response. Orders remain unimplemented.
 - No production deployment profile, secret rotation workflow, refresh-token system, or immediate token revocation exists.
 - Apply security review and operational monitoring before deployment; this baseline does not certify the application as production-ready.

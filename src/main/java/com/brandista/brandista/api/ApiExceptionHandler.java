@@ -12,6 +12,9 @@ import com.brandista.brandista.product.service.InactiveProductReferenceException
 import com.brandista.brandista.product.service.ProductNotFoundException;
 import com.brandista.brandista.product.service.ProductReferenceNotFoundException;
 import com.brandista.brandista.address.service.AddressNotFoundException;
+import com.brandista.brandista.cart.service.CartNotFoundException;
+import com.brandista.brandista.cart.service.CartProductUnavailableException;
+import com.brandista.brandista.cart.service.CartQuantityException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,24 @@ import java.util.List;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(CartNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleCartNotFound(
+            CartNotFoundException exception, HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(CartProductUnavailableException.class)
+    public ResponseEntity<ApiErrorResponse> handleCartProductUnavailable(
+            CartProductUnavailableException exception, HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(CartQuantityException.class)
+    public ResponseEntity<ApiErrorResponse> handleCartQuantity(
+            CartQuantityException exception, HttpServletRequest request) {
+        return response(HttpStatus.BAD_REQUEST, exception.getMessage(), request, List.of());
+    }
 
     @ExceptionHandler(AddressNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleAddressNotFound(
