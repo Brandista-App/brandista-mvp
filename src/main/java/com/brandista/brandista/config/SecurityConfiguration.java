@@ -106,6 +106,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/brand-applications").permitAll()
+                        .requestMatchers("/api/v1/admin/brand-applications/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/brands").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products", "/api/v1/products/*").permitAll()
