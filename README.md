@@ -1,6 +1,6 @@
 # Brandista
 
-Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains the Java backend foundation, account registration and authentication, authorization baseline, and brand, category, and initial product management. Cart and commerce features remain future work.
+Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains customer registration and authentication, role-based authorization, brand/category/product management and discovery, customer addresses, and persistent carts. Checkout, order placement, payment, and inventory management remain unimplemented.
 
 ## Technology stack
 
@@ -58,7 +58,7 @@ Build and start MySQL and the backend from the repository root:
 docker compose up --build
 ```
 
-Compose waits for MySQL's health check before starting the backend. Flyway runs versioned SQL migrations from `src/main/resources/db/migration` at application startup. The initial `V1` migration creates the User table; add a new versioned migration for every later schema change and never change the meaning of an applied migration. Hibernate uses `ddl-auto=validate`, so it checks mapped entities against the database without creating or updating tables. The backend is available at <http://localhost:8080>, and its health endpoint is <http://localhost:8080/actuator/health>. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using the service name `mysql`.
+Compose waits for MySQL's server health check before starting the backend. This check only confirms that MySQL accepts a root ping; it does not validate the application user's credentials. Flyway applies versioned SQL migrations V1–V7 from `src/main/resources/db/migration` at application startup. Add a new versioned migration for each schema change and never change the meaning of an applied migration. Hibernate uses `ddl-auto=validate`, so it checks mapped entities without creating or updating tables. The backend is available at <http://localhost:8080>; its health endpoints are described below. The MySQL port is published only on the local machine at `127.0.0.1:3307`. The backend connects to MySQL over the Compose network using `mysql:3306`.
 
 Useful commands:
 
@@ -72,7 +72,15 @@ Use `docker compose up --build` again after rebuilding to start the updated serv
 
 `docker compose down -v` removes that volume and permanently deletes the local database data. Do not use it unless you intend to reset the database. MySQL applies the initial database name and passwords only when creating an empty data directory; changing `.env` later does not change credentials stored in an existing volume.
 
-If startup fails, check `docker compose ps` and `docker compose logs mysql backend`. A port conflict can be resolved by changing `BACKEND_PORT` or `MYSQL_PORT` in `.env`. If the backend health response is `DOWN`, confirm that MySQL is healthy and that the database credentials in `.env` match the existing database volume.
+If startup fails, check `docker compose ps` and `docker compose logs --tail 150 mysql backend`; redact credentials and tokens before sharing logs. A port conflict can be resolved by changing `BACKEND_PORT` or `MYSQL_PORT` in `.env`. If MySQL is healthy but backend readiness is down, confirm that `MYSQL_DATABASE`, `MYSQL_USER`, and `MYSQL_PASSWORD` match the account initialized in the existing volume. Changing `.env` does not change credentials in an existing volume. Do not use `docker compose down -v` as a credential repair; it deletes local database data.
+
+## Health endpoints
+
+- `GET /actuator/health` reports aggregate application health with details disabled.
+- `GET /actuator/health/liveness` reports application liveness and does not depend on MySQL.
+- `GET /actuator/health/readiness` reports readiness and includes the database connection check. A database authentication/connectivity failure makes readiness unavailable while liveness can remain up.
+
+The liveness and readiness probes are enabled outside Kubernetes for local diagnostics. Each endpoint is public but only exposes the overall status. Check readiness before using customer-facing API routes. The Compose MySQL health check gates backend startup on the MySQL server, while readiness verifies the backend's application database connection.
 
 ## Run tests
 
@@ -115,7 +123,7 @@ Stop the running application with `Ctrl+C` in the terminal where it is running.
 - If port `8080` is already in use, stop the other process using it and retry.
 - Run commands from the repository root so the wrapper can find `pom.xml`.
 
-Flyway manages database schema changes. The initial `User` persistence model, customer registration, and email/password login are implemented. Marketplace entities and user-management endpoints have not been implemented yet.
+Flyway currently manages seven schema versions for users, brands, categories, products, customer addresses, and carts. The API contract and known gaps are summarized in `B0.14-api-contract.md` and `B0.14-backend-audit.md`.
 
 ## User account policy (proposal)
 
@@ -264,7 +272,7 @@ Example response:
 
 `GET /api/v1/products/{slug}` returns the same public product shape and returns `404 Not Found` for missing, unpublished, or ineligible products. Search uses database substring matching; its leading wildcard prevents ordinary B-tree indexes from accelerating keyword matches. The implementation keeps filtering and paging in SQL and adds indexes for publication/price and publication/brand/category query paths. It is intended for MVP catalogue scale; full-text search infrastructure is not included.
 
-The availability flag is not live inventory and does not reserve or decrement stock. Cart, checkout, purchase rejection, inventory reservation, and order-history snapshots are not implemented by this task.
+The availability flag is not live inventory and does not reserve or decrement stock. Checkout, purchase rejection, inventory reservation, and order-history snapshots are not implemented.
 
 ## Customer address management
 
