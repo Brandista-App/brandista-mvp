@@ -15,6 +15,10 @@ import com.brandista.brandista.address.service.AddressNotFoundException;
 import com.brandista.brandista.cart.service.CartNotFoundException;
 import com.brandista.brandista.cart.service.CartProductUnavailableException;
 import com.brandista.brandista.cart.service.CartQuantityException;
+import com.brandista.brandista.brandapplication.service.BrandApplicationNotFoundException;
+import com.brandista.brandista.brandapplication.service.DuplicateOpenBrandApplicationException;
+import com.brandista.brandista.brandapplication.service.BrandApplicationReviewConflictException;
+import com.brandista.brandista.brandapplication.service.BrandApplicationApprovalException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -60,6 +64,30 @@ public class ApiExceptionHandler {
             BrandNotFoundException exception,
             HttpServletRequest request) {
         return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(BrandApplicationNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleBrandApplicationNotFound(
+            BrandApplicationNotFoundException exception, HttpServletRequest request) {
+        return response(HttpStatus.NOT_FOUND, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(DuplicateOpenBrandApplicationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateBrandApplication(
+            DuplicateOpenBrandApplicationException exception, HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(BrandApplicationReviewConflictException.class)
+    public ResponseEntity<ApiErrorResponse> handleBrandApplicationReviewConflict(
+            BrandApplicationReviewConflictException exception, HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
+    }
+
+    @ExceptionHandler(BrandApplicationApprovalException.class)
+    public ResponseEntity<ApiErrorResponse> handleBrandApplicationApproval(
+            BrandApplicationApprovalException exception, HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT, exception.getMessage(), request, List.of());
     }
 
     @ExceptionHandler(DuplicateBrandSlugException.class)
