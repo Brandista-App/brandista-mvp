@@ -1,0 +1,163 @@
+{
+  "audit": "Brandista A0.1",
+  "date": "2026-10-16",
+  "timezone": "Asia/Karachi",
+  "backendBaseline": "c6c0420186b9ce531c5fb8abed0f493b2ef3127e",
+  "frontendBaseline": "b90cee91a0e113ed038eb9a734047a1d4edc0148",
+  "baselineRun": {
+    "log": "target/a01-audit-tests.log",
+    "result": "BUILD SUCCESS",
+    "skipped": 0,
+    "command": "mvnw.cmd -o test",
+    "tests": 80,
+    "failures": 0,
+    "errors": 0
+  },
+  "additionalRun": {
+    "log": "target/a01-admin-workflow-tests.log",
+    "result": "BUILD SUCCESS",
+    "skipped": 0,
+    "command": "mvnw.cmd -o -Dtest=AdminWorkflowIntegrationTests test",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0
+  },
+  "environment": "Java 21, Spring random-port HTTP tests, isolated H2 in MySQL compatibility mode; no administration browser test",
+  "suites": [
+    {
+      "suite": "com.brandista.brandista.address.AddressManagementIntegrationTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.admin.AdminWorkflowIntegrationTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.auth.LoginIntegrationTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.brand.BrandManagementIntegrationTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.brandapplication.BrandApplicationIntegrationTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.BrandistaApplicationTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.cart.CartIntegrationTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.category.CategoryManagementIntegrationTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.config.JwtConfigurationTests",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.order.CheckoutIntegrationTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.product.ProductDiscoveryIntegrationTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.product.ProductManagementIntegrationTests",
+      "tests": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.registration.RegistrationIntegrationTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.security.AuthorizationIntegrationTests",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    {
+      "suite": "com.brandista.brandista.user.UserRepositoryIntegrationTests",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  ],
+  "mysqlReadOnly": {
+    "invitationOrMembershipNamedTables": 0,
+    "allMigrationsSuccessful": true,
+    "brands": 4,
+    "userRoleCounts": [
+      {
+        "role": "CUSTOMER",
+        "status": "ENABLED",
+        "count": 8
+      }
+    ],
+    "products": 7,
+    "adminAccounts": 0,
+    "migrationVersions": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "recordsModified": 0
+  },
+  "adminRepository": "Local checkout contains only .git, no tracked files, no commits",
+  "docsRepository": "Local checkout contains only .git, no tracked files",
+  "productionImplementation": "Not started: owner requested permission definition before implementation",
+  "deploymentPerformed": false
+}
