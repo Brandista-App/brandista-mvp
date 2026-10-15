@@ -62,6 +62,19 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "stock_quantity", nullable = false)
+    private int stockQuantity;
+
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int value) {
+        if (value < 0) throw new IllegalArgumentException("Stock cannot be negative");
+        stockQuantity = value;
+    }
+    public void consumeStock(int quantity) {
+        if (quantity < 1 || quantity > stockQuantity) throw new IllegalStateException("Insufficient stock");
+        stockQuantity -= quantity;
+    }
+
     @Enumerated(EnumType.STRING)
     @Column(name = "availability", nullable = false, length = 16)
     private ProductAvailability availability;

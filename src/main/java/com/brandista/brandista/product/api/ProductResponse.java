@@ -20,5 +20,6 @@ public record ProductResponse(
         ProductAvailability availability,
         ProductPublicationStatus publicationStatus,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt,
+        int stockQuantity) {
 }

@@ -1,0 +1,49 @@
+{
+  "browser": "Microsoft Edge (Playwright, isolated headless context)",
+  "database": "MySQL via real Spring HTTP API",
+  "checks": {
+    "registrationAndLogin": "PASS",
+    "addressCreateEditAndDefault": "PASS",
+    "multiBrandCartAndServerReview": "PASS",
+    "codPlacementAndConfirmation": "PASS (PLACED / UNPAID; no payment)",
+    "cartClearedAfterSuccess": "PASS",
+    "addressDeletionKeepsOrderSnapshotAndHistory": "PASS",
+    "logoutLoginRestoresOrder": "PASS",
+    "javascriptExceptions": "PASS (none)",
+    "failedApiRequests": "PASS (none)"
+  },
+  "responsive": [
+    {
+      "width": 1366,
+      "height": 768,
+      "scrollWidth": 1366,
+      "overflow": false
+    },
+    {
+      "width": 360,
+      "height": 800,
+      "scrollWidth": 360,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "scrollWidth": 390,
+      "overflow": false
+    },
+    {
+      "width": 768,
+      "height": 1024,
+      "scrollWidth": 768,
+      "overflow": false
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "scrollWidth": 1920,
+      "overflow": false
+    }
+  ],
+  "orderId": 4,
+  "status": "PASS"
+}

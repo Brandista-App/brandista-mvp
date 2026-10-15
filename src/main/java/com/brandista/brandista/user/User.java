@@ -41,6 +41,12 @@ public class User {
     @Column(name = "status", nullable = false, length = 16)
     private AccountStatus status;
 
+    @Column(name = "default_address_id")
+    private Long defaultAddressId;
+
+    public Long getDefaultAddressId() { return defaultAddressId; }
+    public void setDefaultAddressId(Long id) { defaultAddressId = id; }
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

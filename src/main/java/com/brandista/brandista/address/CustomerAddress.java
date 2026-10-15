@@ -54,6 +54,12 @@ public class CustomerAddress {
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 
+    @Column(name = "delivery_instructions", length = 500)
+    private String deliveryInstructions;
+
+    public String getDeliveryInstructions() { return deliveryInstructions; }
+    public void setDeliveryInstructions(String value) { deliveryInstructions = trimOptional(value); }
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -1,0 +1,31 @@
+{
+  "database": "MySQL brandista_m01",
+  "checks": {
+    "addressCrudDefaultAndOwnership": "PASS",
+    "multiBrandServerTotalsUnpaidAndIdempotency": "PASS",
+    "orderOwnershipAndRoleGuards": "PASS",
+    "addressSnapshotSurvivesEditAndDeletion": "PASS",
+    "concurrentLastUnit": "PASS (201/409, stock 0)",
+    "concurrentSameKey": "PASS (201/200, one order and one decrement)",
+    "changedPriceUnavailableRollbackAndProductSnapshots": "PASS",
+    "disabledAccount": "PASS"
+  },
+  "orderIds": [
+    1,
+    2,
+    3
+  ],
+  "status": "PASS",
+  "customerIds": [
+    5,
+    6
+  ],
+  "persistence": [
+    "order\t1\t5\tPLACED\tCOD\tUNPAID\tPKR\t6250.40",
+    "order\t2\t5\tPLACED\tCOD\tUNPAID\tPKR\t99.95",
+    "order\t3\t5\tPLACED\tCOD\tUNPAID\tPKR\t2499.95",
+    "items\t1\t2\t6250.40",
+    "items\t2\t1\t99.95",
+    "items\t3\t1\t2499.95"
+  ]
+}
