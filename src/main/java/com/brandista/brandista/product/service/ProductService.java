@@ -212,12 +212,12 @@ public class ProductService {
         return new ProductResponse(product.getId(), product.getName(), product.getSlug(), product.getDescription(),
                 product.getBrand().getId(), product.getBrand().getName(), product.getCategory().getId(),
                 product.getCategory().getName(), product.getPrice(), "PKR", product.getAvailability(),
-                product.getPublicationStatus(), product.getCreatedAt(), product.getUpdatedAt());
+                product.getPublicationStatus(), product.getCreatedAt(), product.getUpdatedAt(), product.getStockQuantity());
     }
 
     private static PublicProductResponse toPublicResponse(Product product) {
         return new PublicProductResponse(product.getId(), product.getName(), product.getSlug(), product.getDescription(),
                 product.getBrand().getId(), product.getBrand().getName(), product.getCategory().getId(),
-                product.getCategory().getName(), product.getPrice(), "PKR", product.getAvailability());
+                product.getCategory().getName(), product.getPrice(), "PKR", product.getAvailability(), product.getStockQuantity());
     }
 }

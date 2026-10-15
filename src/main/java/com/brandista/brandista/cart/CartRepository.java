@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
+    Optional<Cart> findByCustomer_Id(Long customerId);
+
     @EntityGraph(attributePaths = {"items", "items.product", "items.product.brand", "items.product.category"})
     @Query("select distinct cart from Cart cart where cart.customer.id = :customerId")
     Optional<Cart> findAggregateByCustomerId(@Param("customerId") Long customerId);

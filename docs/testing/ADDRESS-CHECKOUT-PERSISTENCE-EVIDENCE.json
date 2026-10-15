@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "check": "Both API-created and browser-created orders, snapshots and inventory survive MySQL and backend restart",
+  "orderIds": [
+    1,
+    4
+  ],
+  "mysqlRows": [
+    "order\t1\t5\tPLACED\tCOD\tUNPAID\t6250.40\tLahore",
+    "order\t4\t8\tPLACED\tCOD\tUNPAID\t6250.40\tHyderabad",
+    "item\t1\t5\t3\t2\t2499.95\t4999.90",
+    "item\t1\t6\t4\t1\t1250.50\t1250.50",
+    "item\t4\t1\t1\t2\t2499.95\t4999.90",
+    "item\t4\t3\t2\t1\t1250.50\t1250.50",
+    "inventory\t1\t18",
+    "inventory\t3\t19",
+    "inventory\t5\t7",
+    "inventory\t6\t9"
+  ]
+}

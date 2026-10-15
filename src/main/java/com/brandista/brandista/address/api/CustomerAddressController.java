@@ -64,4 +64,9 @@ public class CustomerAddressController {
     public void delete(@AuthenticationPrincipal Jwt principal, @PathVariable Long addressId) {
         addressService.delete(principal.getSubject(), addressId);
     }
+
+    @PutMapping("/{addressId}/default")
+    public AddressResponse setDefault(@AuthenticationPrincipal Jwt principal, @PathVariable Long addressId) {
+        return addressService.setDefault(principal.getSubject(), addressId);
+    }
 }

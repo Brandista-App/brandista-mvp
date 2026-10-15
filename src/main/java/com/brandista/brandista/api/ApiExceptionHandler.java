@@ -34,6 +34,16 @@ import java.util.List;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    @ExceptionHandler(com.brandista.brandista.order.CheckoutFailure.class)
+    public ResponseEntity<ApiErrorResponse> handleCheckout(com.brandista.brandista.order.CheckoutFailure exception,HttpServletRequest request) {
+        return response(exception.status(),exception.getMessage(),request,List.of());
+    }
+
+    @ExceptionHandler(org.springframework.dao.PessimisticLockingFailureException.class)
+    public ResponseEntity<ApiErrorResponse> handleBusyCheckout(org.springframework.dao.PessimisticLockingFailureException exception,HttpServletRequest request) {
+        return response(HttpStatus.CONFLICT,"Checkout is busy. Retry the same submission.",request,List.of());
+    }
+
     @ExceptionHandler(CartNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleCartNotFound(
             CartNotFoundException exception, HttpServletRequest request) {

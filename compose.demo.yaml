@@ -1,0 +1,27 @@
+# Overlay: docker compose -f compose.yaml -f compose.demo.yaml up -d --build
+# Local/private evaluation only. Public release requires owner approval and TLS.
+services:
+  backend:
+    environment:
+      SERVER_PORT: '8080'
+  storefront:
+    build:
+      context: ../brandista-mobile
+      dockerfile: ../brandista-mvp/deploy/frontend.Dockerfile
+      args:
+        VITE_API_BASE_URL: /api/v1
+    ports:
+      - '127.0.0.1:${STOREFRONT_PORT:-8090}:80'
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - brandista
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1/healthz']
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s

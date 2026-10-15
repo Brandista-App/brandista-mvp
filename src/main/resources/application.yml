@@ -17,6 +17,8 @@ server:
   port: ${SERVER_PORT:8080}
 
 brandista:
+  checkout:
+    cod-enabled: ${COD_CHECKOUT_ENABLED:false}
   security:
     jwt:
       secret-base64: ${JWT_SECRET_BASE64:}

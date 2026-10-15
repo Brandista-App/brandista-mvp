@@ -1,0 +1,27 @@
+# Brandista MVP coverage — 15 October 2026
+
+Formal SRS reconciliation: **BLOCKED**. No SRS exists in the four inspected repositories. `brandista-docs` and `brandista-admin` contain only Git metadata. IDs below are provisional audit IDs, not invented SRS identifiers. Scope is grounded in backend source/API contract, frontend source, F0.6/F0.7 reports, F0.9/F1.0 pilot reports, and the sprint brief. No standalone F0.8 report or OpenAPI definition was found.
+
+Classification vocabulary: fully implemented and verified; implemented but not integrated; partially implemented; missing; blocked by an external dependency; out of agreed MVP scope. “Verified” below is limited to the stated H2/local evidence; no MySQL or deployed acceptance is implied. Agreed transactional MVP scope needs owner/SRS review.
+
+| Requirement ID | Feature | Backend status | Frontend status | Integration status | Test evidence | Priority | Remaining work |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| AUD-01 | Registration/login | Implemented | Implemented | Fully implemented and verified locally | 72-test backend suite; actual browser registration/login, isolated H2 | P0 | MySQL validation; public abuse controls |
+| AUD-02 | Logout/protected routes | Stateless bearer; no revocation | In-memory token, logout/401 handling | Partially implemented | Browser logout redirects cart; login restores saved cart | P0 | SRS decision on refresh/revocation; no session restoration after reload |
+| AUD-03 | Customer profile/addresses | Address CRUD; no profile editing | Identity/address read only | Partially implemented | Account empty state browser; backend address ownership tests | P1 | Connect address editing if required; define profile scope |
+| AUD-04 | Brand discovery | Active brands, array response | Brand list/home/filter UI | Fully implemented and verified locally after repair | Real browser brands/home; array regression tests | P0 | MySQL verification |
+| AUD-05 | Brand storefront | Brand list + brand-filtered products | Placeholder replaced with active-brand storefront, pagination/error/empty states | Fully implemented and verified locally | Browser SAMPLE Studio; storefront/missing-brand regression tests | P1 | MySQL; larger catalogue validation |
+| AUD-06 | Categories/search/filter/sort/detail | SQL filtering and paging; published/active only | Real endpoints | Partially implemented verification | Category/detail browser; search/paging/filter tests | P0 | Broader real-browser keyword/sort combinations; MySQL |
+| AUD-07 | Prices/availability/images | PKR decimals, availability flag; no photo/stock count | PKR and CSS illustrations | Partially implemented | Browser price; smoke asserts decimal subtotal | P0 | Approved photo storage/assets; quantity inventory model |
+| AUD-08 | Cart add/update/remove/persistence | Owner-scoped DB cart, server totals | Connected | Fully implemented and verified locally | Browser add/update/remove/re-add; logout/login; file-H2 restart check | P0 | MySQL concurrency/runtime acceptance; checkout price validation absent |
+| AUD-09 | Checkout/address snapshot/order/history | Missing | Disabled checkout; /checkout redirects to cart | Missing | Browser disabled control confirmed; source/schema audit | P0 | Approved checkout/order/fulfilment contract and implementation |
+| AUD-10 | Payments | Missing | Missing | Missing | NOT RUN; no fake success introduced | P0 if transactional demo | Provider, credentials, approved sandbox workflow |
+| AUD-11 | Merchant application/approval | Public intake; ADMIN review creates INACTIVE brand; separate activation | Intake connected; no admin console | Partially implemented | Browser intake success; API approval/activation smoke; backend tests | P1 | Operator UI/tenant merchant model if required; abuse/retention policy |
+| AUD-12 | Product management | ADMIN draft/update/publish/availability/price | No admin console | Implemented but not integrated into operator UI | API create/publish/read smoke; backend tests | P1 | Operator UI if agreed scope; stock counts absent |
+| AUD-13 | Ownership/authorization | Customer subject ownership; ADMIN restriction | Protected customer routes | Partially implemented security | API anonymous cart 401/customer admin 403; ownership tests | P0 | Token revocation/account-change policy, public abuse controls |
+| AUD-14 | Responsive/accessibility | N/A | Existing design preserved | Partially implemented verification | Home/cart five widths; mobile navigation; labelled forms | P1 | Full keyboard/accessibility and all-route/device audit |
+| AUD-15 | Deployment/MySQL | Compose, persistent volume, Flyway V1–V8 | Production build; new same-origin proxy configuration | Blocked by external dependency | Compose syntax PASS; engine unavailable; build PASS | P0 | Docker/MySQL, private host approval/access, TLS, backup restore drill |
+| AUD-16 | Native mobile | No separate native client found | Existing React web storefront | Out of this sprint scope | Repository inspection | P2 | None in this sprint |
+| AUD-17 | PWA | N/A | Not added | NOT RUN / deferred optional scope | No service worker added | P2 | Evaluate only after core release |
+
+Minimum credible demonstration today: clearly labelled local H2 catalogue/auth/cart and synthetic brand intake/admin API demonstration. A complete purchasing MVP is **not ready**. Requirements for orders, inventory, payment and fulfilment cannot be inferred safely from milestone names.

@@ -1,0 +1,24 @@
+database	brandista_m01	8.4.11
+migration	1	1
+migration	2	1
+migration	3	1
+migration	4	1
+migration	5	1
+migration	6	1
+migration	7	1
+migration	8	1
+catalogue	DEMO Lahore Loom	DEMO Linen Shirt	2499.95	AVAILABLE	PUBLISHED
+catalogue	DEMO Lahore Loom	DEMO Cotton Kurta	3499.00	AVAILABLE	PUBLISHED
+catalogue	DEMO Karachi Craft	DEMO Canvas Tote	1250.50	AVAILABLE	PUBLISHED
+catalogue	DEMO Karachi Craft	DEMO Woven Scarf	1799.00	AVAILABLE	PUBLISHED
+customer	1	m01-api-1792010595407@example.test	CUSTOMER	ENABLED	1
+customer	2	m01-other-1792010595407@example.test	CUSTOMER	ENABLED	1
+customer	3	m01-browser-1792010625185@example.test	CUSTOMER	ENABLED	1
+privileged_accounts	0
+cart_row	1	m01-api-1792010595407@example.test	1	demo-m01-linen-shirt	demo-m01-lahore-loom	2	2499.95	4999.90
+cart_row	1	m01-api-1792010595407@example.test	1	demo-m01-canvas-tote	demo-m01-karachi-craft	1	1250.50	1250.50
+cart_row	3	m01-browser-1792010625185@example.test	4	demo-m01-linen-shirt	demo-m01-lahore-loom	2	2499.95	4999.90
+cart_row	3	m01-browser-1792010625185@example.test	4	demo-m01-canvas-tote	demo-m01-karachi-craft	1	1250.50	1250.50
+cart_total	1	2	6250.40
+cart_total	3	2	6250.40
+order_tables	0

@@ -14,11 +14,12 @@ public record AddressPatchRequest(
         @Size(max = 255) String addressLine2,
         @Size(max = 100) @Pattern(regexp = "(?s).*\\S.*", message = "must not be blank") String city,
         @Size(max = 100) String province,
-        @Size(max = 20) String postalCode) {
+        @Size(max = 20) String postalCode,
+        @Size(max = 500) String deliveryInstructions) {
 
     @AssertTrue(message = "at least one address field must be provided")
     public boolean isAtLeastOneFieldProvided() {
         return recipientName != null || phoneNumber != null || addressLine1 != null || addressLine2 != null
-                || city != null || province != null || postalCode != null;
+                || city != null || province != null || postalCode != null || deliveryInstructions != null;
     }
 }

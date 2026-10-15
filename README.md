@@ -1,6 +1,10 @@
 # Brandista
 
-Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains customer registration and authentication, role-based authorization, brand/category/product management and discovery, customer addresses, and persistent carts. Checkout, order placement, payment, and inventory management remain unimplemented.
+Brandista is a multi-brand e-commerce platform initially targeting Pakistani brands. This repository contains customer registration/authentication, role-based catalogue management, customer addresses/defaults, persistent carts, counted inventory and transactional COD orders with immutable snapshots and customer history. Online payment gateways and fulfilment/status changes remain unimplemented.
+
+## Current address and checkout extension
+
+The owner-approved [SRS addendum](docs/requirements/ADDRESS-CHECKOUT-SRS.md), [checkout API contract](docs/api/CHECKOUT-CONTRACT.md), [acceptance evidence](docs/testing/ADDRESS-CHECKOUT-ACCEPTANCE.md) and [manual checkout guide](docs/testing/MANUAL-CHECKOUT-GUIDE.md) supersede the historical checkout/inventory limitations in the milestone notes below. Flyway now applies V1–V9. Existing products start with stock zero until explicitly configured. The local `scripts/start-m01-backend.ps1` enables COD; other environments default to disabled (`COD_CHECKOUT_ENABLED=false`). No money is collected when an order is placed.
 
 ## Technology stack
 

@@ -12,5 +12,7 @@ public record AddressResponse(
         String province,
         String postalCode,
         LocalDateTime createdAt,
-        LocalDateTime updatedAt) {
+        LocalDateTime updatedAt,
+        String deliveryInstructions,
+        boolean isDefault) {
 }

@@ -15,5 +15,6 @@ public record PublicProductResponse(
         String categoryName,
         BigDecimal price,
         String currency,
-        ProductAvailability availability) {
+        ProductAvailability availability,
+        int stockQuantity) {
 }
