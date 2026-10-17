@@ -12,7 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import com.brandista.brandista.privilege.CurrentAccountAuthorities;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,15 +57,9 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtAuthenticationConverter jwtAuthenticationConverter(CurrentAccountAuthorities currentAccountAuthorities) {
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        converter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            String role = jwt.getClaimAsString("role");
-            if ("ADMIN".equals(role) || "CUSTOMER".equals(role)) {
-                return List.of(new SimpleGrantedAuthority("ROLE_" + role));
-            }
-            return List.of();
-        });
+        converter.setJwtGrantedAuthoritiesConverter(currentAccountAuthorities);
         return converter;
     }
 
@@ -96,7 +90,8 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             ApiAuthenticationEntryPoint authenticationEntryPoint,
-            ApiAccessDeniedHandler accessDeniedHandler) throws Exception {
+            ApiAccessDeniedHandler accessDeniedHandler,
+            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
         return http
                 .cors(cors -> {})
                 // CSRF is disabled because this API uses stateless Authorization bearer headers,
@@ -104,23 +99,28 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/brand-applications").permitAll()
-                        .requestMatchers("/api/v1/admin/brand-applications/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/super-admin/**").hasRole("SUPER_ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/v1/brands").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/products", "/api/v1/products/*").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/brands", "/api/v1/admin/brands/**",
+                                "/api/v1/admin/categories", "/api/v1/admin/categories/**",
+                                "/api/v1/admin/products", "/api/v1/admin/products/**",
+                                "/api/v1/admin/brand-applications", "/api/v1/admin/brand-applications/**")
+                            .hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/api/v1/customers/**").hasRole("CUSTOMER")
-                        .anyRequest().authenticated())
+                        .anyRequest().denyAll())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .oauth2ResourceServer(resourceServer -> resourceServer
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler)
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
                 .build();
     }
 }

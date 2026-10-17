@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/brand-applications")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
 public class AdminBrandApplicationController {
     private final BrandApplicationService service;
     public AdminBrandApplicationController(BrandApplicationService service) { this.service = service; }

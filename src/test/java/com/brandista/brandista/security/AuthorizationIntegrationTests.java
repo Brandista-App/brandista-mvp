@@ -67,9 +67,9 @@ class AuthorizationIntegrationTests {
 
     @Test
     void unauthenticatedIsDeniedAndValidCustomerCanReachCustomerRoute() {
-        ResponseEntity<String> anonymous = get("/api/v1/security-test/private", null);
+        ResponseEntity<String> anonymous = get("/api/v1/customers/security-test/private", null);
         String customerToken = tokenFor(UserRole.CUSTOMER);
-        ResponseEntity<String> authenticated = get("/api/v1/security-test/private", customerToken);
+        ResponseEntity<String> authenticated = get("/api/v1/customers/security-test/private", customerToken);
 
         assertThat(anonymous.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(anonymous.getBody()).contains("Authentication is required");
@@ -79,7 +79,7 @@ class AuthorizationIntegrationTests {
 
     @Test
     void invalidBearerTokenReturnsSafeUnauthorizedResponse() {
-        ResponseEntity<String> response = get("/api/v1/security-test/private", "not.a.valid.token");
+        ResponseEntity<String> response = get("/api/v1/customers/security-test/private", "not.a.valid.token");
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(response.getBody()).contains("bearer token is invalid");
@@ -88,9 +88,9 @@ class AuthorizationIntegrationTests {
 
     @Test
     void adminRouteRequiresAdminRole() {
-        ResponseEntity<String> anonymous = get("/api/v1/admin/security-test", null);
-        ResponseEntity<String> customer = get("/api/v1/admin/security-test", tokenFor(UserRole.CUSTOMER));
-        ResponseEntity<String> admin = get("/api/v1/admin/security-test", tokenFor(UserRole.ADMIN));
+        ResponseEntity<String> anonymous = get("/api/v1/admin/brands/security-test", null);
+        ResponseEntity<String> customer = get("/api/v1/admin/brands/security-test", tokenFor(UserRole.CUSTOMER));
+        ResponseEntity<String> admin = get("/api/v1/admin/brands/security-test", tokenFor(UserRole.ADMIN));
 
         assertThat(anonymous.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(customer.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -99,11 +99,11 @@ class AuthorizationIntegrationTests {
     }
 
     @Test
-    void methodAuthorizationCanFurtherRestrictAuthenticatedRoutes() {
+    void methodAuthorizationCanFurtherRestrictPublicUrlMatchers() {
         ResponseEntity<String> customer = get(
-                "/api/v1/security-test/admin-method", tokenFor(UserRole.CUSTOMER));
+                "/api/v1/products/security-method-test", tokenFor(UserRole.CUSTOMER));
         ResponseEntity<String> admin = get(
-                "/api/v1/security-test/admin-method", tokenFor(UserRole.ADMIN));
+                "/api/v1/products/security-method-test", tokenFor(UserRole.ADMIN));
 
         assertThat(customer.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
         assertThat(admin.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -116,7 +116,7 @@ class AuthorizationIntegrationTests {
                 "/api/v1/not-yet-implemented", tokenFor(UserRole.CUSTOMER));
 
         assertThat(anonymous.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(customer.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(customer.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -169,17 +169,17 @@ class AuthorizationIntegrationTests {
 
     @RestController
     static class TestAuthorizationRoutes {
-        @GetMapping("/api/v1/security-test/private")
+        @GetMapping("/api/v1/customers/security-test/private")
         String authenticated() {
             return "authenticated";
         }
 
-        @GetMapping("/api/v1/admin/security-test")
+        @GetMapping("/api/v1/admin/brands/security-test")
         String adminRoute() {
             return "admin";
         }
 
-        @GetMapping("/api/v1/security-test/admin-method")
+        @GetMapping("/api/v1/products/security-method-test")
         @PreAuthorize("hasRole('ADMIN')")
         String adminMethod() {
             return "admin-method";

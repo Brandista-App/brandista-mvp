@@ -59,15 +59,9 @@ class BrandistaApplicationTests {
 
     @Test
     void versionedMigrationRunsOnceAndIsRecorded() {
-        assertThat(flyway.info().applied()).hasSize(9);
-        assertThat(flyway.info().applied()[0].getVersion().getVersion()).isEqualTo("1");
-        assertThat(flyway.info().applied()[1].getVersion().getVersion()).isEqualTo("2");
-        assertThat(flyway.info().applied()[2].getVersion().getVersion()).isEqualTo("3");
-        assertThat(flyway.info().applied()[3].getVersion().getVersion()).isEqualTo("4");
-        assertThat(flyway.info().applied()[4].getVersion().getVersion()).isEqualTo("5");
-        assertThat(flyway.info().applied()[5].getVersion().getVersion()).isEqualTo("6");
-        assertThat(flyway.info().applied()[6].getVersion().getVersion()).isEqualTo("7");
-        assertThat(flyway.info().applied()[7].getVersion().getVersion()).isEqualTo("8");
+        assertThat(java.util.Arrays.stream(flyway.info().applied())
+                .map(migration -> migration.getVersion().getVersion()).toList())
+                .containsExactly("1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
         assertThat(flyway.migrate().migrationsExecuted).isZero();
     }
 }
