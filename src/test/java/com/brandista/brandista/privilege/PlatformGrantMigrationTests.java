@@ -16,7 +16,7 @@ class PlatformGrantMigrationTests {
                     "('customer@example.invalid','test-only-hash','CUSTOMER','ENABLED',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)," +
                     "('admin@example.invalid','test-only-hash','ADMIN','ENABLED',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)");
         }
-        assertThat(Flyway.configure().dataSource(url, "sa", "").load().migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(Flyway.configure().dataSource(url, "sa", "").target("10").load().migrate().migrationsExecuted).isEqualTo(1);
         try (Connection connection = DriverManager.getConnection(url, "sa", ""); Statement sql = connection.createStatement()) {
             try (ResultSet rows = sql.executeQuery("SELECT role,COUNT(*) FROM users GROUP BY role ORDER BY role")) {
                 assertThat(rows.next()).isTrue(); assertThat(rows.getString(1)).isEqualTo("ADMIN"); assertThat(rows.getInt(2)).isEqualTo(1);

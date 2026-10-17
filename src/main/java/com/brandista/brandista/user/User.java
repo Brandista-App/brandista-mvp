@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
+@jakarta.persistence.EntityListeners(com.brandista.brandista.privilege.SecurityMutationListener.class)
 @Table(
         name = "users",
         uniqueConstraints = @UniqueConstraint(name = "uk_users_email", columnNames = "email"))
