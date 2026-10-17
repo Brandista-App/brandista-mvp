@@ -24,6 +24,17 @@ public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpec
 
     Page<Product> findAllByOrderByNameAsc(Pageable pageable);
 
+    @EntityGraph(attributePaths = {"brand", "category"})
+    Page<Product> findAllByBrand_IdOrderByNameAscIdAsc(Long brandId, Pageable pageable);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select p from Product p where p.id=:id and p.brand.id=:brandId")
+    Optional<Product> findForMerchant(@org.springframework.data.repository.query.Param("id") Long id,
+                                     @org.springframework.data.repository.query.Param("brandId") Long brandId);
+
+    @EntityGraph(attributePaths = {"brand", "category"})
+    Optional<Product> findByIdAndBrand_Id(Long id, Long brandId);
+
     Page<Product> findAllByPublicationStatusAndBrand_StatusAndCategory_StatusOrderByNameAsc(
             ProductPublicationStatus publicationStatus, BrandStatus brandStatus, CategoryStatus categoryStatus,
             Pageable pageable);

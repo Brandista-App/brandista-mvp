@@ -66,6 +66,12 @@ public class ProductService {
         return page(productRepository.findAllByOrderByNameAsc(pageRequest(page, size)));
     }
 
+    /** Internal shared query; the merchant facade authorizes the brand before calling. */
+    @Transactional(readOnly = true)
+    public ProductPageResponse listForBrand(long brandId, int page, int size) {
+        return page(productRepository.findAllByBrand_IdOrderByNameAscIdAsc(brandId, pageRequest(page, size)));
+    }
+
     @Transactional(readOnly = true)
     public ProductResponse getById(Long id) {
         return toResponse(findById(id));

@@ -16,7 +16,8 @@ public class SecurityAudit {
         INITIAL_CREATE, INITIAL_GRANT, RECOVER_CREATE, RECOVER_GRANT, RESET_PASSWORD,
         REVOKE, DISABLE, GRANT_CREATED, GRANT_CHANGED, GRANT_REMOVED,
         ACCOUNT_SECURITY_CHANGED, ACCOUNT_ROLE_CHANGED, ACCOUNT_STATUS_CHANGED,
-        ACCOUNT_PASSWORD_CHANGED, ACCOUNT_REMOVED, PRIVILEGED_ACCESS
+        ACCOUNT_PASSWORD_CHANGED, ACCOUNT_REMOVED, PRIVILEGED_ACCESS,
+        BRAND_MEMBERSHIP_GRANTED, BRAND_MEMBERSHIP_REVOKED
     }
     public enum Outcome { SUCCESS, REJECTED, FAILED }
     public enum Reason {
@@ -34,10 +35,20 @@ public class SecurityAudit {
     }
 
     public void append(Operation operation, Long target, Outcome outcome, Reason reason) {
-        jdbc.update("INSERT INTO security_audit_events(actor,operation,target_user_id,occurred_at,outcome,reason) "
-                        + "VALUES (?,?,?,?,?,?)",
-                actor(), operation.name(), target, java.time.LocalDateTime.now(java.time.Clock.systemUTC()),
+        append(operation, target, null, outcome, reason);
+    }
+
+    public void append(Operation operation, Long target, Long brand, Outcome outcome, Reason reason) {
+        jdbc.update("INSERT INTO security_audit_events(actor,operation,target_user_id,target_brand_id,occurred_at,outcome,reason) "
+                        + "VALUES (?,?,?,?,?,?,?)",
+                actor(), operation.name(), target, brand, java.time.LocalDateTime.now(java.time.Clock.systemUTC()),
                 outcome.name(), reason.name());
+    }
+
+    public void rejectedMembership(Operation operation, Long target, Long brand, Reason reason) {
+        var independent = new TransactionTemplate(transactions.getObject());
+        independent.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        independent.executeWithoutResult(status -> append(operation, target, brand, Outcome.REJECTED, reason));
     }
 
     public void rejectedIndependently(Operation operation, Long target, Reason reason) {

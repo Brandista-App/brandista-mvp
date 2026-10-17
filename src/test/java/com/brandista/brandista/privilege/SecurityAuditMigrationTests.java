@@ -16,7 +16,7 @@ class SecurityAuditMigrationTests {
             sql.executeUpdate("INSERT INTO user_platform_grants(user_id,grant_type,created_at,revoked_at) "
                     + "SELECT id,'SUPER_ADMIN',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP FROM users");
         }
-        assertThat(Flyway.configure().dataSource(url, "sa", "").load().migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(Flyway.configure().dataSource(url, "sa", "").target("11").load().migrate().migrationsExecuted).isEqualTo(1);
         try (var connection = DriverManager.getConnection(url, "sa", ""); var sql = connection.createStatement()) {
             try (var rows = sql.executeQuery("SELECT role,password_hash FROM users")) {
                 assertThat(rows.next()).isTrue(); assertThat(rows.getString(1)).isEqualTo("ADMIN");
