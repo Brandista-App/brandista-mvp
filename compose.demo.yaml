@@ -6,7 +6,7 @@ services:
       SERVER_PORT: '8080'
   storefront:
     build:
-      context: ../brandista-mobile
+      context: ../brandista-frontend
       dockerfile: ../brandista-mvp/deploy/frontend.Dockerfile
       args:
         VITE_API_BASE_URL: /api/v1

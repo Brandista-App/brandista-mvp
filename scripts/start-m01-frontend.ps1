@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 Set-Location (Split-Path $PSScriptRoot -Parent)
-$source = Join-Path (Split-Path (Get-Location) -Parent) 'brandista-mobile'
+$source = Join-Path (Split-Path (Get-Location) -Parent) 'brandista-frontend'
 $destination = Join-Path (Get-Location) 'target/m01-frontend'
 New-Item -ItemType Directory -Force "$destination/src" | Out-Null
 Copy-Item "$source/src/*" "$destination/src" -Recurse -Force

@@ -4,7 +4,7 @@ Status: **BLOCKED for deployment**. No approved hosting target, domain, TLS cert
 
 ## Existing MySQL deployment, with storefront overlay
 
-Keep sibling paths `brandista-mvp` and `brandista-mobile`. Backend Dockerfile builds Java 21 and runs as uid 10001. The new frontend Dockerfile installs locked dependencies, builds Vite with `/api/v1`, and serves assets with nginx. Explicit COPY paths avoid importing host node_modules or environment files. `compose.demo.yaml` overlays existing MySQL/backend services; nginx proxies the same-origin API and readiness endpoint, and falls back to index.html for SPA routes. API responses use no-store; no service worker caches private data.
+Keep sibling paths `brandista-mvp` and `brandista-frontend`. Backend Dockerfile builds Java 21 and runs as uid 10001. The new frontend Dockerfile installs locked dependencies, builds Vite with `/api/v1`, and serves assets with nginx. Explicit COPY paths avoid importing host node_modules or environment files. `compose.demo.yaml` overlays existing MySQL/backend services; nginx proxies the same-origin API and readiness endpoint, and falls back to index.html for SPA routes. API responses use no-store; no service worker caches private data.
 
 From backend root, use a private local shell:
 

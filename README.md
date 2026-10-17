@@ -98,7 +98,7 @@ docker compose --project-name brandista-f0-8-local --env-file .env.staging ps
 Invoke-RestMethod http://127.0.0.1:8082/actuator/health/readiness
 ```
 
-The project name gives the local DB a separate Compose volume; normal `down` preserves its data. Do not use the local TLS-disabled MySQL URL against a remote DB. Frontend build/preview steps, remote deployment prerequisites and pilot operations are documented in the sibling `brandista-mobile/docs/deployment` folder. No public staging host is configured.
+The project name gives the local DB a separate Compose volume; normal `down` preserves its data. Do not use the local TLS-disabled MySQL URL against a remote DB. Frontend build/preview steps, remote deployment prerequisites and pilot operations are documented in the sibling `brandista-frontend/docs/deployment` folder. No public staging host is configured.
 
 ## Run tests
 

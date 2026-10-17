@@ -13,12 +13,12 @@ $env:MAVEN_OPTS='-Duser.home=C:\Users\DELL' # host-specific existing cache
 
 This binds only 127.0.0.1:8081, loads main application.yml, applies migrations to `target/launch-demo`, generates a JWT key and seeds SAMPLE Studio/SAMPLE Linen Shirt at PKR 2499.95. It creates customer@demo.brandista.test and admin@demo.brandista.test with the generated password saved only in ignored `target/launch-demo-password.local`. Never display that file on a shared screen or use those accounts outside this isolated demo. Existing users are not password-reset on restart. The launcher is under src/test and excluded from the production jar.
 
-The original frontend has a locked native dependency on this host. The verified copy is backend `target/launch-frontend`, installed using the sibling package-lock.json and copied source/config files. To recreate without touching existing frontend processes:
+The canonical frontend is the sibling `brandista-frontend` repository. The isolated demo copy is backend `target/launch-frontend`, installed using the canonical package-lock.json and copied source/config files. To recreate without touching existing frontend processes:
 
 ```powershell
 New-Item -ItemType Directory -Force target/launch-frontend | Out-Null
-Copy-Item ../brandista-mobile/src target/launch-frontend -Recurse -Force
-Copy-Item ../brandista-mobile/package*.json,../brandista-mobile/index.html,../brandista-mobile/vite.config.ts,../brandista-mobile/tsconfig*.json,../brandista-mobile/eslint.config.js target/launch-frontend -Force
+Copy-Item ../brandista-frontend/src target/launch-frontend -Recurse -Force
+Copy-Item ../brandista-frontend/package*.json,../brandista-frontend/index.html,../brandista-frontend/vite.config.ts,../brandista-frontend/tsconfig*.json,../brandista-frontend/eslint.config.js target/launch-frontend -Force
 Set-Location target/launch-frontend
 npm.cmd ci --ignore-scripts --offline --no-audit --no-fund
 # If cache is unavailable, rerun without --offline with permitted registry access.
@@ -26,7 +26,7 @@ Set-Content .env.local 'VITE_API_BASE_URL=http://127.0.0.1:8081/api/v1'
 npm.cmd run dev -- --host 127.0.0.1 --port 5175 --strictPort
 ```
 
-Use a fresh copy directory if repeating Copy-Item into an existing src directory; the sprint's copy already exists and has current source. The clean-room copy is verification tooling, not an independent product fork. Once the original dependency lock is resolved, normal development remains in brandista-mobile.
+Use a fresh copy directory if repeating Copy-Item into an existing src directory; the sprint's copy already exists and has current source. The clean-room copy is verification tooling, not an independent product fork. Normal web development takes place in `brandista-frontend`; the mobile repository retains its legacy web source.
 
 ## Demonstration sequence
 
