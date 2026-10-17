@@ -102,7 +102,7 @@ class LoginIntegrationTests {
         ResponseEntity<String> authorized = getPrivateRoute(token);
         ResponseEntity<String> rejected = getPrivateRoute(tampered);
 
-        assertThat(authorized.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(authorized.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(rejected.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(rejected.getBody()).contains("bearer token is invalid");
     }
@@ -122,6 +122,6 @@ class LoginIntegrationTests {
     private ResponseEntity<String> getPrivateRoute(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(token);
-        return restTemplate.exchange("/api/v1/private", HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        return restTemplate.exchange("/api/v1/customers/me/addresses", HttpMethod.GET, new HttpEntity<>(headers), String.class);
     }
 }
