@@ -101,6 +101,7 @@ class PrivilegedIdentityIntegrationTests {
 
     @Test
     void revocationRejectsTheSameStillValidTokenAndLeavesCustomerAccessIntact() {
+        grant(user(UserRole.CUSTOMER)); // Another active custodian preserves last-admin protection.
         User customer = user(UserRole.CUSTOMER);
         PlatformGrant grant = grant(customer);
         String token = login(customer);
@@ -115,6 +116,7 @@ class PrivilegedIdentityIntegrationTests {
 
     @Test
     void disabledGranteeCannotUseOldTokenOrLogin() {
+        grant(user(UserRole.CUSTOMER));
         User customer = user(UserRole.CUSTOMER);
         grant(customer);
         String token = login(customer);

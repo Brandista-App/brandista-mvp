@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends com.brandista.brandista.privilege.SecurityEntityRepository<User> {
 
     Optional<User> findByEmail(String email);
 

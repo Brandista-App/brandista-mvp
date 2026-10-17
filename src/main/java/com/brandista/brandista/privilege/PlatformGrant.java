@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
+@EntityListeners(SecurityMutationListener.class)
 @Table(name = "user_platform_grants", uniqueConstraints =
         @UniqueConstraint(name = "uk_platform_grant_user_type", columnNames = {"user_id", "grant_type"}))
 public class PlatformGrant {
@@ -36,6 +37,7 @@ public class PlatformGrant {
     }
 
     public Long getId() { return id; }
+    public Long subjectId() { return user.getId(); }
     public LocalDateTime getRevokedAt() { return revokedAt; }
     public void revoke() {
         if (revokedAt == null) revokedAt = LocalDateTime.now(Clock.systemUTC());

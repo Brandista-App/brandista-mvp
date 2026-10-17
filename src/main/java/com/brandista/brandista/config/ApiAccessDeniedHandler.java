@@ -17,9 +17,11 @@ import java.util.List;
 public class ApiAccessDeniedHandler implements AccessDeniedHandler {
 
     private final ObjectMapper objectMapper;
+    private final com.brandista.brandista.privilege.SecurityAudit audit;
 
-    public ApiAccessDeniedHandler(ObjectMapper objectMapper) {
+    public ApiAccessDeniedHandler(ObjectMapper objectMapper, com.brandista.brandista.privilege.SecurityAudit audit) {
         this.objectMapper = objectMapper;
+        this.audit = audit;
     }
 
     @Override
@@ -27,6 +29,11 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
             HttpServletRequest request,
             HttpServletResponse response,
             AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        if (request.getRequestURI().startsWith("/api/v1/super-admin/")) {
+            audit.rejectedIndependently(
+                    com.brandista.brandista.privilege.SecurityAudit.Operation.PRIVILEGED_ACCESS, null,
+                    com.brandista.brandista.privilege.SecurityAudit.Reason.ACCESS_DENIED);
+        }
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), new ApiErrorResponse(

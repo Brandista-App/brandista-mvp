@@ -13,10 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/super-admin")
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 public class SuperAdminIdentityController {
+    private final SecurityAudit audit;
+    public SuperAdminIdentityController(SecurityAudit audit) { this.audit = audit; }
     public record Identity(long userId, List<String> platformGrants) { }
 
     @GetMapping("/identity")
     public Identity identity(@AuthenticationPrincipal Jwt jwt) {
+        audit.append(SecurityAudit.Operation.PRIVILEGED_ACCESS, Long.parseLong(jwt.getSubject()),
+                SecurityAudit.Outcome.SUCCESS, SecurityAudit.Reason.COMPLETED);
         return new Identity(Long.parseLong(jwt.getSubject()), List.of("SUPER_ADMIN"));
     }
 }
