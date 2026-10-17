@@ -19,7 +19,9 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Cannot start disposable MySQL verification container' }
     $ready = $false
     for ($attempt = 0; $attempt -lt 45; $attempt++) {
-        docker exec $containerId sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -e "SELECT 1"' *> $null
+        # The image's temporary initialization server exposes a socket before it
+        # restarts. TCP readiness waits for the final server, avoiding that race.
+        docker exec $containerId sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql --protocol=TCP -h127.0.0.1 -uroot -N -e "SELECT 1"' *> $null
         if ($LASTEXITCODE -eq 0) { $ready = $true; break }
         Start-Sleep -Seconds 2
     }
