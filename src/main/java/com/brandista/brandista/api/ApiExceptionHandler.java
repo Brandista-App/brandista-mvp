@@ -34,6 +34,11 @@ import java.util.List;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    @ExceptionHandler(com.brandista.brandista.onboarding.OnboardingFailure.class)
+    public ResponseEntity<ApiErrorResponse> handleOnboarding(com.brandista.brandista.onboarding.OnboardingFailure exception,HttpServletRequest request) {
+        return response(exception.status(),exception.getMessage(),request,List.of());
+    }
+
     @ExceptionHandler(com.brandista.brandista.order.CheckoutFailure.class)
     public ResponseEntity<ApiErrorResponse> handleCheckout(com.brandista.brandista.order.CheckoutFailure exception,HttpServletRequest request) {
         return response(exception.status(),exception.getMessage(),request,List.of());

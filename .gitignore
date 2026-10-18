@@ -29,3 +29,4 @@ Desktop.ini
 application-local.yml
 application-local.yaml
 secrets/
+*.invitation.enc

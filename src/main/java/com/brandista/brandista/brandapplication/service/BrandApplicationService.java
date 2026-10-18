@@ -21,10 +21,14 @@ public class BrandApplicationService {
             BrandApplicationStatus.SUBMITTED, BrandApplicationStatus.NEEDS_INFORMATION);
     private final BrandApplicationRepository applicationRepository;
     private final BrandRepository brandRepository;
+    private final com.brandista.brandista.onboarding.OnboardingPolicy onboarding;
+    private final com.brandista.brandista.privilege.SecurityAudit audit;
 
-    public BrandApplicationService(BrandApplicationRepository applicationRepository, BrandRepository brandRepository) {
+    public BrandApplicationService(BrandApplicationRepository applicationRepository, BrandRepository brandRepository,
+            com.brandista.brandista.onboarding.OnboardingPolicy onboarding, com.brandista.brandista.privilege.SecurityAudit audit) {
         this.applicationRepository = applicationRepository;
         this.brandRepository = brandRepository;
+        this.onboarding=onboarding; this.audit=audit;
     }
 
     @Transactional
@@ -42,11 +46,19 @@ public class BrandApplicationService {
         return applicationRepository.findAllByOrderByCreatedAtDesc().stream().map(BrandApplicationService::toResponse).toList();
     }
 
-    @Transactional
+    @Transactional(isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED)
     public BrandApplicationResponse review(Long id, BrandApplicationReviewRequest request) {
-        BrandApplication application = applicationRepository.findById(id)
-                .orElseThrow(BrandApplicationNotFoundException::new);
-        if (!OPEN_STATUSES.contains(application.getStatus())) throw new BrandApplicationReviewConflictException();
+        onboarding.reviewer(request.decision()==BrandApplicationStatus.APPROVED,id);
+        BrandApplication application = applicationRepository.findForReview(id)
+                .orElseThrow(() -> {
+                    rejectReview(id,com.brandista.brandista.privilege.SecurityAudit.Reason.NOT_FOUND);
+                    return new BrandApplicationNotFoundException();
+                });
+        if (!OPEN_STATUSES.contains(application.getStatus())) {
+            audit.rejectedOnboarding(com.brandista.brandista.privilege.SecurityAudit.Operation.APPLICATION_REVIEWED,null,null,null,id,
+                    com.brandista.brandista.privilege.SecurityAudit.Reason.INVALID_INPUT);
+            throw new BrandApplicationReviewConflictException();
+        }
 
         Brand approvedBrand = null;
         if (request.decision() == BrandApplicationStatus.APPROVED) {
@@ -54,19 +66,33 @@ public class BrandApplicationService {
                     .replaceAll("[^a-z0-9]+", "-").replaceAll("^-|-$", "");
             slug = BrandSlugNormalizer.normalize(slug);
             if (slug == null || slug.isBlank() || brandRepository.existsBySlug(slug)) {
+                rejectReview(id,com.brandista.brandista.privilege.SecurityAudit.Reason.INVALID_INPUT);
                 throw new BrandApplicationApprovalException(
                         "Brand name cannot be converted to a unique storefront slug; resolve the duplicate before approval.");
             }
             approvedBrand = new Brand(application.getBrandName(), slug, null, null);
             approvedBrand.deactivate();
-            approvedBrand = brandRepository.saveAndFlush(approvedBrand);
+            try { approvedBrand = brandRepository.saveAndFlush(approvedBrand); }
+            catch(DataIntegrityViolationException conflict) {
+                rejectReview(id,com.brandista.brandista.privilege.SecurityAudit.Reason.INVALID_INPUT);
+                throw new BrandApplicationApprovalException("Brand approval conflicts with an existing storefront.");
+            }
         }
         try {
             application.review(request.decision(), request.reviewNote(), approvedBrand);
         } catch (IllegalStateException exception) {
             throw new BrandApplicationReviewConflictException();
         }
-        return toResponse(applicationRepository.saveAndFlush(application));
+        BrandApplication saved=applicationRepository.saveAndFlush(application);
+        audit.onboarding(com.brandista.brandista.privilege.SecurityAudit.Operation.APPLICATION_REVIEWED,null,
+                approvedBrand==null?null:approvedBrand.getId(),null,id,com.brandista.brandista.privilege.SecurityAudit.Outcome.SUCCESS,
+                com.brandista.brandista.privilege.SecurityAudit.Reason.COMPLETED);
+        return toResponse(saved);
+    }
+
+    private void rejectReview(Long id,com.brandista.brandista.privilege.SecurityAudit.Reason reason) {
+        audit.rejectedOnboarding(com.brandista.brandista.privilege.SecurityAudit.Operation.APPLICATION_REVIEWED,
+                null,null,null,id,reason);
     }
 
     private static BrandApplicationResponse toResponse(BrandApplication application) {

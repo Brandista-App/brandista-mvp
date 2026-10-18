@@ -19,7 +19,7 @@ class BrandMembershipMigrationTests {
         }
         var jdbc=new JdbcTemplate(datasource);
         var before=snapshot(jdbc);
-        assertThat(Flyway.configure().dataSource(datasource).load().migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(Flyway.configure().dataSource(datasource).target("12").load().migrate().migrationsExecuted).isEqualTo(1);
         assertThat(snapshot(jdbc)).isEqualTo(before);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM brand_admin_memberships",Long.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT target_brand_id FROM security_audit_events",Long.class)).isNull();
@@ -28,7 +28,7 @@ class BrandMembershipMigrationTests {
         for(String values:List.of("1,1","999,1","1,999"))
             assertThatThrownBy(() -> jdbc.update("INSERT INTO brand_admin_memberships(user_id,brand_id,created_at) VALUES("+values+",CURRENT_TIMESTAMP)"))
                     .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
-        assertThat(Flyway.configure().dataSource(datasource).load().migrate().migrationsExecuted).isZero();
+        assertThat(Flyway.configure().dataSource(datasource).target("12").load().migrate().migrationsExecuted).isZero();
     }
 
     private Map<String,Object> snapshot(JdbcTemplate jdbc) {
