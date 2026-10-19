@@ -37,6 +37,7 @@ class BrandApplicationIntegrationTests {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private ObjectMapper objectMapper;
+    @Autowired private com.brandista.brandista.privilege.PlatformGrantRepository grants;
 
     @Test
     void publicSubmissionValidatesNormalizesAndPreventsDuplicateOpenEmail() throws Exception {
@@ -157,7 +158,10 @@ class BrandApplicationIntegrationTests {
 
     private String tokenFor(UserRole role) {
         String email = role.name().toLowerCase() + "-application-" + UUID.randomUUID() + "@example.com";
-        userRepository.saveAndFlush(new User(email, passwordEncoder.encode(PASSWORD), role, AccountStatus.ENABLED));
+        User actor=userRepository.saveAndFlush(new User(email, passwordEncoder.encode(PASSWORD), role, AccountStatus.ENABLED));
+        // Approval fixtures now carry an explicit grant; legacy ADMIN alone cannot approve.
+        if(role==UserRole.ADMIN) grants.saveAndFlush(new com.brandista.brandista.privilege.PlatformGrant(actor,
+                com.brandista.brandista.privilege.PlatformGrantType.SUPER_ADMIN));
         ResponseEntity<LoginResponse> response = restTemplate.postForEntity(
                 "/api/v1/auth/login", Map.of("email", email, "password", PASSWORD), LoginResponse.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

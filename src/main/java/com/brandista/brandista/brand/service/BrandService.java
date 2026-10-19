@@ -17,9 +17,11 @@ import java.util.List;
 public class BrandService {
 
     private final BrandRepository brandRepository;
+    private final com.brandista.brandista.onboarding.OnboardingPolicy onboarding;
 
-    public BrandService(BrandRepository brandRepository) {
+    public BrandService(BrandRepository brandRepository,com.brandista.brandista.onboarding.OnboardingPolicy onboarding) {
         this.brandRepository = brandRepository;
+        this.onboarding=onboarding;
     }
 
     @Transactional
@@ -57,8 +59,9 @@ public class BrandService {
         return toResponse(findById(id));
     }
 
-    @Transactional
+    @Transactional(isolation=org.springframework.transaction.annotation.Isolation.READ_COMMITTED)
     public BrandResponse update(Long id, BrandUpdateRequest request) {
+        if(request.status()==BrandStatus.ACTIVE) onboarding.guardGlobalActivation(id);
         Brand brand = findById(id);
         String slug = BrandSlugNormalizer.normalize(request.slug());
         if (brandRepository.existsBySlugAndIdNot(slug, id)) {

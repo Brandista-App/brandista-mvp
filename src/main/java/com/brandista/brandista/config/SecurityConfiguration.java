@@ -104,6 +104,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/v1/registrations", "/api/v1/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/brand-applications").permitAll()
                         .requestMatchers("/api/v1/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/v1/brand-invitations/accept").authenticated()
                         .requestMatchers("/api/v1/merchant/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/v1/brands").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/categories").permitAll()
