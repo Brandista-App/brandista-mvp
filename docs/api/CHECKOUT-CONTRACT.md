@@ -1,5 +1,9 @@
 # Customer addresses and COD checkout contract
 
+PR7A adds a separate [merchant fulfillment contract](../admin/PR7A-MERCHANT-ORDERS.md).
+The no-fulfillment statements below describe the original checkout scope; customer
+order PLACED and payment UNPAID remain unchanged by brand fulfillment.
+
 Scope: [approved SRS addendum](../requirements/ADDRESS-CHECKOUT-SRS.md), migration V9. Base API `/api/v1`. All routes below require a valid CUSTOMER bearer token except existing public catalogue routes. Owner identity always comes from the signed JWT subject. Cross-customer address/order IDs return the same 404 as a missing ID. Checkout/history also verify that the database account is still an enabled CUSTOMER.
 
 ## Addresses
