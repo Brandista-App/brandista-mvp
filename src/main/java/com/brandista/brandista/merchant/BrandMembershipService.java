@@ -12,7 +12,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import static com.brandista.brandista.privilege.SecurityAudit.*;
 
-/** Secured application service for a future platform workflow; deliberately no HTTP controller. */
+/** Secured membership service. PR6B exposes only identity-verified revocation; grants remain internal. */
 @Service
 @PreAuthorize("hasRole('SUPER_ADMIN')")
 public class BrandMembershipService {
