@@ -1,5 +1,10 @@
 # PR3: brand memberships and merchant tenant isolation
 
+Current operator interface: [PR6B account lifecycle](PR6B-ACCOUNT-LIFECYCLE.md)
+adds identity-verified SUPER_ADMIN membership revocation. The no-HTTP-workflow
+statements below describe the original PR3 scope; membership granting remains
+internal, with operator recovery through PR4 invitations.
+
 ## Authorization policy
 
 A brand administrator is an existing enabled user with an explicit, non-revoked
