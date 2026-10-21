@@ -19,13 +19,13 @@ class BrandInvitationMigrationTests {
         var jdbc=new JdbcTemplate(datasource);
         jdbc.update("INSERT INTO brand_admin_memberships(user_id,brand_id,created_at) VALUES(1,1,CURRENT_TIMESTAMP)");
         var before=snapshot(jdbc);
-        assertThat(Flyway.configure().dataSource(datasource).load().migrate().migrationsExecuted).isEqualTo(1);
+        assertThat(Flyway.configure().dataSource(datasource).target("13").load().migrate().migrationsExecuted).isEqualTo(1);
         assertThat(snapshot(jdbc)).isEqualTo(before);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM brand_admin_invitations",Long.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM brand_invitation_accept_limits",Long.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT target_invitation_id FROM security_audit_events",Long.class)).isNull();
         assertThat(jdbc.queryForObject("SELECT target_application_id FROM security_audit_events",Long.class)).isNull();
-        assertThat(Flyway.configure().dataSource(datasource).load().migrate().migrationsExecuted).isZero();
+        assertThat(Flyway.configure().dataSource(datasource).target("13").load().migrate().migrationsExecuted).isZero();
     }
     private Map<String,Object> snapshot(JdbcTemplate jdbc) {
         var state=new LinkedHashMap<String,Object>();

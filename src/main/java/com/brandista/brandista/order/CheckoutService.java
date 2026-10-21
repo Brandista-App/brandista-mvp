@@ -27,10 +27,13 @@ public class CheckoutService {
     private final OrderRepository orders;
     private final ObjectMapper mapper;
     private final boolean codEnabled;
+    private final org.springframework.jdbc.core.JdbcTemplate jdbc;
     public CheckoutService(UserRepository users,CustomerAddressRepository addresses,CartRepository carts,
                            ProductRepository products,OrderRepository orders,ObjectMapper mapper,
-                           @Value("${brandista.checkout.cod-enabled:false}") boolean codEnabled) {
+                           @Value("${brandista.checkout.cod-enabled:false}") boolean codEnabled,
+                           org.springframework.jdbc.core.JdbcTemplate jdbc) {
         this.users=users;this.addresses=addresses;this.carts=carts;this.products=products;this.orders=orders;this.mapper=mapper;this.codEnabled=codEnabled;
+        this.jdbc=jdbc;
     }
     public boolean isCodEnabled() { return codEnabled; }
     @Transactional
@@ -54,6 +57,10 @@ public class CheckoutService {
         // All lines have been validated and locked before any mutation. One transaction commits everything.
         prepared.products.forEach((product,quantity) -> product.consumeStock(quantity));
         CustomerOrder saved=orders.saveAndFlush(new CustomerOrder(customer.getId(),key,requestHash,request.addressId(),prepared.preview));
+        // Same checkout transaction: exactly one fulfillment per snapshotted brand.
+        jdbc.update("INSERT INTO merchant_order_fulfillments(order_id,brand_id,status,version,created_at,updated_at) "
+                + "SELECT DISTINCT o.id,i.brand_id,'PLACED',0,o.created_at,o.created_at "
+                + "FROM customer_orders o JOIN customer_order_items i ON i.order_id=o.id WHERE o.id=?",saved.id);
         prepared.cart.clearItems();
         carts.saveAndFlush(prepared.cart);
         return new Placement(saved.response(),false);
