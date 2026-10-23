@@ -1,0 +1,27 @@
+log_format brandista_safe '$remote_addr [$time_local] "$request_method $uri $server_protocol" $status $body_bytes_sent';
+server {
+    listen 443 ssl;
+    server_name ${APPROVED_API_HOST};
+    ssl_certificate /etc/nginx/tls/fullchain.pem;
+    ssl_certificate_key /etc/nginx/tls/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    server_tokens off;
+    access_log /var/log/nginx/access.log brandista_safe;
+
+    location = /healthz {
+        proxy_pass http://backend:8080/actuator/health/readiness;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 10s;
+        add_header Cache-Control "no-store" always;
+    }
+    location /api/v1/ {
+        proxy_pass http://backend:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto https;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_connect_timeout 5s;
+        proxy_read_timeout 30s;
+        add_header Cache-Control "no-store" always;
+    }
+    location / { return 404; }
+}

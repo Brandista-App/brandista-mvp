@@ -1,0 +1,51 @@
+# Preparation only. Validate configuration; do not deploy without owner approval.
+name: brandista-production-like
+services:
+  backend:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 256
+    mem_limit: 1g
+    environment:
+      SERVER_PORT: '8080'
+      JAVA_TOOL_OPTIONS: '-XX:MaxRAMPercentage=70.0'
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:?Provide approved MySQL JDBC URL with sslMode=VERIFY_IDENTITY}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:?Provide least-privilege database user}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:?Inject database password securely}
+      JWT_SECRET_BASE64: ${JWT_SECRET_BASE64:?Inject a random base64 key of at least 32 bytes}
+      JWT_ISSUER: ${JWT_ISSUER:?Provide approved token issuer}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:?Provide approved API audience}
+      JWT_ACCESS_TOKEN_TTL: PT15M
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-}
+      COD_CHECKOUT_ENABLED: ${COD_CHECKOUT_ENABLED:-false}
+    networks: [application]
+  https:
+    # Existing repository image family; pin an approved immutable digest before deployment.
+    image: nginx:stable-alpine
+    restart: unless-stopped
+    read_only: true
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /etc/nginx/conf.d
+      - /var/cache/nginx
+      - /var/run
+    environment:
+      APPROVED_API_HOST: ${APPROVED_API_HOST:?Provide the owner-approved API hostname}
+    volumes:
+      - ./api.conf.template:/etc/nginx/templates/api.conf.template:ro
+      - ${TLS_CERTIFICATE_FILE:?Provide approved certificate chain file}:/etc/nginx/tls/fullchain.pem:ro
+      - ${TLS_PRIVATE_KEY_FILE:?Provide approved private key file}:/etc/nginx/tls/privkey.pem:ro
+    ports:
+      - '127.0.0.1:${HTTPS_LOOPBACK_PORT:-8443}:443'
+    depends_on: [backend]
+    networks: [application]
+networks:
+  application:
