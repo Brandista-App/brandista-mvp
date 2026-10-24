@@ -87,6 +87,77 @@ class BrandInvitationIntegrationTests {
         brand=reviewed.getBody().path("brandId").asLong();
     }
 
+    @Test void completeSyntheticMarketplaceJourneyKeepsTwoBrandsIsolatedThroughFulfillment() {
+        // Existing test-only platform fixture; no operator/runtime account is provisioned.
+        assertThat(accept(raw(issue(application)),recipientToken).getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(activate().getStatusCode()).isEqualTo(HttpStatus.OK);
+        String brandBToken=login(other);
+        long appB=submit(other.getEmail());
+        var approvedB=review(appB,"APPROVED",platformToken);
+        assertThat(approvedB.getStatusCode()).isEqualTo(HttpStatus.OK);
+        long brandB=approvedB.getBody().path("brandId").asLong();
+        assertThat(accept(raw(issue(appB)),brandBToken).getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(call(HttpMethod.POST,base(appB)+"/activate",platformToken,null).getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(call(HttpMethod.GET,"/api/v1/merchant/brands",recipientToken,null).getBody()).hasSize(1);
+        assertThat(call(HttpMethod.GET,"/api/v1/merchant/brands",brandBToken,null).getBody()).hasSize(1);
+
+        var category=categories.saveAndFlush(new com.brandista.brandista.category.Category("Presentation category","pitch-"+UUID.randomUUID(),null));
+        long[] stores={brand,brandB}; String[] tokens={recipientToken,brandBToken}; long[] productIds=new long[2];
+        for(int index=0;index<2;index++) {
+            String slug="presentation-"+UUID.randomUUID();
+            var body=new HashMap<String,Object>(Map.of("name","Fictional presentation piece "+index,"slug",slug,
+                    "brandId",stores[index],"categoryId",category.getId(),"price",index==0?150:200,"availability","AVAILABLE"));
+            var created=call(HttpMethod.POST,merchant(stores[index]),tokens[index],body);
+            assertThat(created.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            productIds[index]=created.getBody().path("id").asLong();
+            String product=merchant(stores[index])+"/"+productIds[index];
+            body.put("description","Synthetic demonstration only");
+            assertThat(call(HttpMethod.PUT,product,tokens[index],body).getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(call(HttpMethod.PUT,product+"/stock",tokens[index],Map.of("stockQuantity",20)).getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(call(HttpMethod.PATCH,product+"/publish",tokens[index],null).getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(call(HttpMethod.GET,"/api/v1/products/"+slug,null,null).getStatusCode()).isEqualTo(HttpStatus.OK);
+        }
+        assertThat(call(HttpMethod.GET,merchant(brandB),recipientToken,null).getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(call(HttpMethod.GET,merchant(brand),brandBToken,null).getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+
+        String buyerEmail=UUID.randomUUID()+"@example.invalid";
+        assertThat(call(HttpMethod.POST,"/api/v1/registrations",null,Map.of("email",buyerEmail,"password",password)).getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        String buyerToken=login(users.findByEmail(buyerEmail).orElseThrow());
+        String customer="/api/v1/customers/me";
+        var address=call(HttpMethod.POST,customer+"/addresses",buyerToken,Map.of("recipientName","Synthetic presentation customer",
+                "phoneNumber","+92 300 1234567","addressLine1","Synthetic residence","city","Lahore","province","Punjab"));
+        assertThat(address.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        long addressId=address.getBody().path("id").asLong();
+        for(int index=0;index<2;index++) assertThat(call(HttpMethod.POST,customer+"/cart/items",buyerToken,
+                Map.of("productId",productIds[index],"quantity",index==0?2:1)).getStatusCode().is2xxSuccessful()).isTrue();
+        var quote=call(HttpMethod.POST,customer+"/checkout/preview",buyerToken,Map.of("addressId",addressId));
+        assertThat(quote.getStatusCode()).isEqualTo(HttpStatus.OK);
+        var headers=new HttpHeaders();headers.setBearerAuth(buyerToken);headers.set("Idempotency-Key",UUID.randomUUID().toString());
+        var placed=http.exchange(customer+"/orders",HttpMethod.POST,new HttpEntity<>(Map.of("addressId",addressId,
+                "quoteToken",quote.getBody().path("quoteToken").asText()),headers),JsonNode.class);
+        assertThat(placed.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        long order=placed.getBody().path("id").asLong();
+        assertThat(placed.getBody().path("total").decimalValue()).isEqualByComparingTo("500.00");
+        assertThat(placed.getBody().path("paymentStatus").asText()).isEqualTo("UNPAID");
+        assertThat(placed.getBody().path("paymentMethod").asText()).isEqualTo("COD");
+        String orderA="/api/v1/merchant/brands/"+brand+"/orders/"+order;
+        String orderB="/api/v1/merchant/brands/"+brandB+"/orders/"+order;
+        assertThat(call(HttpMethod.GET,orderA,recipientToken,null).getBody().path("items")).hasSize(1);
+        assertThat(call(HttpMethod.GET,orderB,brandBToken,null).getBody().path("items")).hasSize(1);
+        assertThat(call(HttpMethod.GET,orderB,recipientToken,null).getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(call(HttpMethod.GET,orderA,buyerToken,null).getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        long version=0;
+        for(String state:List.of("ACCEPTED","PACKED","SHIPPED","DELIVERED")) {
+            var result=call(HttpMethod.POST,orderA+"/fulfillment",recipientToken,Map.of("status",state,"expectedVersion",version++));
+            assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(result.getBody().path("order").path("fulfillmentStatus").asText()).isEqualTo(state);
+        }
+        assertThat(call(HttpMethod.GET,orderB,brandBToken,null).getBody().path("order").path("fulfillmentStatus").asText()).isEqualTo("PLACED");
+        assertThat(call(HttpMethod.GET,customer+"/orders/"+order,buyerToken,null).getBody().path("paymentStatus").asText()).isEqualTo("UNPAID");
+        assertThat(products.findById(productIds[0]).orElseThrow().getStockQuantity()).isEqualTo(18);
+        assertThat(products.findById(productIds[1]).orElseThrow().getStockQuantity()).isEqualTo(19);
+    }
+
     @Test void validExistingCustomerAcceptanceIsTraceableAndRequiresExplicitActivation() {
         long id=issue(application); String token=raw(id);
         assertThat(jdbc.queryForObject("SELECT status FROM brands WHERE id=?",String.class,brand)).isEqualTo("INACTIVE");
