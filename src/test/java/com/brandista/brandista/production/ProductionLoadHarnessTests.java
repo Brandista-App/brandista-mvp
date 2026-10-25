@@ -30,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureObservability
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
         "server.address=127.0.0.1",
+        "spring.jpa.properties.hibernate.session_factory.statement_inspector=com.brandista.brandista.production.Perf001SqlProbe",
         "management.server.port=0", "management.endpoints.web.exposure.include=health,metrics,prometheus",
         "brandista.checkout.cod-enabled=true", "brandista.security.provisioning.enabled=true"})
 @Import(ProductionLoadHarnessTests.DeliveryFixture.class)
@@ -55,6 +56,7 @@ class ProductionLoadHarnessTests {
     @Autowired PasswordEncoder encoder;
     @Autowired OperatorProvisioning operator;
     @Autowired CaptureDelivery delivery;
+    @Autowired io.micrometer.core.instrument.MeterRegistry meters;
     @LocalServerPort int port;
     @LocalManagementPort int management;
     final String password=UUID.randomUUID()+"-Synthetic!";
@@ -149,6 +151,7 @@ class ProductionLoadHarnessTests {
                 .put("base","http://127.0.0.1:"+port).put("management","http://127.0.0.1:"+management)
                 .put("password",password).put("brandId",brands[0]).put("slug","synthetic-product-0");
         fixture.set("users",identities); fixture.set("productIds",json.valueToTree(products));
+        Files.writeString(output.resolve("database-before.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(databaseSnapshot()));
         var process=new ProcessBuilder("node","scripts/load/mixed-load.mjs").redirectError(ProcessBuilder.Redirect.INHERIT).start();
         var writer=new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8);
         writer.write(fixture.toString()+"\n");writer.flush();
@@ -169,15 +172,37 @@ class ProductionLoadHarnessTests {
         }
         assertThat(process.waitFor()).isZero();assertThat(stages).isNotEmpty();
         assertIntegrity();
+        explainSearches();
         Files.writeString(output.resolve("integrity.json"),"{\"stockReconciliation\":\"PASS\",\"uniqueIdempotency\":\"PASS\",\"fulfillmentsMatchSnapshottedBrands\":\"PASS\",\"unpaidCODTotalsMatchItems\":\"PASS\"}");
     }
     Map<String,Object> databaseSnapshot() {
         var snapshot=new LinkedHashMap<String,Object>();
-        snapshot.put("globalStatus",jdbc.queryForList("SHOW GLOBAL STATUS WHERE Variable_name IN ('Threads_connected','Threads_running','Max_used_connections','Slow_queries','Innodb_row_lock_waits','Innodb_row_lock_time')"));
+        snapshot.put("globalStatus",jdbc.queryForList("SHOW GLOBAL STATUS WHERE Variable_name IN ('Threads_connected','Threads_running','Max_used_connections','Slow_queries','Innodb_row_lock_waits','Innodb_row_lock_time','Innodb_buffer_pool_reads','Innodb_buffer_pool_read_requests','Innodb_buffer_pool_pages_data','Innodb_buffer_pool_pages_free','Innodb_deadlocks')"));
         snapshot.put("slowQueryCount",jdbc.queryForObject("SELECT COUNT(*) FROM mysql.slow_log",Long.class));
         snapshot.put("topStatementDigests",jdbc.queryForList("SELECT DIGEST_TEXT,COUNT_STAR,SUM_TIMER_WAIT/1000000000000 AS total_seconds,SUM_ROWS_EXAMINED,SUM_ERRORS "
-                +"FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME='brandista_prod001' ORDER BY SUM_TIMER_WAIT DESC LIMIT 8"));
+                +"FROM performance_schema.events_statements_summary_by_digest WHERE SCHEMA_NAME='brandista_prod001' ORDER BY SUM_TIMER_WAIT DESC LIMIT 25"));
+        var timers=new LinkedHashMap<String,Object>();
+        for(String name:List.of("hikaricp.connections.usage","hikaricp.connections.acquire")) {
+            var timer=meters.find(name).timer();
+            if(timer!=null)timers.put(name,Map.of("count",timer.count(),"totalSeconds",timer.totalTime(TimeUnit.SECONDS),"windowMaxSeconds",timer.max(TimeUnit.SECONDS)));
+        }
+        snapshot.put("poolTimersCumulative",timers);
+        snapshot.put("committedOrders",jdbc.queryForObject("SELECT COUNT(*) FROM customer_orders",Long.class));
         snapshot.put("integrity","PASS");return snapshot;
+    }
+    void explainSearches() throws Exception {
+        var plans=new ArrayList<Object>();
+        for(String sql:Perf001SqlProbe.searches.stream().sorted().toList()) {
+            boolean count=sql.startsWith("select count(");
+            Object[] bindings=count ? new Object[]{"PUBLISHED","ACTIVE","ACTIVE","%synthetic%","%synthetic%"}
+                    : new Object[]{"PUBLISHED","ACTIVE","ACTIVE","%synthetic%","%synthetic%",0,20};
+            assertThat(sql.chars().filter(c->c=='?').count()).isEqualTo(bindings.length);
+            var measurements=new ArrayList<Object>();
+            for(int repeat=0;repeat<3;repeat++) measurements.add(jdbc.queryForList("EXPLAIN ANALYZE "+sql,bindings));
+            plans.add(Map.of("parameterizedSql",sql,"syntheticBindings",bindings,"explain",jdbc.queryForList("EXPLAIN "+sql,bindings),"analyzeWarmRepeats",measurements));
+        }
+        assertThat(plans).hasSize(2);
+        Files.writeString(output.resolve("search-plans.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(plans));
     }
     void assertIntegrity() {
         for(long product:products) {

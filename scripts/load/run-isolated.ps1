@@ -37,7 +37,10 @@ try {
         while($true){
             $taskSample=docker stats --no-stream --format '{{json .}}' $taskDb 2>$null
             if($LASTEXITCODE -ne 0){break}
-            [IO.File]::AppendAllText($taskFile,([ordered]@{time=[DateTime]::UtcNow.ToString('o');stats=($taskSample | ConvertFrom-Json)} | ConvertTo-Json -Compress)+"`n")
+            $taskLocks=docker exec $taskDb sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql -uroot -N -e "SELECT (SELECT COUNT(*) FROM performance_schema.data_lock_waits),COUNT(*),COALESCE(MAX(TIMESTAMPDIFF(SECOND,trx_started,NOW())),0) FROM information_schema.innodb_trx"' 2>$null
+            $taskLockExit=$LASTEXITCODE
+            $taskLockFields=if($taskLockExit -eq 0){$taskLocks.Trim() -split '\s+'}else{@()}
+            [IO.File]::AppendAllText($taskFile,([ordered]@{time=[DateTime]::UtcNow.ToString('o');stats=($taskSample | ConvertFrom-Json);lockSampleOk=($taskLockFields.Count -eq 3);lockWaitEdges=$(if($taskLockFields.Count -eq 3){[long]$taskLockFields[0]}else{$null});activeTransactions=$(if($taskLockFields.Count -eq 3){[long]$taskLockFields[1]}else{$null});oldestTransactionSeconds=$(if($taskLockFields.Count -eq 3){[long]$taskLockFields[2]}else{$null})} | ConvertTo-Json -Compress)+"`n")
             Start-Sleep -Seconds 3
         }
     }
