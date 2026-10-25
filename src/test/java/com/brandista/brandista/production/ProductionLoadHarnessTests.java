@@ -165,7 +165,7 @@ class ProductionLoadHarnessTests {
             }
         } finally {
             writer.close();
-            if(process.isAlive())process.destroyForcibly();
+            if(!process.waitFor(10,TimeUnit.SECONDS))process.destroyForcibly();
         }
         assertThat(process.waitFor()).isZero();assertThat(stages).isNotEmpty();
         assertIntegrity();
