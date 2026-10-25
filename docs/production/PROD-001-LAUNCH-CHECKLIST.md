@@ -7,6 +7,7 @@
 | Priority | Gate | Responsible role | Acceptance evidence |
 | --- | --- | --- | --- |
 | P0 | Mobile high-severity dependency paths | Mobile/security owner | Compatible upstream remediation and repeated native regression; existing testing exception ends **2026-11-05**, not extended here |
+| P0 | Unresolved backend advisory matches | Backend/security owner | Verify Tomcat fix artifact availability and Spring feature applicability/remediation; retain explicit critical-match tracking and regression before approval |
 | P0 | Actual production invitation delivery | Backend/operations | Approved email/delivery adapter, recipient binding, retries without token disclosure, rate limits, audit and failure recovery |
 | P0 | Device and live environment acceptance | Mobile/QA/backend | Reviewed signed Android/iPhone candidates, actual fresh-install offline tests and reachable trusted-HTTPS synthetic customer/COD tests |
 | P0 | Payment/COD operating rules | Business/finance/merchant operations | Agreed collection responsibility, remittance evidence, reconciliation, refund/cancellation/returns policy and truthful customer notices |

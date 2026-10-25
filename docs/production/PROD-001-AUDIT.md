@@ -50,3 +50,17 @@ Documents: [architecture and cost assumptions](PROD-001-ARCHITECTURE.md), [measu
 ## Verification evidence
 
 Raw logs/reports live outside Git in `D:\brandista workplace\PROD-001-evidence` and ignored `target/prod001-*`. Sanitized measured results and exact final source/PR/test references are recorded here and in the load report after completion. No incomplete check is assigned PASS.
+
+
+## Final verification and review
+
+- Patched local backend verify: **193 passed**,194 discovered with one opt-in load test intentionally skipped, zero failures/errors. Includes existing191 tests plus two production listener/probe/query-count tests.
+- Hosted [run40220962069](https://github.com/Brandista-App/brandista-mvp/actions/runs/40220962069) at63afb8f: **PASS**, full verify plus generator syntax. Final-head checks are attached to [PR29](https://github.com/Brandista-App/brandista-mvp/pull/29).
+- Additional post-load controller availability tests: **2 passed**, sanitized503 HTTP envelope for resource/acquisition failure. No throughput improvement is inferred from this response-only fix.
+- Disposable MySQL commercial/load/stock/order reconciliation: **PASS for correctness and cleanup**.10-user local escalation gates passed;50-user route-latency gate **FAIL** stopped escalation.100/250/500 capacity remains **NOT VERIFIED**. A green JUnit correctness run is not a passing load SLO.
+- Synthetic consistent dump/new-schema restore: **PASS**,8.874 s; six table counts match. Not production backup/RPO/RTO evidence.
+- Final isolated proxy: **PASS**, config/trusted test TLS, readiness proxy200, identity429, body413, public metrics404; stub upstream only.
+- Prometheus3.15.1 config and four alert rules: **PASS** using promtool. No collector/notification recipient is deployed.
+- Backend OSV:17 IDs/five package entries before, five IDs/two entries after Jackson/Log4j fixes. Residual findings remain tracked, not waived. Mobile five high entries remain; customer/admin production audits zero.
+
+Sanitized [committed evidence](evidence/) records the clean measured source0d33529e5909175e801886c873a9c8f3dba5bc53. Raw logs remain in the external evidence directory. Later503 mapping is explicitly distinguished from that measured source. Six reports and engineering changes are delivered through [PR29](https://github.com/Brandista-App/brandista-mvp/pull/29). No merge, public deployment, purchase, live funds or production privileged account was created. Launch decision remains **NO-GO** until the checklist gates are closed.

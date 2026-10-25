@@ -19,7 +19,7 @@ subprocess.run([openssl, "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days
                check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=30)
 config = (root / "deploy/production-like/api.conf.template").read_text()
 config = config.replace("${APPROVED_API_HOST}", "example.invalid").replace("backend:8080", "127.0.0.1:18080")
-config += "\nserver { listen 18080; return 204; }\n"
+config += "\nserver { listen 18080; location = /readyz { return 200; } location / { return 204; } }\n"
 (out / "default.conf").write_text(config)
 name = "brandista-prod001-proxy-" + uuid.uuid4().hex[:10]
 mounts = ["--volume", f"{out / 'default.conf'}:/etc/nginx/conf.d/default.conf:ro",
@@ -44,12 +44,13 @@ try:
             return error.code
     time.sleep(2)
     assert request("/api/v1/products") == 204
+    assert request("/healthz") == 200
     assert request("/actuator/prometheus") == 404
     assert request("/api/v1/products", b"x" * (2 * 1024 * 1024)) == 413
     statuses = [request("/api/v1/auth/login", b"{}") for _ in range(10)]
     assert 204 in statuses and 429 in statuses, statuses
     result = {"status":"PASS", "nginxConfig":"PASS", "trustedLocalTLS":"PASS",
-              "identityStatuses":statuses, "oversizedBody":413, "publicMetrics":404,
+              "identityStatuses":statuses, "readinessProxy":200, "oversizedBody":413, "publicMetrics":404,
               "scope":"isolated Nginx with stub upstream; not deployed backend/TLS acceptance"}
     (out / "results.json").write_text(json.dumps(result, indent=2))
     print(json.dumps(result))

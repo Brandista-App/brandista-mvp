@@ -34,6 +34,16 @@ import java.util.List;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
+    @ExceptionHandler({org.springframework.dao.DataAccessResourceFailureException.class,
+            org.springframework.transaction.CannotCreateTransactionException.class})
+    public ResponseEntity<ApiErrorResponse> handleDatabaseUnavailable(
+            RuntimeException exception, HttpServletRequest request) {
+        // Resource exhaustion/unavailability is retryable, but never expose driver
+        // messages, connection strings or credentials. Checkout must reuse its key.
+        return response(HttpStatus.SERVICE_UNAVAILABLE,
+                "Shopping service is temporarily unavailable. Retry shortly.", request, List.of());
+    }
+
     @ExceptionHandler(com.brandista.brandista.onboarding.OnboardingFailure.class)
     public ResponseEntity<ApiErrorResponse> handleOnboarding(com.brandista.brandista.onboarding.OnboardingFailure exception,HttpServletRequest request) {
         return response(exception.status(),exception.getMessage(),request,List.of());
