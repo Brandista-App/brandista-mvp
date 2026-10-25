@@ -1,0 +1,11 @@
+# Preparation only. Run collector in the backend network namespace or on a
+# host-local listener/tunnel; do not expose management or Prometheus publicly.
+global:
+  scrape_interval: 15s
+rule_files:
+  - /etc/prometheus/alerts.yml
+scrape_configs:
+  - job_name: brandista
+    metrics_path: /actuator/prometheus
+    static_configs:
+      - targets: ['127.0.0.1:9091']

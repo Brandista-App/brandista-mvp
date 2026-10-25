@@ -1,0 +1,57 @@
+# Explicit opt-in profile. API/business defaults in application.yml remain intact.
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:10}
+      minimum-idle: ${DB_POOL_MIN:2}
+      connection-timeout: 3000
+      validation-timeout: 1000
+      max-lifetime: 1500000
+  transaction:
+    default-timeout: 10s
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+server:
+  shutdown: graceful
+  forward-headers-strategy: none
+  max-http-request-header-size: 16KB
+  tomcat:
+    threads:
+      max: ${HTTP_THREADS_MAX:64}
+      min-spare: 4
+    max-connections: 256
+    accept-count: 64
+    connection-timeout: 5s
+    keep-alive-timeout: 15s
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+        add-additional-paths: true
+  server:
+    # Scrape through a host-local collector/SSH tunnel; never publish this port.
+    port: ${MANAGEMENT_PORT:9091}
+    address: 127.0.0.1
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      slo:
+        http.server.requests: 100ms,300ms,1s,3s,5s
+logging:
+  structured:
+    format:
+      console: ecs

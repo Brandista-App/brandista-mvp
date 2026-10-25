@@ -6,6 +6,9 @@ on:
       - 'pom.xml'
       - '.mvn/**'
       - 'mvnw*'
+      - 'scripts/load/**'
+      - 'deploy/production-like/**'
+      - 'docs/production/**'
       - '.github/workflows/backend-tests.yml'
 permissions:
   contents: read
@@ -22,3 +25,5 @@ jobs:
           cache: maven
       - name: Full backend verification
         run: sh ./mvnw --batch-mode --no-transfer-progress verify
+      - name: Check load generator syntax (load is opt-in and isolated)
+        run: node --check scripts/load/mixed-load.mjs
