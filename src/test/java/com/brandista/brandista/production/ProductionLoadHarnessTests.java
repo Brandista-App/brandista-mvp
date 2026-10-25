@@ -150,7 +150,8 @@ class ProductionLoadHarnessTests {
                 .put("password",password).put("brandId",brands[0]).put("slug","synthetic-product-0");
         fixture.set("users",identities); fixture.set("productIds",json.valueToTree(products));
         var process=new ProcessBuilder("node","scripts/load/mixed-load.mjs").redirectError(ProcessBuilder.Redirect.INHERIT).start();
-        try(var writer=new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8)) {writer.write(fixture.toString()+"\n");}
+        var writer=new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8);
+        writer.write(fixture.toString()+"\n");writer.flush();
         ArrayNode stages=json.createArrayNode();
         try(var reader=process.inputReader(StandardCharsets.UTF_8)) {
             String line;while((line=reader.readLine())!=null) {
@@ -160,11 +161,15 @@ class ProductionLoadHarnessTests {
                 stages.add(result);
                 Files.writeString(output.resolve("results.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(stages));
                 System.out.println("PROD001 stage users="+result.path("users")+" rps="+result.path("rps")+" p95="+result.path("p95")+" errors="+result.path("errorRate"));
+                writer.write("continue\n");writer.flush();
             }
+        } finally {
+            writer.close();
+            if(process.isAlive())process.destroyForcibly();
         }
         assertThat(process.waitFor()).isZero();assertThat(stages).isNotEmpty();
         assertIntegrity();
-        Files.writeString(output.resolve("integrity.json"),"{\"stockReconciliation\":\"PASS\",\"uniqueIdempotency\":\"PASS\",\"twoFulfillmentsPerOrder\":\"PASS\",\"unpaidCOD\":\"PASS\"}");
+        Files.writeString(output.resolve("integrity.json"),"{\"stockReconciliation\":\"PASS\",\"uniqueIdempotency\":\"PASS\",\"fulfillmentsMatchSnapshottedBrands\":\"PASS\",\"unpaidCODTotalsMatchItems\":\"PASS\"}");
     }
     Map<String,Object> databaseSnapshot() {
         var snapshot=new LinkedHashMap<String,Object>();
@@ -181,7 +186,8 @@ class ProductionLoadHarnessTests {
             assertThat(stock+sold).isEqualTo(1000000);
         }
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM (SELECT customer_id,idempotency_key FROM customer_orders GROUP BY customer_id,idempotency_key HAVING COUNT(*)>1) x",Long.class)).isZero();
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM customer_orders o WHERE (SELECT COUNT(*) FROM merchant_order_fulfillments f WHERE f.order_id=o.id)<>2",Long.class)).isZero();
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM customer_orders WHERE payment_status<>'UNPAID' OR payment_method<>'COD' OR total<>300",Long.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM customer_orders o WHERE (SELECT COUNT(*) FROM merchant_order_fulfillments f WHERE f.order_id=o.id)<>(SELECT COUNT(DISTINCT i.brand_id) FROM customer_order_items i WHERE i.order_id=o.id)",Long.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM merchant_order_fulfillments f WHERE NOT EXISTS(SELECT 1 FROM customer_order_items i WHERE i.order_id=f.order_id AND i.brand_id=f.brand_id)",Long.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM customer_orders o WHERE payment_status<>'UNPAID' OR payment_method<>'COD' OR currency<>'PKR' OR total<>(SELECT SUM(i.line_subtotal) FROM customer_order_items i WHERE i.order_id=o.id)",Long.class)).isZero();
     }
 }

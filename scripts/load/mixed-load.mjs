@@ -4,8 +4,8 @@ import { performance } from 'node:perf_hooks'
 import { setTimeout as sleep } from 'node:timers/promises'
 import os from 'node:os'
 const input = createInterface({ input: process.stdin })
-const fixture = JSON.parse(await new Promise(resolve => input.once('line', resolve)))
-input.close()
+const lines = input[Symbol.asyncIterator]()
+const fixture = JSON.parse((await lines.next()).value)
 if (fixture.guard !== 'brandista-prod001-disposable' ||
     !/^http:\/\/127\.0\.0\.1:\d+$/.test(fixture.base) ||
     !/^http:\/\/127\.0\.0\.1:\d+$/.test(fixture.management) || fixture.users.length !== 500)
@@ -72,9 +72,13 @@ async function user(index, until, rampMs) {
         if(!address) address=(await request('address-create','/api/v1/customers/me/addresses',token,
           {recipientName:'Synthetic load customer',phoneNumber:'+923001234567',addressLine1:'Synthetic residence',city:'Test city',province:'Test province'})).value?.id
         await request('cart-read','/api/v1/customers/me/cart',token)
-        for(const productId of fixture.productIds) await request('cart-add','/api/v1/customers/me/cart/items',token,{productId,quantity:1})
-        const quote=await request('checkout-preview','/api/v1/customers/me/checkout/preview',token,{addressId:address})
-        if(quote.status===200) {
+        let ready=(await request('cart-clear','/api/v1/customers/me/cart/items',token,null,'DELETE')).status===200
+        if(ready) for(const productId of fixture.productIds) {
+          const added=await request('cart-add','/api/v1/customers/me/cart/items',token,{productId,quantity:1})
+          ready=ready && added.status>=200 && added.status<300
+        }
+        const quote=ready ? await request('checkout-preview','/api/v1/customers/me/checkout/preview',token,{addressId:address}) : null
+        if(quote?.status===200 && quote.value.items.length===2 && quote.value.items.every(i=>i.quantity===1)) {
           const body={addressId:address,quoteToken:quote.value.quoteToken}
           const headers={'Idempotency-Key':crypto.randomUUID()}
           const placed=await request('checkout-place','/api/v1/customers/me/orders',token,body,'POST',headers)
@@ -117,6 +121,12 @@ for(const users of stages) {
     routes:Object.fromEntries(Object.entries(stage.routes).map(([k,v])=>[k,summarize(v)])),
     samples:stage.samples,monitorFailures:stage.monitorFailures}
   console.log(JSON.stringify(result))
-  if(aborted || result.p95>3000 || result.errorRate>.01) break
+  // Pause users before the parent takes a coherent stock/order snapshot. No next
+  // stage may race its SQL assertions or outlive a failed parent test.
+  const acknowledgment=await lines.next()
+  if(acknowledgment.done || acknowledgment.value!=='continue') break
+  if(aborted || result.p95>3000 || result.errorRate>.01 ||
+     Object.values(result.routes).some(route=>route.requests>=20 && route.p95>3000)) break
   await sleep(5000)
 }
+input.close()
