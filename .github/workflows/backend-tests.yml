@@ -9,6 +9,7 @@ on:
       - 'scripts/load/**'
       - 'deploy/production-like/**'
       - 'docs/production/**'
+      - 'docs/performance/**'
       - '.github/workflows/backend-tests.yml'
 permissions:
   contents: read
