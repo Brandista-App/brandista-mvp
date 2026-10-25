@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "nginxConfig": "PASS",
+  "trustedLocalTLS": "PASS",
+  "identityStatuses": [
+    204,
+    204,
+    204,
+    204,
+    204,
+    204,
+    429,
+    429,
+    429,
+    429
+  ],
+  "readinessProxy": 200,
+  "oversizedBody": 413,
+  "publicMetrics": 404,
+  "scope": "isolated Nginx with stub upstream; not deployed backend/TLS acceptance"
+}

@@ -27,6 +27,7 @@ public class CustomerOrder {
     @Embedded OrderDelivery delivery;
     @Column(name="created_at",nullable=false,updatable=false) LocalDateTime createdAt;
     @OneToMany(mappedBy="order",cascade=CascadeType.PERSIST)
+    @org.hibernate.annotations.BatchSize(size=50)
     @OrderBy("id ASC") List<CustomerOrderItem> items=new ArrayList<>();
     protected CustomerOrder() { }
     CustomerOrder(Long customerId,String key,String requestHash,Long addressId,CheckoutModels.Preview preview) {

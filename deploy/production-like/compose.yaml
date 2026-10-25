@@ -14,7 +14,9 @@ services:
     security_opt: [no-new-privileges:true]
     pids_limit: 256
     mem_limit: 1g
+    stop_grace_period: 40s
     environment:
+      SPRING_PROFILES_ACTIVE: production
       SERVER_PORT: '8080'
       JAVA_TOOL_OPTIONS: '-XX:MaxRAMPercentage=70.0'
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:?Provide approved MySQL JDBC URL with sslMode=VERIFY_IDENTITY}
