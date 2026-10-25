@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("production")
 @AutoConfigureObservability
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={
+        "server.address=127.0.0.1",
         "spring.datasource.url=jdbc:h2:mem:production-ops;MODE=MySQL;DB_CLOSE_DELAY=-1",
         "spring.datasource.username=sa", "spring.datasource.password=", "management.server.port=0",
         "management.endpoints.web.exposure.include=health,metrics,prometheus",

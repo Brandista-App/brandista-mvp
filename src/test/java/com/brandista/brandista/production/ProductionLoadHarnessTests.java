@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ActiveProfiles("production")
 @AutoConfigureObservability
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
+        "server.address=127.0.0.1",
         "management.server.port=0", "management.endpoints.web.exposure.include=health,metrics,prometheus",
         "brandista.checkout.cod-enabled=true", "brandista.security.provisioning.enabled=true"})
 @Import(ProductionLoadHarnessTests.DeliveryFixture.class)
