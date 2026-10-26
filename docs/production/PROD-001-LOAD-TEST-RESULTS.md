@@ -1,5 +1,7 @@
 # PROD-001 controlled load and recovery results
 
+Follow-up: [PERF-001 database investigation and paired benchmarks](../performance/PERF-001.md) records the subsequent search-join remediation and measured scaling limits. The PROD-001 measurements below remain historical evidence.
+
 2026-10-25, Asia/Karachi. This report separates automated correctness, measured short local load, isolated proxy tests, recovery drills and unverified production capacity. No production or third-party system is a load target.
 
 ## Reproduction and safety boundary

@@ -1,0 +1,10 @@
+{
+  "databaseMemoryMiB": 640,
+  "databaseCpuLimit": 1,
+  "nodeVersion": "v24.21.0",
+  "jvmHeapMiB": 512,
+  "workingTree": null,
+  "sourceSha": "40c5ef5c1d2e4e750b8efca0945fd2547de53103",
+  "mysqlImage": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+  "startedUtc": "2026-10-25T18:50:34.4258018Z"
+}

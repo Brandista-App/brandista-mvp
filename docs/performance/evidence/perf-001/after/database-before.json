@@ -1,0 +1,199 @@
+{
+  "globalStatus" : [ {
+    "Variable_name" : "Innodb_buffer_pool_pages_data",
+    "Value" : "1536"
+  }, {
+    "Variable_name" : "Innodb_buffer_pool_pages_free",
+    "Value" : "6656"
+  }, {
+    "Variable_name" : "Innodb_buffer_pool_read_requests",
+    "Value" : "153436"
+  }, {
+    "Variable_name" : "Innodb_buffer_pool_reads",
+    "Value" : "1067"
+  }, {
+    "Variable_name" : "Innodb_row_lock_time",
+    "Value" : "0"
+  }, {
+    "Variable_name" : "Innodb_row_lock_waits",
+    "Value" : "0"
+  }, {
+    "Variable_name" : "Max_used_connections",
+    "Value" : "4"
+  }, {
+    "Variable_name" : "Slow_queries",
+    "Value" : "28"
+  }, {
+    "Variable_name" : "Threads_connected",
+    "Value" : "3"
+  }, {
+    "Variable_name" : "Threads_running",
+    "Value" : "2"
+  } ],
+  "slowQueryCount" : 20,
+  "topStatementDigests" : [ {
+    "DIGEST_TEXT" : "INSERT INTO `products` ( NAME , `slug` , `brand_id` , `category_id` , `price` , `stock_quantity` , `availability` , `publication_status` , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+    "COUNT_STAR" : 1000,
+    "total_seconds" : 11.8594,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "INSERT INTO `users` ( `email` , `password_hash` , ROLE , STATUS , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+    "COUNT_STAR" : 500,
+    "total_seconds" : 6.3668,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "INSERT INTO `brand_admin_memberships` ( `user_id` , `brand_id` , `created_at` ) VALUES ( ?, ... , NOW )",
+    "COUNT_STAR" : 50,
+    "total_seconds" : 0.8411,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "COMMIT",
+    "COUNT_STAR" : 85,
+    "total_seconds" : 0.7279,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `brand_admin_memberships` ( `id` INT8 NOT NULL AUTO_INCREMENT PRIMARY KEY , `user_id` INT8 NOT NULL , `brand_id` INT8 NOT NULL , `created_at` DATETIME (?) NOT NULL , `revoked_at` DATETIME (?) NULL , `version` INT8 NOT NULL DEFAULT ? , CONSTRAINT `uk_brand_membership_user_brand` UNIQUE ( `user_id` , `brand_id` ) , CONSTRAINT `fk_brand_membership_user` FOREIGN KEY ( `user_id` ) REFERENCES `users` ( `id` ) ON DELETE RESTRICT , CONSTRAINT `fk_brand_membership_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) ON DELETE RESTRICT )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.3301,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `users` ( `id` INT8 NOT NULL AUTO_INCREMENT , `email` VARCHARACTER (?) NOT NULL , `password_hash` VARCHARACTER (?) NOT NULL , ROLE VARCHARACTER (?) NOT NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_users` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_users_email` UNIQUE ( `email` ) , CONSTRAINT `ck_users_role` CHECK ( ROLE IN (...) ) , CONSTRAINT `ck_users_status` CHECK ( STATUS IN (...) ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.2986,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `products` ADD CONSTRAINT `ck_products_stock` CHECK ( `stock_quantity` >= ? )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.2657,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `brandista_prod001` . `flyway_schema_history` ( `installed_rank` INTEGER NOT NULL , `version` VARCHARACTER (?) , `description` VARCHARACTER (?) NOT NULL , `type` VARCHARACTER (?) NOT NULL , `script` VARCHARACTER (?) NOT NULL , `checksum` INTEGER , `installed_by` VARCHARACTER (?) NOT NULL , `installed_on` TIMESTAMP NOT NULL DEFAULT NOW , `execution_time` INTEGER NOT NULL , `success` BOOL NOT NULL , CONSTRAINT `flyway_schema_history_pk` PRIMARY KEY ( `installed_rank` ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.2424,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "SELECT `id` FROM `products` WHERE `slug` = ?",
+    "COUNT_STAR" : 500,
+    "total_seconds" : 0.2101,
+    "SUM_ROWS_EXAMINED" : 500,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `products` ADD COLUMN `stock_quantity` INTEGER NOT NULL DEFAULT ?",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.2092,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "SELECT `id` FROM `users` WHERE `email` = ?",
+    "COUNT_STAR" : 500,
+    "total_seconds" : 0.2087,
+    "SUM_ROWS_EXAMINED" : 500,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `brands` ( `id` INT8 NOT NULL AUTO_INCREMENT , NAME VARCHARACTER (?) NOT NULL , `slug` VARCHARACTER (?) NOT NULL , DESCRIPTION VARCHARACTER (?) NULL , `logo_reference` VARCHARACTER (?) NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_brands` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_brands_slug` UNIQUE ( `slug` ) , CONSTRAINT `ck_brands_status` CHECK ( STATUS IN (...) ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1838,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `customer_addresses` ADD COLUMN `delivery_instructions` VARCHARACTER (?) NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1824,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `brand_admin_invitations` ( `id` INT8 NOT NULL AUTO_INCREMENT PRIMARY KEY , `application_id` INT8 NOT NULL , `brand_id` INT8 NOT NULL , `recipient_email` VARCHARACTER (?) NOT NULL , `token_hash` VARCHARACTER (?) NOT NULL , `created_by` INT8 NOT NULL , `created_at` DATETIME (?) NOT NULL , `expires_at` DATETIME (?) NOT NULL , `revoked_at` DATETIME (?) NULL , `accepted_at` DATETIME (?) NULL , `accepted_user_id` INT8 NULL , `membership_id` INT8 NULL , `expected_membership_version` INT8 NULL , `accepted_membership_version` INT8 NULL , `replaces_invitation_id` INT8 NULL , CONSTRAINT `uk_brand_invitation_hash` UNIQUE ( `token_hash` ) , CONSTRAINT `fk_invitation_application` FOREIGN KEY ( `application_id` ) REFERENCES `brand_applications` ( `id` ) , CONSTRAINT `fk_invitation_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) , CONSTRAINT `fk_invitation_creator` FOREIGN KEY ( `created_by` ) REFERENCES `users` ( `id` ) , CONSTRAINT `fk_invitation_acceptor` FOREIGN KEY ( `accepted_user_id` ) REFERENCES `users` ( `id` ) , CONSTRAINT `fk_invitation_membership` FOREIGN KEY ( `membership_id` ) REFERENCES `brand_admin_memberships` ( `id` ) , CONSTRAINT `fk_invitation_replacement` FOREIGN KEY ( `replaces_invitation_id` ) REFERENCES `brand_admin_invitations` ( `id` ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1823,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `users` ADD CONSTRAINT `fk_users_default_address` FOREIGN KEY ( `default_address_id` ) REFERENCES `customer_addresses` ( `id` ) ON DELETE SET NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1798,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `security_audit_events` ADD COLUMN `target_brand_id` INT8 NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1714,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `brand_applications` ( `id` INT8 NOT NULL AUTO_INCREMENT , `brand_name` VARCHARACTER (?) NOT NULL , `contact_name` VARCHARACTER (?) NOT NULL , `contact_email` VARCHARACTER (?) NOT NULL , `website` VARCHARACTER (?) NULL , `message` VARCHARACTER (?) NULL , STATUS VARCHARACTER (?) NOT NULL , `review_note` VARCHARACTER (?) NULL , `reviewed_at` DATETIME (?) NULL , `brand_id` INT8 NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_brand_applications` PRIMARY KEY ( `id` ) , CONSTRAINT `ck_brand_applications_status` CHECK ( STATUS IN (...) ) , CONSTRAINT `fk_brand_applications_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) ON DELETE RESTRICT )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1698,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `cart_items` ( `id` INT8 NOT NULL AUTO_INCREMENT , `cart_id` INT8 NOT NULL , `product_id` INT8 NOT NULL , `quantity` INTEGER NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_cart_items` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_cart_items_cart_product` UNIQUE ( `cart_id` , `product_id` ) , CONSTRAINT `chk_cart_items_quantity_positive` CHECK ( `quantity` > ? ) , CONSTRAINT `fk_cart_items_cart` FOREIGN KEY ( `cart_id` ) REFERENCES `carts` ( `id` ) ON DELETE CASCADE , CONSTRAINT `fk_cart_items_product` FOREIGN KEY ( `product_id` ) REFERENCES `products` ( `id` ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1567,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `users` ADD COLUMN `default_address_id` INT8 NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1485,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `security_audit_events` ADD COLUMN `target_invitation_id` INT8 NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1456,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `products` ( `id` INT8 NOT NULL AUTO_INCREMENT , NAME VARCHARACTER (?) NOT NULL , `slug` VARCHARACTER (?) NOT NULL , DESCRIPTION VARCHARACTER (?) NULL , `brand_id` INT8 NOT NULL , `category_id` INT8 NOT NULL , `price` DECIMAL (...) NOT NULL , `availability` VARCHARACTER (?) NOT NULL , `publication_status` VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_products` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_products_slug` UNIQUE ( `slug` ) , CONSTRAINT `ck_products_price` CHECK ( `price` >= ? ) , CONSTRAINT `ck_products_availability` CHECK ( `availability` IN (...) ) , CONSTRAINT `ck_products_publication_status` CHECK ( `publication_status` IN (...) ) , CONSTRAINT `fk_products_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) ON DELETE RESTRICT , CONSTRAINT `fk_products_category` FOREIGN KEY ( `category_id` ) REFERENCES `categories` ( `id` ) ON DELETE RESTRICT )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1418,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `customer_addresses` ( `id` INT8 NOT NULL AUTO_INCREMENT , `customer_id` INT8 NOT NULL , `recipient_name` VARCHARACTER (?) NOT NULL , `phone_number` VARCHARACTER (?) NOT NULL , `address_line1` VARCHARACTER (?) NOT NULL , `address_line2` VARCHARACTER (?) NULL , `city` VARCHARACTER (?) NOT NULL , `province` VARCHARACTER (?) NULL , `postal_code` VARCHARACTER (?) NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_customer_addresses` PRIMARY KEY ( `id` ) , CONSTRAINT `fk_customer_addresses_user` FOREIGN KEY ( `customer_id` ) REFERENCES `users` ( `id` ) ON DELETE CASCADE )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1352,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE INDEX `idx_products_category_id` ON `products` ( `category_id` )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1297,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "ALTER TABLE `security_audit_events` ADD COLUMN `target_application_id` INT8 NULL",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1236,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  }, {
+    "DIGEST_TEXT" : "CREATE TABLE `merchant_order_fulfillments` ( `order_id` INT8 NOT NULL , `brand_id` INT8 NOT NULL , STATUS VARCHARACTER (?) NOT NULL , `version` INT8 NOT NULL DEFAULT ? , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , PRIMARY KEY ( `order_id` , `brand_id` ) , CONSTRAINT `fk_merchant_fulfillment_order` FOREIGN KEY ( `order_id` ) REFERENCES `customer_orders` ( `id` ) , CONSTRAINT `ck_merchant_fulfillment_status` CHECK ( STATUS IN (...) ) , CONSTRAINT `ck_merchant_fulfillment_version` CHECK ( `version` >= ? ) )",
+    "COUNT_STAR" : 1,
+    "total_seconds" : 0.1218,
+    "SUM_ROWS_EXAMINED" : 0,
+    "SUM_ERRORS" : 0
+  } ],
+  "poolTimersCumulative" : {
+    "hikaricp.connections.usage" : {
+      "count" : 1135,
+      "totalSeconds" : 30.681,
+      "windowMaxSeconds" : 13.979
+    },
+    "hikaricp.connections.acquire" : {
+      "count" : 1135,
+      "totalSeconds" : 0.011584,
+      "windowMaxSeconds" : 0.0022747
+    }
+  },
+  "committedOrders" : 1,
+  "integrity" : "PASS"
+}

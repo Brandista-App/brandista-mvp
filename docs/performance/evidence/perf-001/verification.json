@@ -1,0 +1,21 @@
+{
+  "productionCodeCommit": "f3b3f61d19da8e891d4d7476db37dfa7a0248568",
+  "command": "mvnw.cmd --batch-mode --no-transfer-progress verify",
+  "completedKarachi": "2026-10-26T23:23:42+05:00",
+  "result": "BUILD SUCCESS",
+  "testsDiscovered": 197,
+  "testsPassed": 196,
+  "testsSkipped": 1,
+  "failures": 0,
+  "errors": 0,
+  "skippedTest": "ProductionLoadHarnessTests (requires explicit disposable infrastructure opt-in)",
+  "focusedSearchVerification": { "testsPassed": 6, "failures": 0, "errors": 0 },
+  "coverage": [
+    "public search semantics, visibility, filters, sorting, pagination and SQL shape",
+    "stock concurrency and rollback",
+    "checkout idempotency and immutable COD snapshots",
+    "merchant tenant isolation, order visibility and fulfillment",
+    "account and privilege revocation",
+    "migration compatibility and production operations controls"
+  ]
+}

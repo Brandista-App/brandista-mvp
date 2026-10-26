@@ -18,7 +18,6 @@ import com.brandista.brandista.product.api.ProductResponse;
 import com.brandista.brandista.product.api.ProductUpdateRequest;
 import com.brandista.brandista.product.api.PublicProductPageResponse;
 import com.brandista.brandista.product.api.PublicProductResponse;
-import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -183,8 +182,11 @@ public class ProductService {
 
     private Specification<Product> publicProductSpecification(String keyword, Long brandId, Long categoryId) {
         return (root, query, criteriaBuilder) -> {
-            Join<Product, Brand> brand = root.join("brand");
-            Join<Product, Category> category = root.join("category");
+            // Path navigation lets Hibernate reuse the to-one entity-graph joins.
+            // Explicit joins here created separate filter and fetch joins, forcing
+            // a catalogue scan/hash joins/filesort for the measured price page.
+            var brand = root.get("brand");
+            var category = root.get("category");
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(criteriaBuilder.equal(root.get("publicationStatus"), ProductPublicationStatus.PUBLISHED));
             predicates.add(criteriaBuilder.equal(brand.get("status"), BrandStatus.ACTIVE));
