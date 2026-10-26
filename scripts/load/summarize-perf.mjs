@@ -13,6 +13,7 @@ const max = values => {
   return present.length ? Math.max(...present) : null
 }
 const status = database => Object.fromEntries((database?.globalStatus ?? []).map(v => [v.Variable_name, Number(v.Value)]))
+const counterKeys = new Set(['Slow_queries', 'Innodb_row_lock_waits', 'Innodb_row_lock_time', 'Innodb_buffer_pool_reads', 'Innodb_buffer_pool_read_requests'])
 const output = {}
 for (const run of runs.length ? runs : ['before', 'after']) {
   const folder = path.join(root, run)
@@ -26,7 +27,7 @@ for (const run of runs.length ? runs : ['before', 'after']) {
     const times = stage.samples.map(s => Date.parse(s.time))
     const during = resources.filter(s => Date.parse(s.time) >= Math.min(...times) && Date.parse(s.time) <= Math.max(...times))
     const currentStatus = status(stage.database), previousStatus = status(previous)
-    const deltas = Object.fromEntries(Object.entries(currentStatus).filter(([k]) => k in previousStatus).map(([k, v]) => [k, v - previousStatus[k]]))
+    const deltas = Object.fromEntries(Object.entries(currentStatus).filter(([k]) => counterKeys.has(k) && k in previousStatus).map(([k, v]) => [k, v - previousStatus[k]]))
     const timers = Object.fromEntries(Object.entries(stage.database.poolTimersCumulative ?? {}).map(([name, timer]) => {
       const before = previous?.poolTimersCumulative?.[name]
       const count = before ? timer.count - before.count : null
@@ -48,7 +49,7 @@ for (const run of runs.length ? runs : ['before', 'after']) {
       peakMysqlMemoryPercent: max(during.map(s => parseFloat(s.stats.MemPerc))),
       peakLockWaitEdges: max(during.map(s => s.lockWaitEdges)), peakOldestTransactionSeconds: max(during.map(s => s.oldestTransactionSeconds)),
       lockSampleFailures: during.filter(s => s.lockSampleOk === false).length,
-      databaseCounterDeltas: deltas, routes: stage.routes })
+      databaseCounterDeltas: deltas, databaseGauges: Object.fromEntries(Object.entries(currentStatus).filter(([k]) => !counterKeys.has(k))), routes: stage.routes })
     previous = stage.database
   }
 }
