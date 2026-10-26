@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.jpa.properties.hibernate.session_factory.statement_inspector=com.brandista.brandista.production.Perf001SqlProbe",
         "management.server.port=0", "management.endpoints.web.exposure.include=health,metrics,prometheus",
         "brandista.checkout.cod-enabled=true", "brandista.security.provisioning.enabled=true"})
-@Import(ProductionLoadHarnessTests.DeliveryFixture.class)
+@Import({ProductionLoadHarnessTests.DeliveryFixture.class,Perf002Diagnostics.class})
 class ProductionLoadHarnessTests {
     @DynamicPropertySource static void database(DynamicPropertyRegistry properties) {
         String url=System.getenv("BRANDISTA_PROD001_URL");
@@ -152,6 +152,7 @@ class ProductionLoadHarnessTests {
                 .put("password",password).put("brandId",brands[0]).put("slug","synthetic-product-0");
         fixture.set("users",identities); fixture.set("productIds",json.valueToTree(products));
         Files.writeString(output.resolve("database-before.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(databaseSnapshot()));
+        Perf002Diagnostics.clear();
         var process=new ProcessBuilder("node","scripts/load/mixed-load.mjs").redirectError(ProcessBuilder.Redirect.INHERIT).start();
         var writer=new OutputStreamWriter(process.getOutputStream(),StandardCharsets.UTF_8);
         writer.write(fixture.toString()+"\n");writer.flush();
@@ -159,6 +160,7 @@ class ProductionLoadHarnessTests {
         try(var reader=process.inputReader(StandardCharsets.UTF_8)) {
             String line;while((line=reader.readLine())!=null) {
                 ObjectNode result=(ObjectNode)json.readTree(line);
+                Files.writeString(output.resolve("auth-"+result.path("users").asInt()+".json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Perf002Diagnostics.snapshot()));
                 result.set("database",json.valueToTree(databaseSnapshot()));
                 assertIntegrity();
                 stages.add(result);
