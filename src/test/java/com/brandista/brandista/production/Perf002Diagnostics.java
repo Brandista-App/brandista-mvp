@@ -153,13 +153,13 @@ public class Perf002Diagnostics {
     @Bean(destroyMethod="close") Lifetime perf002ExecutorTiming() {return new Lifetime();}
     static class Lifetime implements ApplicationListener<ServletWebServerInitializedEvent>,AutoCloseable {
         ScheduledExecutorService sampler;
-        java.util.concurrent.ThreadPoolExecutor original;
+        org.apache.tomcat.util.threads.ThreadPoolExecutor original;
         org.apache.coyote.ProtocolHandler protocol;
         @Override public void onApplicationEvent(ServletWebServerInitializedEvent event) {
             if(event.getApplicationContext().getServerNamespace()!=null)return;
             var server=(TomcatWebServer)event.getWebServer();
             protocol=server.getTomcat().getConnector().getProtocolHandler();
-            if(!(protocol.getExecutor() instanceof java.util.concurrent.ThreadPoolExecutor pool))throw new IllegalStateException("Unexpected Tomcat executor; no queue measurements available");
+            if(!(protocol.getExecutor() instanceof org.apache.tomcat.util.threads.ThreadPoolExecutor pool))throw new IllegalStateException("Unexpected Tomcat executor; no queue measurements available");
             original=pool;
             // Delegate unchanged scheduling to Tomcat's original pool/TaskQueue.
             protocol.setExecutor(command->{long entered=System.nanoTime();pool.execute(()-> {
