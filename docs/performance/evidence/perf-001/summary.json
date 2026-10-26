@@ -1,0 +1,952 @@
+{
+  "before-repeat": {
+    "environment": {
+      "startedUtc": "2026-10-26T18:24:53.0743707Z",
+      "workingTree": null,
+      "databaseMemoryMiB": 640,
+      "mysqlImage": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+      "sourceSha": "b8f3a68f6b5015dc4a23a3e4c88df08047ff8417",
+      "jvmHeapMiB": 512,
+      "databaseCpuLimit": 1,
+      "nodeVersion": "v24.21.0"
+    },
+    "stages": [
+      {
+        "users": 10,
+        "peakActiveUsers": 10,
+        "seconds": 36.2570144,
+        "requests": 653,
+        "requestsPerSecond": 18.010308096410718,
+        "p50Ms": 248.87389999999868,
+        "p95Ms": 959.6635999999999,
+        "p99Ms": 2486.5522999999994,
+        "errors": 0,
+        "errorRate": 0,
+        "committedOrders": 14,
+        "ordersPerSecond": 0.38613217970865243,
+        "gate": "PASS",
+        "failingRoutes": [],
+        "integrity": "PASS",
+        "monitorFailures": 0,
+        "peakPoolActive": 9,
+        "peakPoolPending": 1,
+        "poolTimers": {
+          "hikaricp.connections.usage": {
+            "count": 827,
+            "meanMs": 257.30108827085854
+          },
+          "hikaricp.connections.acquire": {
+            "count": 827,
+            "meanMs": 8.114173035066505
+          }
+        },
+        "peakBackendCpuFraction": 0.37141238468482113,
+        "peakJvmUsedMiB": 262.15875244140625,
+        "peakBackendRssMiB": null,
+        "peakGeneratorRssMiB": 79.8203125,
+        "mysqlSamples": 6,
+        "peakMysqlCpuPercent": 152.22,
+        "peakMysqlMemoryPercent": 84.82,
+        "peakLockWaitEdges": 0,
+        "peakOldestTransactionSeconds": 3,
+        "lockSampleFailures": 0,
+        "databaseCounterDeltas": {
+          "Innodb_buffer_pool_read_requests": 553760,
+          "Innodb_buffer_pool_reads": 1,
+          "Innodb_row_lock_time": 540,
+          "Innodb_row_lock_waits": 6,
+          "Slow_queries": 166
+        },
+        "databaseGauges": {
+          "Innodb_buffer_pool_pages_data": 1548,
+          "Innodb_buffer_pool_pages_free": 6644,
+          "Max_used_connections": 11,
+          "Threads_connected": 10,
+          "Threads_running": 2
+        },
+        "routes": {
+          "authentication": {
+            "requests": 10,
+            "p50": 522.0376000000006,
+            "p95": 2335.7902999999997,
+            "p99": 2335.7902999999997,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "brands": {
+            "requests": 161,
+            "p50": 121.05069999999978,
+            "p95": 548.6227999999974,
+            "p99": 866.6216999999997,
+            "errors": 0,
+            "statuses": {
+              "200": 161
+            }
+          },
+          "search": {
+            "requests": 161,
+            "p50": 420.22209999999905,
+            "p95": 1082.2351000000017,
+            "p99": 3743.946900000001,
+            "errors": 0,
+            "statuses": {
+              "200": 161
+            }
+          },
+          "product": {
+            "requests": 161,
+            "p50": 174.7510000000002,
+            "p95": 498.1114000000016,
+            "p99": 688.053399999997,
+            "errors": 0,
+            "statuses": {
+              "200": 161
+            }
+          },
+          "address-list": {
+            "requests": 14,
+            "p50": 176.0652000000009,
+            "p95": 654.3719999999994,
+            "p99": 654.3719999999994,
+            "errors": 0,
+            "statuses": {
+              "200": 14
+            }
+          },
+          "address-create": {
+            "requests": 2,
+            "p50": 124.60369999999966,
+            "p95": 153.76939999999968,
+            "p99": 153.76939999999968,
+            "errors": 0,
+            "statuses": {
+              "201": 2
+            }
+          },
+          "cart-read": {
+            "requests": 14,
+            "p50": 165.52880000000005,
+            "p95": 514.7813999999998,
+            "p99": 514.7813999999998,
+            "errors": 0,
+            "statuses": {
+              "200": 14
+            }
+          },
+          "cart-clear": {
+            "requests": 14,
+            "p50": 265.8091999999997,
+            "p95": 1206.0516000000007,
+            "p99": 1206.0516000000007,
+            "errors": 0,
+            "statuses": {
+              "200": 14
+            }
+          },
+          "cart-add": {
+            "requests": 28,
+            "p50": 345.95360000000073,
+            "p95": 1040.2864000000009,
+            "p99": 1344.3129,
+            "errors": 0,
+            "statuses": {
+              "201": 28
+            }
+          },
+          "checkout-preview": {
+            "requests": 14,
+            "p50": 195.0684000000001,
+            "p95": 2011.3015000000005,
+            "p99": 2011.3015000000005,
+            "errors": 0,
+            "statuses": {
+              "200": 14
+            }
+          },
+          "checkout-place": {
+            "requests": 14,
+            "p50": 688.1496999999981,
+            "p95": 1773.559400000001,
+            "p99": 1773.559400000001,
+            "errors": 0,
+            "statuses": {
+              "201": 14
+            }
+          },
+          "merchant-catalogue": {
+            "requests": 10,
+            "p50": 268.3575000000001,
+            "p95": 1045.2502999999997,
+            "p99": 1045.2502999999997,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "checkout-replay": {
+            "requests": 6,
+            "p50": 191.05639999999767,
+            "p95": 464.0682000000006,
+            "p99": 464.0682000000006,
+            "errors": 0,
+            "statuses": {
+              "200": 6
+            }
+          },
+          "merchant-stock": {
+            "requests": 10,
+            "p50": 235.8862999999983,
+            "p95": 656.9732999999997,
+            "p99": 656.9732999999997,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "order-history": {
+            "requests": 14,
+            "p50": 224.09020000000237,
+            "p95": 1217.6602999999996,
+            "p99": 1217.6602999999996,
+            "errors": 0,
+            "statuses": {
+              "200": 14
+            }
+          },
+          "merchant-orders": {
+            "requests": 10,
+            "p50": 263.9948000000004,
+            "p95": 1195.0473999999995,
+            "p99": 1195.0473999999995,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "merchant-order-detail": {
+            "requests": 10,
+            "p50": 402.1935000000012,
+            "p95": 2949.7069,
+            "p99": 2949.7069,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          }
+        }
+      },
+      {
+        "users": 50,
+        "peakActiveUsers": 49,
+        "seconds": 38.726748699999995,
+        "requests": 895,
+        "requestsPerSecond": 23.110641353685345,
+        "p50Ms": 1602.076000000001,
+        "p95Ms": 3430.473299999998,
+        "p99Ms": 4678.598299999998,
+        "errors": 23,
+        "errorRate": 0.02569832402234637,
+        "committedOrders": 12,
+        "ordersPerSecond": 0.3098633477589096,
+        "gate": "FAIL",
+        "failingRoutes": [
+          "brands",
+          "search",
+          "cart-add"
+        ],
+        "integrity": "PASS",
+        "monitorFailures": 0,
+        "peakPoolActive": 10,
+        "peakPoolPending": 39,
+        "poolTimers": {
+          "hikaricp.connections.usage": {
+            "count": 1096,
+            "meanMs": 332.1094890510949
+          },
+          "hikaricp.connections.acquire": {
+            "count": 1117,
+            "meanMs": 1029.7968341092212
+          }
+        },
+        "peakBackendCpuFraction": 0.4489420543656394,
+        "peakJvmUsedMiB": 282.6837692260742,
+        "peakBackendRssMiB": null,
+        "peakGeneratorRssMiB": 94.015625,
+        "mysqlSamples": 6,
+        "peakMysqlCpuPercent": 120.24,
+        "peakMysqlMemoryPercent": 86.53,
+        "peakLockWaitEdges": 2,
+        "peakOldestTransactionSeconds": 2,
+        "lockSampleFailures": 0,
+        "databaseCounterDeltas": {
+          "Innodb_buffer_pool_read_requests": 734303,
+          "Innodb_buffer_pool_reads": 0,
+          "Innodb_row_lock_time": 6973,
+          "Innodb_row_lock_waits": 17,
+          "Slow_queries": 255
+        },
+        "databaseGauges": {
+          "Innodb_buffer_pool_pages_data": 1574,
+          "Innodb_buffer_pool_pages_free": 6618,
+          "Max_used_connections": 11,
+          "Threads_connected": 10,
+          "Threads_running": 2
+        },
+        "routes": {
+          "authentication": {
+            "requests": 50,
+            "p50": 1491.529499999997,
+            "p95": 2881.325499999999,
+            "p99": 3111.2958,
+            "errors": 1,
+            "statuses": {
+              "200": 49,
+              "503": 1
+            }
+          },
+          "brands": {
+            "requests": 227,
+            "p50": 1511.4349999999977,
+            "p95": 3006.8285000000033,
+            "p99": 3149.2291000000114,
+            "errors": 4,
+            "statuses": {
+              "200": 223,
+              "503": 4
+            }
+          },
+          "search": {
+            "requests": 227,
+            "p50": 1788.6661999999997,
+            "p95": 3287.0102999999945,
+            "p99": 3523.3640000000014,
+            "errors": 8,
+            "statuses": {
+              "200": 219,
+              "503": 8
+            }
+          },
+          "product": {
+            "requests": 227,
+            "p50": 1410.4977999999974,
+            "p95": 2533.183800000006,
+            "p99": 3020.9005000000034,
+            "errors": 1,
+            "statuses": {
+              "200": 226,
+              "503": 1
+            }
+          },
+          "address-list": {
+            "requests": 13,
+            "p50": 2376.9170999999988,
+            "p95": 4882.503700000001,
+            "p99": 4882.503700000001,
+            "errors": 1,
+            "statuses": {
+              "200": 12,
+              "500": 1
+            }
+          },
+          "cart-read": {
+            "requests": 13,
+            "p50": 2404.3695000000007,
+            "p95": 4275.620900000009,
+            "p99": 4275.620900000009,
+            "errors": 1,
+            "statuses": {
+              "200": 12,
+              "503": 1
+            }
+          },
+          "merchant-catalogue": {
+            "requests": 11,
+            "p50": 3167.689599999998,
+            "p95": 5113.183900000004,
+            "p99": 5113.183900000004,
+            "errors": 3,
+            "statuses": {
+              "200": 8,
+              "500": 1,
+              "503": 2
+            }
+          },
+          "cart-clear": {
+            "requests": 13,
+            "p50": 1959.3498000000036,
+            "p95": 4011.403099999996,
+            "p99": 4011.403099999996,
+            "errors": 0,
+            "statuses": {
+              "200": 13
+            }
+          },
+          "cart-add": {
+            "requests": 26,
+            "p50": 2559.2706000000035,
+            "p95": 3854.9755000000077,
+            "p99": 4422.009399999995,
+            "errors": 0,
+            "statuses": {
+              "201": 26
+            }
+          },
+          "merchant-stock": {
+            "requests": 11,
+            "p50": 3249.2271000000037,
+            "p95": 4413.739100000006,
+            "p99": 4413.739100000006,
+            "errors": 0,
+            "statuses": {
+              "200": 11
+            }
+          },
+          "merchant-orders": {
+            "requests": 11,
+            "p50": 1751.5011000000013,
+            "p95": 3142.8058999999994,
+            "p99": 3142.8058999999994,
+            "errors": 0,
+            "statuses": {
+              "200": 11
+            }
+          },
+          "address-create": {
+            "requests": 9,
+            "p50": 3272.1007000000027,
+            "p95": 3967.95719999999,
+            "p99": 3967.95719999999,
+            "errors": 0,
+            "statuses": {
+              "201": 9
+            }
+          },
+          "merchant-order-detail": {
+            "requests": 11,
+            "p50": 2510.7708000000057,
+            "p95": 4777.226600000009,
+            "p99": 4777.226600000009,
+            "errors": 0,
+            "statuses": {
+              "200": 11
+            }
+          },
+          "checkout-preview": {
+            "requests": 13,
+            "p50": 3158.587800000001,
+            "p95": 5840.511700000003,
+            "p99": 5840.511700000003,
+            "errors": 0,
+            "statuses": {
+              "200": 13
+            }
+          },
+          "checkout-place": {
+            "requests": 13,
+            "p50": 3366.2407999999996,
+            "p95": 6017.042100000006,
+            "p99": 6017.042100000006,
+            "errors": 3,
+            "statuses": {
+              "0": 2,
+              "201": 10,
+              "503": 1
+            }
+          },
+          "checkout-replay": {
+            "requests": 7,
+            "p50": 2622.1015000000043,
+            "p95": 3855.936999999998,
+            "p99": 3855.936999999998,
+            "errors": 1,
+            "statuses": {
+              "200": 6,
+              "500": 1
+            }
+          },
+          "order-history": {
+            "requests": 13,
+            "p50": 1730.1359999999986,
+            "p95": 5477.097999999998,
+            "p99": 5477.097999999998,
+            "errors": 0,
+            "statuses": {
+              "200": 13
+            }
+          }
+        }
+      }
+    ]
+  },
+  "after": {
+    "environment": {
+      "sourceSha": "94bb2f4fee126f5b0b2d108cca2b641242762dd5",
+      "mysqlImage": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+      "workingTree": null,
+      "nodeVersion": "v24.21.0",
+      "databaseMemoryMiB": 640,
+      "startedUtc": "2026-10-26T18:30:34.2705969Z",
+      "databaseCpuLimit": 1,
+      "jvmHeapMiB": 512
+    },
+    "stages": [
+      {
+        "users": 10,
+        "peakActiveUsers": 10,
+        "seconds": 36.7299531,
+        "requests": 1102,
+        "requestsPerSecond": 30.0027608801929,
+        "p50Ms": 121.28789999999935,
+        "p95Ms": 388.84310000000005,
+        "p99Ms": 635.4191999999985,
+        "errors": 0,
+        "errorRate": 0,
+        "committedOrders": 24,
+        "ordersPerSecond": 0.6534176598227128,
+        "gate": "PASS",
+        "failingRoutes": [],
+        "integrity": "PASS",
+        "monitorFailures": 0,
+        "peakPoolActive": 9,
+        "peakPoolPending": 0,
+        "poolTimers": {
+          "hikaricp.connections.usage": {
+            "count": 1398,
+            "meanMs": 109.86194563662374
+          },
+          "hikaricp.connections.acquire": {
+            "count": 1398,
+            "meanMs": 0.674058226037196
+          }
+        },
+        "peakBackendCpuFraction": 0.5323726469620426,
+        "peakJvmUsedMiB": 267.9875717163086,
+        "peakBackendRssMiB": null,
+        "peakGeneratorRssMiB": 92.9453125,
+        "mysqlSamples": 6,
+        "peakMysqlCpuPercent": 65.01,
+        "peakMysqlMemoryPercent": 72.94,
+        "peakLockWaitEdges": 0,
+        "peakOldestTransactionSeconds": 0,
+        "lockSampleFailures": 0,
+        "databaseCounterDeltas": {
+          "Innodb_buffer_pool_read_requests": 908546,
+          "Innodb_buffer_pool_reads": 1,
+          "Innodb_row_lock_time": 1152,
+          "Innodb_row_lock_waits": 15,
+          "Slow_queries": 16
+        },
+        "databaseGauges": {
+          "Innodb_buffer_pool_pages_data": 1581,
+          "Innodb_buffer_pool_pages_free": 6611,
+          "Max_used_connections": 11,
+          "Threads_connected": 10,
+          "Threads_running": 2
+        },
+        "routes": {
+          "authentication": {
+            "requests": 10,
+            "p50": 442.1322,
+            "p95": 601.5623999999998,
+            "p99": 601.5623999999998,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "brands": {
+            "requests": 270,
+            "p50": 83.34959999999955,
+            "p95": 191.90539999999964,
+            "p99": 454.55119999999806,
+            "errors": 0,
+            "statuses": {
+              "200": 270
+            }
+          },
+          "search": {
+            "requests": 270,
+            "p50": 142.90749999999935,
+            "p95": 367.85629999999946,
+            "p99": 531.6318000000001,
+            "errors": 0,
+            "statuses": {
+              "200": 270
+            }
+          },
+          "product": {
+            "requests": 270,
+            "p50": 105.1278999999995,
+            "p95": 246.40759999999955,
+            "p99": 537.0911999999998,
+            "errors": 0,
+            "statuses": {
+              "200": 270
+            }
+          },
+          "address-list": {
+            "requests": 24,
+            "p50": 92.72209999999905,
+            "p95": 341.5493000000024,
+            "p99": 642.3166999999994,
+            "errors": 0,
+            "statuses": {
+              "200": 24
+            }
+          },
+          "address-create": {
+            "requests": 2,
+            "p50": 116.54919999999993,
+            "p95": 147.86770000000024,
+            "p99": 147.86770000000024,
+            "errors": 0,
+            "statuses": {
+              "201": 2
+            }
+          },
+          "cart-read": {
+            "requests": 24,
+            "p50": 113.55330000000004,
+            "p95": 412.2079999999987,
+            "p99": 678.2389000000003,
+            "errors": 0,
+            "statuses": {
+              "200": 24
+            }
+          },
+          "cart-clear": {
+            "requests": 24,
+            "p50": 175.84950000000026,
+            "p95": 351.1846999999998,
+            "p99": 441.627199999999,
+            "errors": 0,
+            "statuses": {
+              "200": 24
+            }
+          },
+          "cart-add": {
+            "requests": 48,
+            "p50": 234.6251000000011,
+            "p95": 485.9262999999992,
+            "p99": 532.8974999999991,
+            "errors": 0,
+            "statuses": {
+              "201": 48
+            }
+          },
+          "merchant-catalogue": {
+            "requests": 20,
+            "p50": 170.64270000000397,
+            "p95": 719.0574999999999,
+            "p99": 742.160899999999,
+            "errors": 0,
+            "statuses": {
+              "200": 20
+            }
+          },
+          "checkout-preview": {
+            "requests": 24,
+            "p50": 133.14280000000144,
+            "p95": 599.7488999999996,
+            "p99": 635.4191999999985,
+            "errors": 0,
+            "statuses": {
+              "200": 24
+            }
+          },
+          "merchant-stock": {
+            "requests": 20,
+            "p50": 103.71649999999863,
+            "p95": 259.90710000000036,
+            "p99": 421.34400000000096,
+            "errors": 0,
+            "statuses": {
+              "200": 20
+            }
+          },
+          "merchant-orders": {
+            "requests": 20,
+            "p50": 147.75920000000042,
+            "p95": 250.72190000000046,
+            "p99": 272.70969999999943,
+            "errors": 0,
+            "statuses": {
+              "200": 20
+            }
+          },
+          "checkout-place": {
+            "requests": 24,
+            "p50": 351.0528999999988,
+            "p95": 948.0116999999991,
+            "p99": 1500.0730999999996,
+            "errors": 0,
+            "statuses": {
+              "201": 24
+            }
+          },
+          "merchant-order-detail": {
+            "requests": 20,
+            "p50": 128.3089,
+            "p95": 431.09059999999954,
+            "p99": 472.5805999999993,
+            "errors": 0,
+            "statuses": {
+              "200": 20
+            }
+          },
+          "checkout-replay": {
+            "requests": 8,
+            "p50": 168.58459999999832,
+            "p95": 452.10329999999976,
+            "p99": 452.10329999999976,
+            "errors": 0,
+            "statuses": {
+              "200": 8
+            }
+          },
+          "order-history": {
+            "requests": 24,
+            "p50": 132.1955999999991,
+            "p95": 509.80109999999695,
+            "p99": 573.2125000000005,
+            "errors": 0,
+            "statuses": {
+              "200": 24
+            }
+          }
+        }
+      },
+      {
+        "users": 50,
+        "peakActiveUsers": 50,
+        "seconds": 38.4347494,
+        "requests": 1662,
+        "requestsPerSecond": 43.24211881032845,
+        "p50Ms": 726.9960999999967,
+        "p95Ms": 1933.650099999999,
+        "p99Ms": 2787.066000000006,
+        "errors": 1,
+        "errorRate": 0.0006016847172081829,
+        "committedOrders": 23,
+        "ordersPerSecond": 0.5984168066411277,
+        "gate": "FAIL",
+        "failingRoutes": [
+          "authentication"
+        ],
+        "integrity": "PASS",
+        "monitorFailures": 0,
+        "peakPoolActive": 10,
+        "peakPoolPending": 39,
+        "poolTimers": {
+          "hikaricp.connections.usage": {
+            "count": 2009,
+            "meanMs": 179.8063713290194
+          },
+          "hikaricp.connections.acquire": {
+            "count": 2010,
+            "meanMs": 543.3297820398011
+          }
+        },
+        "peakBackendCpuFraction": 0.52546770891807,
+        "peakJvmUsedMiB": 281.89981842041016,
+        "peakBackendRssMiB": null,
+        "peakGeneratorRssMiB": 115.359375,
+        "mysqlSamples": 6,
+        "peakMysqlCpuPercent": 90.01,
+        "peakMysqlMemoryPercent": 73.6,
+        "peakLockWaitEdges": 3,
+        "peakOldestTransactionSeconds": 1,
+        "lockSampleFailures": 0,
+        "databaseCounterDeltas": {
+          "Innodb_buffer_pool_read_requests": 1492338,
+          "Innodb_buffer_pool_reads": 0,
+          "Innodb_row_lock_time": 5686,
+          "Innodb_row_lock_waits": 40,
+          "Slow_queries": 66
+        },
+        "databaseGauges": {
+          "Innodb_buffer_pool_pages_data": 1601,
+          "Innodb_buffer_pool_pages_free": 6591,
+          "Max_used_connections": 11,
+          "Threads_connected": 10,
+          "Threads_running": 2
+        },
+        "routes": {
+          "authentication": {
+            "requests": 50,
+            "p50": 1311.950499999999,
+            "p95": 3163.246800000001,
+            "p99": 3732.4014000000025,
+            "errors": 0,
+            "statuses": {
+              "200": 50
+            }
+          },
+          "brands": {
+            "requests": 442,
+            "p50": 645.9086000000025,
+            "p95": 1625.4820999999938,
+            "p99": 2317.2860999999975,
+            "errors": 1,
+            "statuses": {
+              "200": 441,
+              "503": 1
+            }
+          },
+          "search": {
+            "requests": 442,
+            "p50": 707.2678999999916,
+            "p95": 1647.1656000000003,
+            "p99": 2055.8125999999975,
+            "errors": 0,
+            "statuses": {
+              "200": 442
+            }
+          },
+          "product": {
+            "requests": 442,
+            "p50": 676.9766000000018,
+            "p95": 1647.9131999999954,
+            "p99": 2085.476299999995,
+            "errors": 0,
+            "statuses": {
+              "200": 442
+            }
+          },
+          "address-list": {
+            "requests": 23,
+            "p50": 1214.570900000006,
+            "p95": 2250.9349,
+            "p99": 2477.3750999999975,
+            "errors": 0,
+            "statuses": {
+              "200": 23
+            }
+          },
+          "cart-read": {
+            "requests": 23,
+            "p50": 1398.6986000000034,
+            "p95": 2284.342499999999,
+            "p99": 2787.066000000006,
+            "errors": 0,
+            "statuses": {
+              "200": 23
+            }
+          },
+          "cart-clear": {
+            "requests": 23,
+            "p50": 1367.9990000000034,
+            "p95": 2272.214500000002,
+            "p99": 2548.452599999997,
+            "errors": 0,
+            "statuses": {
+              "200": 23
+            }
+          },
+          "merchant-catalogue": {
+            "requests": 21,
+            "p50": 1423.2808000000005,
+            "p95": 2963.045199999993,
+            "p99": 3463.288999999997,
+            "errors": 0,
+            "statuses": {
+              "200": 21
+            }
+          },
+          "cart-add": {
+            "requests": 46,
+            "p50": 1404.9949999999953,
+            "p95": 2082.6217000000033,
+            "p99": 2374.7275999999983,
+            "errors": 0,
+            "statuses": {
+              "201": 46
+            }
+          },
+          "merchant-stock": {
+            "requests": 21,
+            "p50": 1177.4850000000006,
+            "p95": 1735.8228999999992,
+            "p99": 3142.4706000000006,
+            "errors": 0,
+            "statuses": {
+              "200": 21
+            }
+          },
+          "merchant-orders": {
+            "requests": 21,
+            "p50": 1141.4171999999962,
+            "p95": 1988.8240000000005,
+            "p99": 2484.2163,
+            "errors": 0,
+            "statuses": {
+              "200": 21
+            }
+          },
+          "checkout-preview": {
+            "requests": 23,
+            "p50": 1386.568299999999,
+            "p95": 2455.4651999999987,
+            "p99": 3044.1938999999984,
+            "errors": 0,
+            "statuses": {
+              "200": 23
+            }
+          },
+          "merchant-order-detail": {
+            "requests": 21,
+            "p50": 1326.9500000000044,
+            "p95": 2096.253199999999,
+            "p99": 2780.2690999999904,
+            "errors": 0,
+            "statuses": {
+              "200": 21
+            }
+          },
+          "address-create": {
+            "requests": 8,
+            "p50": 1317.8327999999965,
+            "p95": 3379.287000000004,
+            "p99": 3379.287000000004,
+            "errors": 0,
+            "statuses": {
+              "201": 8
+            }
+          },
+          "checkout-place": {
+            "requests": 23,
+            "p50": 1550.2741000000096,
+            "p95": 2279.6438000000053,
+            "p99": 3600.7523,
+            "errors": 0,
+            "statuses": {
+              "201": 23
+            }
+          },
+          "checkout-replay": {
+            "requests": 10,
+            "p50": 1352.474900000001,
+            "p95": 2754.7437999999966,
+            "p99": 2754.7437999999966,
+            "errors": 0,
+            "statuses": {
+              "200": 10
+            }
+          },
+          "order-history": {
+            "requests": 23,
+            "p50": 1007.7410000000091,
+            "p95": 1976.0556999999972,
+            "p99": 2065.411899999999,
+            "errors": 0,
+            "statuses": {
+              "200": 23
+            }
+          }
+        }
+      }
+    ]
+  }
+}
