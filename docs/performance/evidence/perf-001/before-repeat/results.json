@@ -1,0 +1,1202 @@
+[ {
+  "users" : 10,
+  "peakActiveUsers" : 10,
+  "seconds" : 36.2570144,
+  "requests" : 653,
+  "rps" : 18.010308096410718,
+  "p50" : 248.87389999999868,
+  "p95" : 959.6635999999999,
+  "p99" : 2486.5522999999994,
+  "errorRate" : 0,
+  "integrityErrors" : 0,
+  "aborted" : false,
+  "routes" : {
+    "authentication" : {
+      "requests" : 10,
+      "p50" : 522.0376000000006,
+      "p95" : 2335.7902999999997,
+      "p99" : 2335.7902999999997,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "brands" : {
+      "requests" : 161,
+      "p50" : 121.05069999999978,
+      "p95" : 548.6227999999974,
+      "p99" : 866.6216999999997,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 161
+      }
+    },
+    "search" : {
+      "requests" : 161,
+      "p50" : 420.22209999999905,
+      "p95" : 1082.2351000000017,
+      "p99" : 3743.946900000001,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 161
+      }
+    },
+    "product" : {
+      "requests" : 161,
+      "p50" : 174.7510000000002,
+      "p95" : 498.1114000000016,
+      "p99" : 688.053399999997,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 161
+      }
+    },
+    "address-list" : {
+      "requests" : 14,
+      "p50" : 176.0652000000009,
+      "p95" : 654.3719999999994,
+      "p99" : 654.3719999999994,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 14
+      }
+    },
+    "address-create" : {
+      "requests" : 2,
+      "p50" : 124.60369999999966,
+      "p95" : 153.76939999999968,
+      "p99" : 153.76939999999968,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 2
+      }
+    },
+    "cart-read" : {
+      "requests" : 14,
+      "p50" : 165.52880000000005,
+      "p95" : 514.7813999999998,
+      "p99" : 514.7813999999998,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 14
+      }
+    },
+    "cart-clear" : {
+      "requests" : 14,
+      "p50" : 265.8091999999997,
+      "p95" : 1206.0516000000007,
+      "p99" : 1206.0516000000007,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 14
+      }
+    },
+    "cart-add" : {
+      "requests" : 28,
+      "p50" : 345.95360000000073,
+      "p95" : 1040.2864000000009,
+      "p99" : 1344.3129,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 28
+      }
+    },
+    "checkout-preview" : {
+      "requests" : 14,
+      "p50" : 195.0684000000001,
+      "p95" : 2011.3015000000005,
+      "p99" : 2011.3015000000005,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 14
+      }
+    },
+    "checkout-place" : {
+      "requests" : 14,
+      "p50" : 688.1496999999981,
+      "p95" : 1773.559400000001,
+      "p99" : 1773.559400000001,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 14
+      }
+    },
+    "merchant-catalogue" : {
+      "requests" : 10,
+      "p50" : 268.3575000000001,
+      "p95" : 1045.2502999999997,
+      "p99" : 1045.2502999999997,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "checkout-replay" : {
+      "requests" : 6,
+      "p50" : 191.05639999999767,
+      "p95" : 464.0682000000006,
+      "p99" : 464.0682000000006,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 6
+      }
+    },
+    "merchant-stock" : {
+      "requests" : 10,
+      "p50" : 235.8862999999983,
+      "p95" : 656.9732999999997,
+      "p99" : 656.9732999999997,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "order-history" : {
+      "requests" : 14,
+      "p50" : 224.09020000000237,
+      "p95" : 1217.6602999999996,
+      "p99" : 1217.6602999999996,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 14
+      }
+    },
+    "merchant-orders" : {
+      "requests" : 10,
+      "p50" : 263.9948000000004,
+      "p95" : 1195.0473999999995,
+      "p99" : 1195.0473999999995,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "merchant-order-detail" : {
+      "requests" : 10,
+      "p50" : 402.1935000000012,
+      "p95" : 2949.7069,
+      "p99" : 2949.7069,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    }
+  },
+  "samples" : [ {
+    "time" : "2026-10-26T18:27:37.413Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 526458880,
+    "generatorRss" : 53346304,
+    "cpu" : 0.19504528795550097,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 249304760,
+    "dbActive" : 0,
+    "dbIdle" : 3,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:38.652Z",
+    "pending" : 3,
+    "activeUsers" : 2,
+    "hostFreeBytes" : 514641920,
+    "generatorRss" : 57434112,
+    "cpu" : 0.30550546774553505,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 228893592,
+    "dbActive" : 1,
+    "dbIdle" : 2,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:41.550Z",
+    "pending" : 9,
+    "activeUsers" : 8,
+    "hostFreeBytes" : 454602752,
+    "generatorRss" : 62590976,
+    "cpu" : 0.37141238468482113,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 243081160,
+    "dbActive" : 7,
+    "dbIdle" : 0,
+    "dbPending" : 1,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:44.791Z",
+    "pending" : 6,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 463486976,
+    "generatorRss" : 56627200,
+    "cpu" : 0.15070548394185354,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 252642096,
+    "dbActive" : 3,
+    "dbIdle" : 7,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:47.568Z",
+    "pending" : 10,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 389152768,
+    "generatorRss" : 60051456,
+    "cpu" : 0.3239195360053239,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 242971128,
+    "dbActive" : 9,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:50.598Z",
+    "pending" : 4,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 420753408,
+    "generatorRss" : 61878272,
+    "cpu" : 0.22585084501395578,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 263269736,
+    "dbActive" : 4,
+    "dbIdle" : 6,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:53.606Z",
+    "pending" : 5,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 403619840,
+    "generatorRss" : 64688128,
+    "cpu" : 0.2639873702921841,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 256373016,
+    "dbActive" : 5,
+    "dbIdle" : 5,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:56.631Z",
+    "pending" : 7,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 380809216,
+    "generatorRss" : 67940352,
+    "cpu" : 0.326237429227014,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 247102088,
+    "dbActive" : 9,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:27:59.616Z",
+    "pending" : 4,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 380334080,
+    "generatorRss" : 70352896,
+    "cpu" : 0.21162061003883578,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 267862040,
+    "dbActive" : 4,
+    "dbIdle" : 6,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:02.612Z",
+    "pending" : 2,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 416575488,
+    "generatorRss" : 73347072,
+    "cpu" : 0.21363299477193165,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 256810376,
+    "dbActive" : 3,
+    "dbIdle" : 7,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:05.604Z",
+    "pending" : 6,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 428429312,
+    "generatorRss" : 75251712,
+    "cpu" : 0.17907271352900267,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 274893376,
+    "dbActive" : 6,
+    "dbIdle" : 4,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:08.709Z",
+    "pending" : 8,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 396316672,
+    "generatorRss" : 76959744,
+    "cpu" : 0.19038701312523407,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 263903096,
+    "dbActive" : 9,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:11.589Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 392925184,
+    "generatorRss" : 81702912,
+    "cpu" : 0.3454867954873201,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 248137104,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:11.643Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 393113600,
+    "generatorRss" : 83697664,
+    "cpu" : 0.3454867954873201,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 250243728,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  } ],
+  "monitorFailures" : 0,
+  "database" : {
+    "globalStatus" : [ {
+      "Variable_name" : "Innodb_buffer_pool_pages_data",
+      "Value" : "1548"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_pages_free",
+      "Value" : "6644"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_read_requests",
+      "Value" : "708002"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_reads",
+      "Value" : "1058"
+    }, {
+      "Variable_name" : "Innodb_row_lock_time",
+      "Value" : "540"
+    }, {
+      "Variable_name" : "Innodb_row_lock_waits",
+      "Value" : "6"
+    }, {
+      "Variable_name" : "Max_used_connections",
+      "Value" : "11"
+    }, {
+      "Variable_name" : "Slow_queries",
+      "Value" : "220"
+    }, {
+      "Variable_name" : "Threads_connected",
+      "Value" : "10"
+    }, {
+      "Variable_name" : "Threads_running",
+      "Value" : "2"
+    } ],
+    "slowQueryCount" : 199,
+    "topStatementDigests" : [ {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b2_0` . `id` , `b2_0` . `created_at` , `b2_0` . `description` , `b2_0` . `logo_reference` , `b2_0` . `name` , `b2_0` . `slug` , `b2_0` . `status` , `b2_0` . `updated_at` , `p1_0` . `category_id` , `c2_0` . `id` , `c2_0` . `created_at` , `c2_0` . `description` , `c2_0` . `name` , `c2_0` . `slug` , `c2_0` . `status` , `c2_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` JOIN `brands` `b2_0` ON `b2_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c2_0` ON `c2_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ?",
+      "COUNT_STAR" : 161,
+      "total_seconds" : 48.9321,
+      "SUM_ROWS_EXAMINED" : 487668,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `products` ( NAME , `slug` , `brand_id` , `category_id` , `price` , `stock_quantity` , `availability` , `publication_status` , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 1000,
+      "total_seconds" : 14.0435,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "COMMIT",
+      "COUNT_STAR" : 888,
+      "total_seconds" : 7.8521,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `users` ( `email` , `password_hash` , ROLE , STATUS , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 500,
+      "total_seconds" : 6.2873,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT COUNT ( `p1_0` . `id` ) FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ? AND ( `lower` ( `p1_0` . `name` ) LIKE ? ESCAPE ? OR `lower` ( `p1_0` . `description` ) LIKE ? ESCAPE ? )",
+      "COUNT_STAR" : 161,
+      "total_seconds" : 4.9583,
+      "SUM_ROWS_EXAMINED" : 162805,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `products` ADD CONSTRAINT `ck_products_stock` CHECK ( `stock_quantity` >= ? )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 2.3272,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `users` ADD CONSTRAINT `fk_users_default_address` FOREIGN KEY ( `default_address_id` ) REFERENCES `customer_addresses` ( `id` ) ON DELETE SET NULL",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.9675,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `products` ADD COLUMN `stock_quantity` INTEGER NOT NULL DEFAULT ?",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.7108,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `cart_items` ( `id` INT8 NOT NULL AUTO_INCREMENT , `cart_id` INT8 NOT NULL , `product_id` INT8 NOT NULL , `quantity` INTEGER NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_cart_items` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_cart_items_cart_product` UNIQUE ( `cart_id` , `product_id` ) , CONSTRAINT `chk_cart_items_quantity_positive` CHECK ( `quantity` > ? ) , CONSTRAINT `fk_cart_items_cart` FOREIGN KEY ( `cart_id` ) REFERENCES `carts` ( `id` ) ON DELETE CASCADE , CONSTRAINT `fk_cart_items_product` FOREIGN KEY ( `product_id` ) REFERENCES `products` ( `id` ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.3881,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE INDEX `idx_cart_items_product` ON `cart_items` ( `product_id` )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.9328,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `customer_addresses` ADD COLUMN `delivery_instructions` VARCHARACTER (?) NULL",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.9026,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET `autocommit` = ?",
+      "COUNT_STAR" : 1789,
+      "total_seconds" : 0.8738,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `brand_admin_memberships` ( `user_id` , `brand_id` , `created_at` ) VALUES ( ?, ... , NOW )",
+      "COUNT_STAR" : 50,
+      "total_seconds" : 0.6615,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `b1_0` . `id` , `b1_0` . `created_at` , `b1_0` . `description` , `b1_0` . `logo_reference` , `b1_0` . `name` , `b1_0` . `slug` , `b1_0` . `status` , `b1_0` . `updated_at` FROM `brands` `b1_0` WHERE `b1_0` . `status` = ? ORDER BY `b1_0` . `name`",
+      "COUNT_STAR" : 161,
+      "total_seconds" : 0.6536,
+      "SUM_ROWS_EXAMINED" : 322,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `users` ( `id` INT8 NOT NULL AUTO_INCREMENT , `email` VARCHARACTER (?) NOT NULL , `password_hash` VARCHARACTER (?) NOT NULL , ROLE VARCHARACTER (?) NOT NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_users` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_users_email` UNIQUE ( `email` ) , CONSTRAINT `ck_users_role` CHECK ( ROLE IN (...) ) , CONSTRAINT `ck_users_status` CHECK ( STATUS IN (...) ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.6277,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `brands` ( `id` INT8 NOT NULL AUTO_INCREMENT , NAME VARCHARACTER (?) NOT NULL , `slug` VARCHARACTER (?) NOT NULL , DESCRIPTION VARCHARACTER (?) NULL , `logo_reference` VARCHARACTER (?) NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_brands` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_brands_slug` UNIQUE ( `slug` ) , CONSTRAINT `ck_brands_status` CHECK ( STATUS IN (...) ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5701,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET SESSION TRANSACTION READ WRITE",
+      "COUNT_STAR" : 702,
+      "total_seconds" : 0.5613,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `security_audit_events` ( `id` INT8 NOT NULL AUTO_INCREMENT PRIMARY KEY , `actor` VARCHARACTER (?) NOT NULL , `operation` VARCHARACTER (?) NOT NULL , `target_user_id` INT8 NULL , `occurred_at` DATETIME (?) NOT NULL , `outcome` VARCHARACTER (?) NOT NULL , `reason` VARCHARACTER (?) NOT NULL )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5578,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `customer_orders` ( `id` INT8 NOT NULL AUTO_INCREMENT PRIMARY KEY , `customer_id` INT8 NOT NULL , `idempotency_key` VARCHARACTER (?) NOT NULL , `request_hash` VARCHARACTER (?) NOT NULL , `source_address_id` INT8 NOT NULL , STATUS VARCHARACTER (?) NOT NULL , `payment_method` VARCHARACTER (?) NOT NULL , `payment_status` VARCHARACTER (?) NOT NULL , `currency` VARCHARACTER (?) NOT NULL , `subtotal` DECIMAL (...) NOT NULL , `delivery_charge` DECIMAL (...) NOT NULL , `tax` DECIMAL (...) NOT NULL , `discount` DECIMAL (...) NOT NULL , `total` DECIMAL (...) NOT NULL , `recipient_name` VARCHARACTER (?) NOT NULL , `phone_number` VARCHARACTER (?) NOT NULL , `address_line1` VARCHARACTER (?) NOT NULL , `address_line2` VARCHARACTER (?) NULL , `city` VARCHARACTER (?) NOT NULL , `province` VARCHARACTER (?) NULL , `postal_code` VARCHARACTER (?) NULL , `delivery_instructions` VARCHARACTER (?) NULL , `created_at` DATETIME (?) NOT NULL , CONSTRAINT `uk_customer_order_key` UNIQUE ( `customer_id` , `idempotency_key` ) , CONSTRAINT `fk_customer_order_user` FOREIGN KEY ( `customer_id` ) REFERENCES `users` ( `id` ) , CONSTRAINT `ck_customer_order_status` CHECK ( STATUS = ? ) , CONSTRAINT `ck_customer_order_payment` CHECK ( `payment_method` = ? AND `payment_status` = ? ) , CONSTRAINT `ck_customer_order_money` CHECK ( `subtotal` >= ? AND `delivery_charge` = ? AND `tax` = ? AND `discount` = ? AND `total` = `subtotal` AND `currency` = ? ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5242,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `brand_admin_memberships` ( `id` INT8 NOT NULL AUTO_INCREMENT PRIMARY KEY , `user_id` INT8 NOT NULL , `brand_id` INT8 NOT NULL , `created_at` DATETIME (?) NOT NULL , `revoked_at` DATETIME (?) NULL , `version` INT8 NOT NULL DEFAULT ? , CONSTRAINT `uk_brand_membership_user_brand` UNIQUE ( `user_id` , `brand_id` ) , CONSTRAINT `fk_brand_membership_user` FOREIGN KEY ( `user_id` ) REFERENCES `users` ( `id` ) ON DELETE RESTRICT , CONSTRAINT `fk_brand_membership_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) ON DELETE RESTRICT )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5145,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `products` ( `id` INT8 NOT NULL AUTO_INCREMENT , NAME VARCHARACTER (?) NOT NULL , `slug` VARCHARACTER (?) NOT NULL , DESCRIPTION VARCHARACTER (?) NULL , `brand_id` INT8 NOT NULL , `category_id` INT8 NOT NULL , `price` DECIMAL (...) NOT NULL , `availability` VARCHARACTER (?) NOT NULL , `publication_status` VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_products` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_products_slug` UNIQUE ( `slug` ) , CONSTRAINT `ck_products_price` CHECK ( `price` >= ? ) , CONSTRAINT `ck_products_availability` CHECK ( `availability` IN (...) ) , CONSTRAINT `ck_products_publication_status` CHECK ( `publication_status` IN (...) ) , CONSTRAINT `fk_products_brand` FOREIGN KEY ( `brand_id` ) REFERENCES `brands` ( `id` ) ON DELETE RESTRICT , CONSTRAINT `fk_products_category` FOREIGN KEY ( `category_id` ) REFERENCES `categories` ( `id` ) ON DELETE RESTRICT )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5055,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `carts` ( `id` INT8 NOT NULL AUTO_INCREMENT , `customer_id` INT8 NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_carts` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_carts_customer` UNIQUE ( `customer_id` ) , CONSTRAINT `fk_carts_customer` FOREIGN KEY ( `customer_id` ) REFERENCES `users` ( `id` ) ON DELETE CASCADE )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5042,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `cart_items` ( `cart_id` , `created_at` , `product_id` , `quantity` , `updated_at` ) VALUES (...)",
+      "COUNT_STAR" : 30,
+      "total_seconds" : 0.5009,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `security_audit_events` ADD COLUMN `target_application_id` INT8 NULL",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.437,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `u1_0` . `id` , `u1_0` . `created_at` , `u1_0` . `default_address_id` , `u1_0` . `email` , `u1_0` . `password_hash` , `u1_0` . `role` , `u1_0` . `status` , `u1_0` . `updated_at` FROM `users` `u1_0` WHERE `u1_0` . `email` = ?",
+      "COUNT_STAR" : 28,
+      "total_seconds" : 0.4134,
+      "SUM_ROWS_EXAMINED" : 28,
+      "SUM_ERRORS" : 0
+    } ],
+    "poolTimersCumulative" : {
+      "hikaricp.connections.usage" : {
+        "windowMaxSeconds" : 16.221,
+        "totalSeconds" : 256.483,
+        "count" : 1962
+      },
+      "hikaricp.connections.acquire" : {
+        "windowMaxSeconds" : 1.5729293,
+        "totalSeconds" : 6.7658979,
+        "count" : 1962
+      }
+    },
+    "committedOrders" : 15,
+    "integrity" : "PASS"
+  }
+}, {
+  "users" : 50,
+  "peakActiveUsers" : 49,
+  "seconds" : 38.726748699999995,
+  "requests" : 895,
+  "rps" : 23.110641353685345,
+  "p50" : 1602.076000000001,
+  "p95" : 3430.473299999998,
+  "p99" : 4678.598299999998,
+  "errorRate" : 0.02569832402234637,
+  "integrityErrors" : 1,
+  "aborted" : true,
+  "routes" : {
+    "authentication" : {
+      "requests" : 50,
+      "p50" : 1491.529499999997,
+      "p95" : 2881.325499999999,
+      "p99" : 3111.2958,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 49,
+        "503" : 1
+      }
+    },
+    "brands" : {
+      "requests" : 227,
+      "p50" : 1511.4349999999977,
+      "p95" : 3006.8285000000033,
+      "p99" : 3149.2291000000114,
+      "errors" : 4,
+      "statuses" : {
+        "200" : 223,
+        "503" : 4
+      }
+    },
+    "search" : {
+      "requests" : 227,
+      "p50" : 1788.6661999999997,
+      "p95" : 3287.0102999999945,
+      "p99" : 3523.3640000000014,
+      "errors" : 8,
+      "statuses" : {
+        "200" : 219,
+        "503" : 8
+      }
+    },
+    "product" : {
+      "requests" : 227,
+      "p50" : 1410.4977999999974,
+      "p95" : 2533.183800000006,
+      "p99" : 3020.9005000000034,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 226,
+        "503" : 1
+      }
+    },
+    "address-list" : {
+      "requests" : 13,
+      "p50" : 2376.9170999999988,
+      "p95" : 4882.503700000001,
+      "p99" : 4882.503700000001,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 12,
+        "500" : 1
+      }
+    },
+    "cart-read" : {
+      "requests" : 13,
+      "p50" : 2404.3695000000007,
+      "p95" : 4275.620900000009,
+      "p99" : 4275.620900000009,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 12,
+        "503" : 1
+      }
+    },
+    "merchant-catalogue" : {
+      "requests" : 11,
+      "p50" : 3167.689599999998,
+      "p95" : 5113.183900000004,
+      "p99" : 5113.183900000004,
+      "errors" : 3,
+      "statuses" : {
+        "200" : 8,
+        "500" : 1,
+        "503" : 2
+      }
+    },
+    "cart-clear" : {
+      "requests" : 13,
+      "p50" : 1959.3498000000036,
+      "p95" : 4011.403099999996,
+      "p99" : 4011.403099999996,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 13
+      }
+    },
+    "cart-add" : {
+      "requests" : 26,
+      "p50" : 2559.2706000000035,
+      "p95" : 3854.9755000000077,
+      "p99" : 4422.009399999995,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 26
+      }
+    },
+    "merchant-stock" : {
+      "requests" : 11,
+      "p50" : 3249.2271000000037,
+      "p95" : 4413.739100000006,
+      "p99" : 4413.739100000006,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 11
+      }
+    },
+    "merchant-orders" : {
+      "requests" : 11,
+      "p50" : 1751.5011000000013,
+      "p95" : 3142.8058999999994,
+      "p99" : 3142.8058999999994,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 11
+      }
+    },
+    "address-create" : {
+      "requests" : 9,
+      "p50" : 3272.1007000000027,
+      "p95" : 3967.95719999999,
+      "p99" : 3967.95719999999,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 9
+      }
+    },
+    "merchant-order-detail" : {
+      "requests" : 11,
+      "p50" : 2510.7708000000057,
+      "p95" : 4777.226600000009,
+      "p99" : 4777.226600000009,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 11
+      }
+    },
+    "checkout-preview" : {
+      "requests" : 13,
+      "p50" : 3158.587800000001,
+      "p95" : 5840.511700000003,
+      "p99" : 5840.511700000003,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 13
+      }
+    },
+    "checkout-place" : {
+      "requests" : 13,
+      "p50" : 3366.2407999999996,
+      "p95" : 6017.042100000006,
+      "p99" : 6017.042100000006,
+      "errors" : 3,
+      "statuses" : {
+        "0" : 2,
+        "201" : 10,
+        "503" : 1
+      }
+    },
+    "checkout-replay" : {
+      "requests" : 7,
+      "p50" : 2622.1015000000043,
+      "p95" : 3855.936999999998,
+      "p99" : 3855.936999999998,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 6,
+        "500" : 1
+      }
+    },
+    "order-history" : {
+      "requests" : 13,
+      "p50" : 1730.1359999999986,
+      "p95" : 5477.097999999998,
+      "p99" : 5477.097999999998,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 13
+      }
+    }
+  },
+  "samples" : [ {
+    "time" : "2026-10-26T18:28:16.822Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 427978752,
+    "generatorRss" : 88326144,
+    "cpu" : 0.055965616940891465,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 254808968,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:19.998Z",
+    "pending" : 32,
+    "activeUsers" : 17,
+    "hostFreeBytes" : 471711744,
+    "generatorRss" : 90947584,
+    "cpu" : 0.4489420543656394,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 274574000,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 13,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:22.906Z",
+    "pending" : 49,
+    "activeUsers" : 36,
+    "hostFreeBytes" : 455614464,
+    "generatorRss" : 63303680,
+    "cpu" : 0.4025831957226908,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 267548152,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:25.928Z",
+    "pending" : 49,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 482222080,
+    "generatorRss" : 68534272,
+    "cpu" : 0.2700175832126895,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 265299888,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 37,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:28.977Z",
+    "pending" : 45,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 486109184,
+    "generatorRss" : 70606848,
+    "cpu" : 0.31006223665963945,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 275517944,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 33,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:31.892Z",
+    "pending" : 40,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 455114752,
+    "generatorRss" : 77828096,
+    "cpu" : 0.18148219861324916,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 264025560,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 30,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:34.951Z",
+    "pending" : 49,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 458715136,
+    "generatorRss" : 78024704,
+    "cpu" : 0.19561326182470226,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 288999048,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:37.908Z",
+    "pending" : 43,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 398786560,
+    "generatorRss" : 80498688,
+    "cpu" : 0.2041830549870584,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 277138208,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 33,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:40.985Z",
+    "pending" : 45,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 425021440,
+    "generatorRss" : 87760896,
+    "cpu" : 0.3017067306861904,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 257642600,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 35,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:43.999Z",
+    "pending" : 43,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 392642560,
+    "generatorRss" : 89624576,
+    "cpu" : 0.16189362765453744,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 274953264,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 33,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:46.915Z",
+    "pending" : 43,
+    "activeUsers" : 49,
+    "hostFreeBytes" : 368803840,
+    "generatorRss" : 95150080,
+    "cpu" : 0.1747655566049081,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 296415416,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 31,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:50.245Z",
+    "pending" : 48,
+    "activeUsers" : 48,
+    "hostFreeBytes" : 364224512,
+    "generatorRss" : 95707136,
+    "cpu" : 0.1585803466680459,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 276718096,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 38,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:52.904Z",
+    "pending" : 29,
+    "activeUsers" : 29,
+    "hostFreeBytes" : 401563648,
+    "generatorRss" : 98267136,
+    "cpu" : 0.08155778987451917,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 291710576,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 19,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-26T18:28:55.458Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 416477184,
+    "generatorRss" : 98582528,
+    "cpu" : 0.2362395343309133,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 258498288,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  } ],
+  "monitorFailures" : 0,
+  "database" : {
+    "globalStatus" : [ {
+      "Variable_name" : "Innodb_buffer_pool_pages_data",
+      "Value" : "1574"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_pages_free",
+      "Value" : "6618"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_read_requests",
+      "Value" : "1442305"
+    }, {
+      "Variable_name" : "Innodb_buffer_pool_reads",
+      "Value" : "1058"
+    }, {
+      "Variable_name" : "Innodb_row_lock_time",
+      "Value" : "7513"
+    }, {
+      "Variable_name" : "Innodb_row_lock_waits",
+      "Value" : "23"
+    }, {
+      "Variable_name" : "Max_used_connections",
+      "Value" : "11"
+    }, {
+      "Variable_name" : "Slow_queries",
+      "Value" : "475"
+    }, {
+      "Variable_name" : "Threads_connected",
+      "Value" : "10"
+    }, {
+      "Variable_name" : "Threads_running",
+      "Value" : "2"
+    } ],
+    "slowQueryCount" : 454,
+    "topStatementDigests" : [ {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b2_0` . `id` , `b2_0` . `created_at` , `b2_0` . `description` , `b2_0` . `logo_reference` , `b2_0` . `name` , `b2_0` . `slug` , `b2_0` . `status` , `b2_0` . `updated_at` , `p1_0` . `category_id` , `c2_0` . `id` , `c2_0` . `created_at` , `c2_0` . `description` , `c2_0` . `name` , `c2_0` . `slug` , `c2_0` . `status` , `c2_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` JOIN `brands` `b2_0` ON `b2_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c2_0` ON `c2_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ?",
+      "COUNT_STAR" : 380,
+      "total_seconds" : 119.9106,
+      "SUM_ROWS_EXAMINED" : 1151019,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "COMMIT",
+      "COUNT_STAR" : 1874,
+      "total_seconds" : 19.7859,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT COUNT ( `p1_0` . `id` ) FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ? AND ( `lower` ( `p1_0` . `name` ) LIKE ? ESCAPE ? OR `lower` ( `p1_0` . `description` ) LIKE ? ESCAPE ? )",
+      "COUNT_STAR" : 380,
+      "total_seconds" : 14.7674,
+      "SUM_ROWS_EXAMINED" : 382900,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `products` ( NAME , `slug` , `brand_id` , `category_id` , `price` , `stock_quantity` , `availability` , `publication_status` , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 1000,
+      "total_seconds" : 14.0435,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b1_0` . `id` , `b1_0` . `created_at` , `b1_0` . `description` , `b1_0` . `logo_reference` , `b1_0` . `name` , `b1_0` . `slug` , `b1_0` . `status` , `b1_0` . `updated_at` , `p1_0` . `category_id` , `c1_0` . `id` , `c1_0` . `created_at` , `c1_0` . `description` , `c1_0` . `name` , `c1_0` . `slug` , `c1_0` . `status` , `c1_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `id` = ? FOR UPDATE",
+      "COUNT_STAR" : 110,
+      "total_seconds" : 6.7424,
+      "SUM_ROWS_EXAMINED" : 110,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `users` ( `email` , `password_hash` , ROLE , STATUS , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 500,
+      "total_seconds" : 6.2873,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET `autocommit` = ?",
+      "COUNT_STAR" : 3759,
+      "total_seconds" : 2.9427,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `products` ADD CONSTRAINT `ck_products_stock` CHECK ( `stock_quantity` >= ? )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 2.3272,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `users` ADD CONSTRAINT `fk_users_default_address` FOREIGN KEY ( `default_address_id` ) REFERENCES `customer_addresses` ( `id` ) ON DELETE SET NULL",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.9675,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `products` ADD COLUMN `stock_quantity` INTEGER NOT NULL DEFAULT ?",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.7108,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `cart_items` ( `id` INT8 NOT NULL AUTO_INCREMENT , `cart_id` INT8 NOT NULL , `product_id` INT8 NOT NULL , `quantity` INTEGER NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_cart_items` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_cart_items_cart_product` UNIQUE ( `cart_id` , `product_id` ) , CONSTRAINT `chk_cart_items_quantity_positive` CHECK ( `quantity` > ? ) , CONSTRAINT `fk_cart_items_cart` FOREIGN KEY ( `cart_id` ) REFERENCES `carts` ( `id` ) ON DELETE CASCADE , CONSTRAINT `fk_cart_items_product` FOREIGN KEY ( `product_id` ) REFERENCES `products` ( `id` ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 1.3881,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET SESSION TRANSACTION READ WRITE",
+      "COUNT_STAR" : 1554,
+      "total_seconds" : 1.3415,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `b1_0` . `id` , `b1_0` . `created_at` , `b1_0` . `description` , `b1_0` . `logo_reference` , `b1_0` . `name` , `b1_0` . `slug` , `b1_0` . `status` , `b1_0` . `updated_at` FROM `brands` `b1_0` WHERE `b1_0` . `status` = ? ORDER BY `b1_0` . `name`",
+      "COUNT_STAR" : 384,
+      "total_seconds" : 1.1879,
+      "SUM_ROWS_EXAMINED" : 768,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `cart_items` ( `cart_id` , `created_at` , `product_id` , `quantity` , `updated_at` ) VALUES (...)",
+      "COUNT_STAR" : 56,
+      "total_seconds" : 1.0106,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET SESSION TRANSACTION READ ONLY",
+      "COUNT_STAR" : 1555,
+      "total_seconds" : 0.9771,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE INDEX `idx_cart_items_product` ON `cart_items` ( `product_id` )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.9328,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "ALTER TABLE `customer_addresses` ADD COLUMN `delivery_instructions` VARCHARACTER (?) NULL",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.9026,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `u1_0` . `id` , `u1_0` . `created_at` , `u1_0` . `default_address_id` , `u1_0` . `email` , `u1_0` . `password_hash` , `u1_0` . `role` , `u1_0` . `status` , `u1_0` . `updated_at` FROM `users` `u1_0` WHERE `u1_0` . `id` = ?",
+      "COUNT_STAR" : 395,
+      "total_seconds" : 0.7744,
+      "SUM_ROWS_EXAMINED" : 395,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `p1_0` . `category_id` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `slug` = ? AND `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ?",
+      "COUNT_STAR" : 386,
+      "total_seconds" : 0.7115,
+      "SUM_ROWS_EXAMINED" : 387,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `pg1_0` . `id` FROM `user_platform_grants` `pg1_0` JOIN `users` `u1_0` ON `u1_0` . `id` = `pg1_0` . `user_id` WHERE `u1_0` . `id` = ? AND `pg1_0` . `grant_type` = ? AND `pg1_0` . `revoked_at` IS NULL LIMIT ?",
+      "COUNT_STAR" : 351,
+      "total_seconds" : 0.7098,
+      "SUM_ROWS_EXAMINED" : 7,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `b1_0` . `id` , `b1_0` . `created_at` , `b1_0` . `description` , `b1_0` . `logo_reference` , `b1_0` . `name` , `b1_0` . `slug` , `b1_0` . `status` , `b1_0` . `updated_at` FROM `brands` `b1_0` WHERE `b1_0` . `id` = ?",
+      "COUNT_STAR" : 419,
+      "total_seconds" : 0.6812,
+      "SUM_ROWS_EXAMINED" : 419,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `brand_admin_memberships` ( `user_id` , `brand_id` , `created_at` ) VALUES ( ?, ... , NOW )",
+      "COUNT_STAR" : 50,
+      "total_seconds" : 0.6615,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `users` ( `id` INT8 NOT NULL AUTO_INCREMENT , `email` VARCHARACTER (?) NOT NULL , `password_hash` VARCHARACTER (?) NOT NULL , ROLE VARCHARACTER (?) NOT NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_users` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_users_email` UNIQUE ( `email` ) , CONSTRAINT `ck_users_role` CHECK ( ROLE IN (...) ) , CONSTRAINT `ck_users_status` CHECK ( STATUS IN (...) ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.6277,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `c1_0` . `id` , `c1_0` . `created_at` , `c1_0` . `description` , `c1_0` . `name` , `c1_0` . `slug` , `c1_0` . `status` , `c1_0` . `updated_at` FROM `categories` `c1_0` WHERE `c1_0` . `id` = ?",
+      "COUNT_STAR" : 419,
+      "total_seconds" : 0.6219,
+      "SUM_ROWS_EXAMINED" : 418,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "CREATE TABLE `brands` ( `id` INT8 NOT NULL AUTO_INCREMENT , NAME VARCHARACTER (?) NOT NULL , `slug` VARCHARACTER (?) NOT NULL , DESCRIPTION VARCHARACTER (?) NULL , `logo_reference` VARCHARACTER (?) NULL , STATUS VARCHARACTER (?) NOT NULL , `created_at` DATETIME (?) NOT NULL , `updated_at` DATETIME (?) NOT NULL , CONSTRAINT `pk_brands` PRIMARY KEY ( `id` ) , CONSTRAINT `uk_brands_slug` UNIQUE ( `slug` ) , CONSTRAINT `ck_brands_status` CHECK ( STATUS IN (...) ) )",
+      "COUNT_STAR" : 1,
+      "total_seconds" : 0.5701,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    } ],
+    "poolTimersCumulative" : {
+      "hikaricp.connections.usage" : {
+        "windowMaxSeconds" : 16.221,
+        "totalSeconds" : 620.475,
+        "count" : 3058
+      },
+      "hikaricp.connections.acquire" : {
+        "windowMaxSeconds" : 3.0319949,
+        "totalSeconds" : 1157.0489616,
+        "count" : 3079
+      }
+    },
+    "committedOrders" : 27,
+    "integrity" : "PASS"
+  }
+} ]
