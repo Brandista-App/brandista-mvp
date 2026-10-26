@@ -1,0 +1,942 @@
+[ {
+  "users" : 10,
+  "peakActiveUsers" : 10,
+  "seconds" : 38.3797315,
+  "requests" : 516,
+  "rps" : 13.444596401097805,
+  "p50" : 255.35870000000068,
+  "p95" : 1912.3396000000066,
+  "p99" : 3180.3195000000005,
+  "errorRate" : 0,
+  "integrityErrors" : 0,
+  "aborted" : false,
+  "routes" : {
+    "authentication" : {
+      "requests" : 10,
+      "p50" : 1012.3775999999998,
+      "p95" : 2194.9637999999995,
+      "p99" : 2194.9637999999995,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "brands" : {
+      "requests" : 128,
+      "p50" : 182.91659999999683,
+      "p95" : 1699.8776999999973,
+      "p99" : 1856.626400000001,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 128
+      }
+    },
+    "search" : {
+      "requests" : 128,
+      "p50" : 534.116,
+      "p95" : 2413.510000000001,
+      "p99" : 3497.8487000000005,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 128
+      }
+    },
+    "product" : {
+      "requests" : 128,
+      "p50" : 159.742000000002,
+      "p95" : 1117.4089999999997,
+      "p99" : 1911.7626999999993,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 128
+      }
+    },
+    "address-list" : {
+      "requests" : 10,
+      "p50" : 114.61309999999867,
+      "p95" : 2054.234700000001,
+      "p99" : 2054.234700000001,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "address-create" : {
+      "requests" : 2,
+      "p50" : 135.60300000000007,
+      "p95" : 557.5882000000001,
+      "p99" : 557.5882000000001,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 2
+      }
+    },
+    "cart-read" : {
+      "requests" : 10,
+      "p50" : 242.45900000000256,
+      "p95" : 2493.9981,
+      "p99" : 2493.9981,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "cart-clear" : {
+      "requests" : 10,
+      "p50" : 898.2150999999976,
+      "p95" : 3180.3195000000005,
+      "p99" : 3180.3195000000005,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "cart-add" : {
+      "requests" : 20,
+      "p50" : 359.590699999997,
+      "p95" : 2592.9545,
+      "p99" : 3374.4282000000003,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 20
+      }
+    },
+    "merchant-catalogue" : {
+      "requests" : 9,
+      "p50" : 325.71630000000005,
+      "p95" : 2288.295900000001,
+      "p99" : 2288.295900000001,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 9
+      }
+    },
+    "merchant-stock" : {
+      "requests" : 9,
+      "p50" : 146.0576000000001,
+      "p95" : 1318.2695000000022,
+      "p99" : 1318.2695000000022,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 9
+      }
+    },
+    "checkout-preview" : {
+      "requests" : 10,
+      "p50" : 366.6095999999998,
+      "p95" : 2345.978900000002,
+      "p99" : 2345.978900000002,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    },
+    "merchant-orders" : {
+      "requests" : 9,
+      "p50" : 157.9368000000013,
+      "p95" : 409.9328000000023,
+      "p99" : 409.9328000000023,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 9
+      }
+    },
+    "checkout-place" : {
+      "requests" : 10,
+      "p50" : 703.6706999999988,
+      "p95" : 2091.502800000002,
+      "p99" : 2091.502800000002,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 10
+      }
+    },
+    "merchant-order-detail" : {
+      "requests" : 9,
+      "p50" : 138.7584999999999,
+      "p95" : 1751.8381000000008,
+      "p99" : 1751.8381000000008,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 9
+      }
+    },
+    "checkout-replay" : {
+      "requests" : 4,
+      "p50" : 94.83420000000115,
+      "p95" : 256.3258999999998,
+      "p99" : 256.3258999999998,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 4
+      }
+    },
+    "order-history" : {
+      "requests" : 10,
+      "p50" : 91.21150000000125,
+      "p95" : 776.9030999999995,
+      "p99" : 776.9030999999995,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 10
+      }
+    }
+  },
+  "samples" : [ {
+    "time" : "2026-10-25T18:52:32.063Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 830357504,
+    "generatorRss" : 53186560,
+    "cpu" : 0.1956034601469686,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 242723104,
+    "dbActive" : 0,
+    "dbIdle" : 3,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:33.391Z",
+    "pending" : 3,
+    "activeUsers" : 2,
+    "hostFreeBytes" : 805888000,
+    "generatorRss" : 56877056,
+    "cpu" : 0.26280370073481824,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 229140616,
+    "dbActive" : 2,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:36.338Z",
+    "pending" : 9,
+    "activeUsers" : 5,
+    "hostFreeBytes" : 767610880,
+    "generatorRss" : 60522496,
+    "cpu" : 0.10930985975229972,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 235460184,
+    "dbActive" : 5,
+    "dbIdle" : 0,
+    "dbPending" : 2,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:39.278Z",
+    "pending" : 10,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 730042368,
+    "generatorRss" : 54071296,
+    "cpu" : 0.15969433413850437,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 246472872,
+    "dbActive" : 9,
+    "dbIdle" : 0,
+    "dbPending" : 1,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:42.293Z",
+    "pending" : 6,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 749735936,
+    "generatorRss" : 59527168,
+    "cpu" : 0.35939286785913555,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 239888824,
+    "dbActive" : 2,
+    "dbIdle" : 8,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:45.227Z",
+    "pending" : 10,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 783233024,
+    "generatorRss" : 62410752,
+    "cpu" : 0.1831678237538311,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 246051176,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:48.340Z",
+    "pending" : 10,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 734793728,
+    "generatorRss" : 65945600,
+    "cpu" : 0.14761329624000075,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 261716760,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:51.275Z",
+    "pending" : 7,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 729128960,
+    "generatorRss" : 65650688,
+    "cpu" : 0.26432312929130153,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 245998016,
+    "dbActive" : 6,
+    "dbIdle" : 4,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:54.297Z",
+    "pending" : 1,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 741330944,
+    "generatorRss" : 69087232,
+    "cpu" : 0.236021767967085,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 271545120,
+    "dbActive" : 1,
+    "dbIdle" : 9,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:52:57.783Z",
+    "pending" : 9,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 739004416,
+    "generatorRss" : 73748480,
+    "cpu" : 0.12489073476994311,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 247976072,
+    "dbActive" : 8,
+    "dbIdle" : 2,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:00.326Z",
+    "pending" : 9,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 690917376,
+    "generatorRss" : 75534336,
+    "cpu" : 0.22922583404179744,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 265211056,
+    "dbActive" : 9,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:03.379Z",
+    "pending" : 9,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 673574912,
+    "generatorRss" : 76185600,
+    "cpu" : 0.23688194242143215,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 252426200,
+    "dbActive" : 9,
+    "dbIdle" : 1,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:06.351Z",
+    "pending" : 10,
+    "activeUsers" : 10,
+    "hostFreeBytes" : 663232512,
+    "generatorRss" : 76144640,
+    "cpu" : 0.09315596614031531,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 263465296,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:08.451Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 658743296,
+    "generatorRss" : 79474688,
+    "cpu" : 0.08252179499632006,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 273367728,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  } ],
+  "monitorFailures" : 0,
+  "database" : {
+    "globalStatus" : [ {
+      "Variable_name" : "Innodb_row_lock_time",
+      "Value" : "391"
+    }, {
+      "Variable_name" : "Innodb_row_lock_waits",
+      "Value" : "6"
+    }, {
+      "Variable_name" : "Max_used_connections",
+      "Value" : "11"
+    }, {
+      "Variable_name" : "Slow_queries",
+      "Value" : "156"
+    }, {
+      "Variable_name" : "Threads_connected",
+      "Value" : "10"
+    }, {
+      "Variable_name" : "Threads_running",
+      "Value" : "2"
+    } ],
+    "slowQueryCount" : 148,
+    "topStatementDigests" : [ {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b2_0` . `id` , `b2_0` . `created_at` , `b2_0` . `description` , `b2_0` . `logo_reference` , `b2_0` . `name` , `b2_0` . `slug` , `b2_0` . `status` , `b2_0` . `updated_at` , `p1_0` . `category_id` , `c2_0` . `id` , `c2_0` . `created_at` , `c2_0` . `description` , `c2_0` . `name` , `c2_0` . `slug` , `c2_0` . `status` , `c2_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` JOIN `brands` `b2_0` ON `b2_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c2_0` ON `c2_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ?",
+      "COUNT_STAR" : 128,
+      "total_seconds" : 64.3507,
+      "SUM_ROWS_EXAMINED" : 387710,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `products` ( NAME , `slug` , `brand_id` , `category_id` , `price` , `stock_quantity` , `availability` , `publication_status` , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 1000,
+      "total_seconds" : 13.1241,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "COMMIT",
+      "COUNT_STAR" : 713,
+      "total_seconds" : 8.4352,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT COUNT ( `p1_0` . `id` ) FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ? AND ( `lower` ( `p1_0` . `name` ) LIKE ? ESCAPE ? OR `lower` ( `p1_0` . `description` ) LIKE ? ESCAPE ? )",
+      "COUNT_STAR" : 128,
+      "total_seconds" : 7.4704,
+      "SUM_ROWS_EXAMINED" : 130640,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `users` ( `email` , `password_hash` , ROLE , STATUS , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 500,
+      "total_seconds" : 5.8286,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `u1_0` . `id` , `u1_0` . `created_at` , `u1_0` . `default_address_id` , `u1_0` . `email` , `u1_0` . `password_hash` , `u1_0` . `role` , `u1_0` . `status` , `u1_0` . `updated_at` FROM `users` `u1_0` WHERE `u1_0` . `email` = ?",
+      "COUNT_STAR" : 28,
+      "total_seconds" : 1.4838,
+      "SUM_ROWS_EXAMINED" : 28,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "UPDATE `carts` SET `customer_id` = ? , `updated_at` = ? WHERE `id` = ?",
+      "COUNT_STAR" : 43,
+      "total_seconds" : 1.1921,
+      "SUM_ROWS_EXAMINED" : 43,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET `autocommit` = ?",
+      "COUNT_STAR" : 1439,
+      "total_seconds" : 0.9131,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    } ],
+    "integrity" : "PASS"
+  }
+}, {
+  "users" : 50,
+  "peakActiveUsers" : 50,
+  "seconds" : 39.205671699999996,
+  "requests" : 1071,
+  "rps" : 27.31747610894778,
+  "p50" : 1316.6612999999925,
+  "p95" : 2987.9435999999987,
+  "p99" : 3908.0949000000037,
+  "errorRate" : 0.009337068160597572,
+  "integrityErrors" : 0,
+  "aborted" : false,
+  "routes" : {
+    "authentication" : {
+      "requests" : 50,
+      "p50" : 1470.7183000000005,
+      "p95" : 2665.7774999999965,
+      "p99" : 4039.4207000000024,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 50
+      }
+    },
+    "brands" : {
+      "requests" : 276,
+      "p50" : 1175.4756999999954,
+      "p95" : 2449.5176999999967,
+      "p99" : 3085.515600000006,
+      "errors" : 6,
+      "statuses" : {
+        "200" : 270,
+        "503" : 6
+      }
+    },
+    "search" : {
+      "requests" : 276,
+      "p50" : 1490.5674999999974,
+      "p95" : 2329.5328999999983,
+      "p99" : 2996.9116000000067,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 275,
+        "503" : 1
+      }
+    },
+    "product" : {
+      "requests" : 276,
+      "p50" : 1185.840699999986,
+      "p95" : 2305.999499999991,
+      "p99" : 2670.161500000002,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 275,
+        "503" : 1
+      }
+    },
+    "address-list" : {
+      "requests" : 16,
+      "p50" : 2025.2002999999968,
+      "p95" : 3833.255400000009,
+      "p99" : 3833.255400000009,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 16
+      }
+    },
+    "cart-read" : {
+      "requests" : 16,
+      "p50" : 2115.118300000002,
+      "p95" : 3394.591400000005,
+      "p99" : 3394.591400000005,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 16
+      }
+    },
+    "merchant-catalogue" : {
+      "requests" : 12,
+      "p50" : 2195.431899999996,
+      "p95" : 4286.254100000006,
+      "p99" : 4286.254100000006,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 12
+      }
+    },
+    "cart-clear" : {
+      "requests" : 16,
+      "p50" : 1501.461599999995,
+      "p95" : 3823.068600000006,
+      "p99" : 3823.068600000006,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 16
+      }
+    },
+    "merchant-stock" : {
+      "requests" : 12,
+      "p50" : 2197.0170999999973,
+      "p95" : 3757.466499999995,
+      "p99" : 3757.466499999995,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 12
+      }
+    },
+    "address-create" : {
+      "requests" : 9,
+      "p50" : 2836.2428,
+      "p95" : 4497.921300000002,
+      "p99" : 4497.921300000002,
+      "errors" : 1,
+      "statuses" : {
+        "201" : 8,
+        "500" : 1
+      }
+    },
+    "cart-add" : {
+      "requests" : 32,
+      "p50" : 2303.801800000001,
+      "p95" : 4149.398199999996,
+      "p99" : 4283.903400000003,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 32
+      }
+    },
+    "merchant-orders" : {
+      "requests" : 12,
+      "p50" : 2417.1206999999995,
+      "p95" : 3480.3413,
+      "p99" : 3480.3413,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 12
+      }
+    },
+    "merchant-order-detail" : {
+      "requests" : 12,
+      "p50" : 2612.5641000000032,
+      "p95" : 3079.429700000008,
+      "p99" : 3079.429700000008,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 12
+      }
+    },
+    "checkout-preview" : {
+      "requests" : 16,
+      "p50" : 1391.0987000000023,
+      "p95" : 3845.1129000000074,
+      "p99" : 3845.1129000000074,
+      "errors" : 1,
+      "statuses" : {
+        "200" : 15,
+        "400" : 1
+      }
+    },
+    "checkout-place" : {
+      "requests" : 15,
+      "p50" : 2703.191199999994,
+      "p95" : 3438.2195999999967,
+      "p99" : 3438.2195999999967,
+      "errors" : 0,
+      "statuses" : {
+        "201" : 15
+      }
+    },
+    "checkout-replay" : {
+      "requests" : 9,
+      "p50" : 2414.3690999999963,
+      "p95" : 4102.4565,
+      "p99" : 4102.4565,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 9
+      }
+    },
+    "order-history" : {
+      "requests" : 16,
+      "p50" : 1950.4689999999973,
+      "p95" : 4167.0144,
+      "p99" : 4167.0144,
+      "errors" : 0,
+      "statuses" : {
+        "200" : 16
+      }
+    }
+  },
+  "samples" : [ {
+    "time" : "2026-10-25T18:53:13.660Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 642060288,
+    "generatorRss" : 82821120,
+    "cpu" : 0.01194001816296459,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 276749816,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:16.668Z",
+    "pending" : 30,
+    "activeUsers" : 20,
+    "hostFreeBytes" : 618192896,
+    "generatorRss" : 88633344,
+    "cpu" : 0.3907438848005648,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 263593176,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 20,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:19.743Z",
+    "pending" : 46,
+    "activeUsers" : 38,
+    "hostFreeBytes" : 610148352,
+    "generatorRss" : 92221440,
+    "cpu" : 0.4999031467852908,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 256634344,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 34,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:22.878Z",
+    "pending" : 48,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 574140416,
+    "generatorRss" : 93331456,
+    "cpu" : 0.251351670807306,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 282679504,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 38,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:25.754Z",
+    "pending" : 48,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 498229248,
+    "generatorRss" : 94384128,
+    "cpu" : 0.3591715936273417,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 275337560,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:28.733Z",
+    "pending" : 48,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 588988416,
+    "generatorRss" : 95268864,
+    "cpu" : 0.24652148735674223,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 270976168,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 37,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:31.716Z",
+    "pending" : 49,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 561360896,
+    "generatorRss" : 95592448,
+    "cpu" : 0.2301973549917099,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 261111872,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:34.820Z",
+    "pending" : 48,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 509218816,
+    "generatorRss" : 96509952,
+    "cpu" : 0.20755396176114502,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 286954264,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 38,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:37.773Z",
+    "pending" : 45,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 530583552,
+    "generatorRss" : 99188736,
+    "cpu" : 0.283544222464277,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 275142112,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 36,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:40.775Z",
+    "pending" : 45,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 515829760,
+    "generatorRss" : 110268416,
+    "cpu" : 0.3536635568953244,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 262123072,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 35,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:43.768Z",
+    "pending" : 49,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 512688128,
+    "generatorRss" : 111083520,
+    "cpu" : 0.3112046934514267,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 287933160,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:46.890Z",
+    "pending" : 49,
+    "activeUsers" : 50,
+    "hostFreeBytes" : 490414080,
+    "generatorRss" : 115970048,
+    "cpu" : 0.12351811270827201,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 256385784,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 39,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:49.832Z",
+    "pending" : 28,
+    "activeUsers" : 28,
+    "hostFreeBytes" : 499691520,
+    "generatorRss" : 121909248,
+    "cpu" : 0.1873351769311392,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 280893192,
+    "dbActive" : 10,
+    "dbIdle" : 0,
+    "dbPending" : 18,
+    "dbMax" : 10,
+    "threadBusy" : null
+  }, {
+    "time" : "2026-10-25T18:53:52.705Z",
+    "pending" : 0,
+    "activeUsers" : 0,
+    "hostFreeBytes" : 493252608,
+    "generatorRss" : 124760064,
+    "cpu" : 0.29640579786286175,
+    "cpuTimeNs" : null,
+    "rss" : null,
+    "heapUsed" : 260411352,
+    "dbActive" : 0,
+    "dbIdle" : 10,
+    "dbPending" : 0,
+    "dbMax" : 10,
+    "threadBusy" : null
+  } ],
+  "monitorFailures" : 0,
+  "database" : {
+    "globalStatus" : [ {
+      "Variable_name" : "Innodb_row_lock_time",
+      "Value" : "2780"
+    }, {
+      "Variable_name" : "Innodb_row_lock_waits",
+      "Value" : "35"
+    }, {
+      "Variable_name" : "Max_used_connections",
+      "Value" : "11"
+    }, {
+      "Variable_name" : "Slow_queries",
+      "Value" : "463"
+    }, {
+      "Variable_name" : "Threads_connected",
+      "Value" : "10"
+    }, {
+      "Variable_name" : "Threads_running",
+      "Value" : "2"
+    } ],
+    "slowQueryCount" : 455,
+    "topStatementDigests" : [ {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b2_0` . `id` , `b2_0` . `created_at` , `b2_0` . `description` , `b2_0` . `logo_reference` , `b2_0` . `name` , `b2_0` . `slug` , `b2_0` . `status` , `b2_0` . `updated_at` , `p1_0` . `category_id` , `c2_0` . `id` , `c2_0` . `created_at` , `c2_0` . `description` , `c2_0` . `name` , `c2_0` . `slug` , `c2_0` . `status` , `c2_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` JOIN `brands` `b2_0` ON `b2_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c2_0` ON `c2_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ?",
+      "COUNT_STAR" : 403,
+      "total_seconds" : 131.0438,
+      "SUM_ROWS_EXAMINED" : 1220685,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "COMMIT",
+      "COUNT_STAR" : 1915,
+      "total_seconds" : 19.8167,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT COUNT ( `p1_0` . `id` ) FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `publication_status` = ? AND `b1_0` . `status` = ? AND `c1_0` . `status` = ? AND ( `lower` ( `p1_0` . `name` ) LIKE ? ESCAPE ? OR `lower` ( `p1_0` . `description` ) LIKE ? ESCAPE ? )",
+      "COUNT_STAR" : 403,
+      "total_seconds" : 16.7356,
+      "SUM_ROWS_EXAMINED" : 407015,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `products` ( NAME , `slug` , `brand_id` , `category_id` , `price` , `stock_quantity` , `availability` , `publication_status` , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 1000,
+      "total_seconds" : 13.1241,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "INSERT INTO `users` ( `email` , `password_hash` , ROLE , STATUS , `created_at` , `updated_at` ) VALUES ( ?, ... , NOW , NOW )",
+      "COUNT_STAR" : 500,
+      "total_seconds" : 5.8286,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SET `autocommit` = ?",
+      "COUNT_STAR" : 3844,
+      "total_seconds" : 2.6559,
+      "SUM_ROWS_EXAMINED" : 0,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `p1_0` . `id` , `p1_0` . `availability` , `p1_0` . `brand_id` , `b1_0` . `id` , `b1_0` . `created_at` , `b1_0` . `description` , `b1_0` . `logo_reference` , `b1_0` . `name` , `b1_0` . `slug` , `b1_0` . `status` , `b1_0` . `updated_at` , `p1_0` . `category_id` , `c1_0` . `id` , `c1_0` . `created_at` , `c1_0` . `description` , `c1_0` . `name` , `c1_0` . `slug` , `c1_0` . `status` , `c1_0` . `updated_at` , `p1_0` . `created_at` , `p1_0` . `description` , `p1_0` . `name` , `p1_0` . `price` , `p1_0` . `publication_status` , `p1_0` . `slug` , `p1_0` . `stock_quantity` , `p1_0` . `updated_at` FROM `products` `p1_0` JOIN `brands` `b1_0` ON `b1_0` . `id` = `p1_0` . `brand_id` JOIN `categories` `c1_0` ON `c1_0` . `id` = `p1_0` . `category_id` WHERE `p1_0` . `id` = ? FOR UPDATE",
+      "COUNT_STAR" : 104,
+      "total_seconds" : 1.7632,
+      "SUM_ROWS_EXAMINED" : 104,
+      "SUM_ERRORS" : 0
+    }, {
+      "DIGEST_TEXT" : "SELECT `u1_0` . `id` , `u1_0` . `created_at` , `u1_0` . `default_address_id` , `u1_0` . `email` , `u1_0` . `password_hash` , `u1_0` . `role` , `u1_0` . `status` , `u1_0` . `updated_at` FROM `users` `u1_0` WHERE `u1_0` . `email` = ?",
+      "COUNT_STAR" : 128,
+      "total_seconds" : 1.5509,
+      "SUM_ROWS_EXAMINED" : 128,
+      "SUM_ERRORS" : 0
+    } ],
+    "integrity" : "PASS"
+  }
+} ]
