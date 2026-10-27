@@ -32,7 +32,14 @@ public class CurrentAccountAuthorities implements Converter<Jwt, Collection<Gran
         }
         // One fresh scalar read needs no surrounding multi-statement transaction.
         // Keep status, role and grant verification on every bearer request.
-        var account = users.findCurrentAuthorizationById(id).orElseThrow(CurrentAccountAuthorities::invalidAccount);
+        final com.brandista.brandista.user.CurrentAuthorization account;
+        try {
+            account = users.findCurrentAuthorizationById(id).orElseThrow(CurrentAccountAuthorities::invalidAccount);
+        } catch (org.springframework.dao.DataAccessResourceFailureException |
+                 org.springframework.transaction.CannotCreateTransactionException unavailable) {
+            // Fail closed through the bearer filter; MVC advice cannot handle this stage.
+            throw new CurrentAccountUnavailableException(unavailable);
+        }
         if (account.status() != AccountStatus.ENABLED) throw invalidAccount();
 
         // Never derive authority from role/roles/scope/grants or identifiers in client input.

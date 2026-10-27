@@ -35,6 +35,7 @@ public class Perf002Diagnostics {
     static class Trace {
         final String route;
         final Map<String,long[]> timings=new LinkedHashMap<>();
+        final Map<String,Integer> failures=new LinkedHashMap<>();
         String phase="request";
         int connectionsHeld,peakConnectionsHeld,bcryptConnectionsAtEntry=-1;
         Trace(String route) {this.route=route;}
@@ -47,7 +48,10 @@ public class Perf002Diagnostics {
     static Object timed(String name,Action action) throws Throwable {
         Trace trace=current.get();if(trace==null)return action.run();
         long wall=System.nanoTime(),cpu=cpu();
-        try{return action.run();}finally{trace.add(name,System.nanoTime()-wall,cpu<0?-1:cpu()-cpu);}
+        try{return action.run();}catch(Throwable failure){
+            Throwable root=failure;while(root.getCause()!=null&&root.getCause()!=root)root=root.getCause();
+            trace.failures.merge(name+":"+root.getClass().getName(),1,Integer::sum);throw failure;
+        }finally{trace.add(name,System.nanoTime()-wall,cpu<0?-1:cpu()-cpu);}
     }
     static Object invoke(Object target,Method method,Object[] args) throws Throwable {
         try{return method.invoke(target,args);}catch(InvocationTargetException exception){throw exception.getCause();}
@@ -124,6 +128,8 @@ public class Perf002Diagnostics {
                 if(queued!=null)trace.add("http.dispatchQueue",queued,-1);
                 ThreadInfo after=threads.getThreadInfo(Thread.currentThread().threadId());
                 var record=new LinkedHashMap<String,Object>();record.put("route",route);
+                record.put("operation",http.getMethod()+" "+uri.replaceAll("/[0-9]+(?=/|$)","/{id}"));
+                record.put("failures",trace.failures);
                 record.put("status",((HttpServletResponse)response).getStatus());
                 record.put("timingsNanos",trace.timings);
                 record.put("peakConnectionsHeld",trace.peakConnectionsHeld);

@@ -27,12 +27,15 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
             HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException authException) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        boolean unavailable = authException instanceof com.brandista.brandista.privilege.CurrentAccountUnavailableException;
+        int status = unavailable ? HttpServletResponse.SC_SERVICE_UNAVAILABLE : HttpServletResponse.SC_UNAUTHORIZED;
+        response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         objectMapper.writeValue(response.getOutputStream(), new ApiErrorResponse(
-                HttpServletResponse.SC_UNAUTHORIZED,
-                "Unauthorized",
-                "Authentication is required or the bearer token is invalid.",
+                status,
+                unavailable ? "Service Unavailable" : "Unauthorized",
+                unavailable ? "Shopping service is temporarily unavailable. Retry shortly."
+                        : "Authentication is required or the bearer token is invalid.",
                 request.getRequestURI(),
                 List.of()));
     }

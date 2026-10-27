@@ -1,0 +1,121 @@
+{
+  "requests": 566,
+  "errors": 32,
+  "rate": 0.05653710247349823,
+  "routes": {
+    "brands": {
+      "requests": 134,
+      "errors": 5,
+      "statuses": {
+        "200": 129,
+        "503": 5
+      }
+    },
+    "search": {
+      "requests": 134,
+      "errors": 9,
+      "statuses": {
+        "200": 125,
+        "503": 9
+      }
+    },
+    "product": {
+      "requests": 134,
+      "errors": 8,
+      "statuses": {
+        "200": 126,
+        "503": 8
+      }
+    },
+    "cart-read": {
+      "requests": 11,
+      "errors": 1,
+      "statuses": {
+        "200": 10,
+        "503": 1
+      }
+    },
+    "cart-clear": {
+      "requests": 11,
+      "errors": 2,
+      "statuses": {
+        "200": 9,
+        "500": 1,
+        "503": 1
+      }
+    },
+    "cart-add": {
+      "requests": 18,
+      "errors": 3,
+      "statuses": {
+        "201": 15,
+        "500": 1,
+        "503": 2
+      }
+    },
+    "merchant-orders": {
+      "requests": 7,
+      "errors": 1,
+      "statuses": {
+        "200": 6,
+        "500": 1
+      }
+    },
+    "merchant-order-detail": {
+      "requests": 6,
+      "errors": 2,
+      "statuses": {
+        "200": 4,
+        "500": 1,
+        "503": 1
+      }
+    },
+    "checkout-replay": {
+      "requests": 5,
+      "errors": 1,
+      "statuses": {
+        "200": 4,
+        "503": 1
+      }
+    }
+  },
+  "serverErrorRoots": [
+    {
+      "time": "2026-10-27T08:46:43.874593300Z",
+      "type": "org.springframework.dao.DataAccessResourceFailureException",
+      "root": "java.sql.SQLTransientConnectionException",
+      "stage": "bearer current-account lookup before MVC",
+      "timeoutMs": 3002,
+      "source": "CurrentAccountAuthorities.convert -> findCurrentAuthorizationById -> Hikari pool acquisition"
+    },
+    {
+      "time": "2026-10-27T08:46:44.063185600Z",
+      "type": "org.springframework.dao.DataAccessResourceFailureException",
+      "root": "java.sql.SQLTransientConnectionException",
+      "stage": "bearer current-account lookup before MVC",
+      "timeoutMs": 3036,
+      "source": "CurrentAccountAuthorities.convert -> findCurrentAuthorizationById -> Hikari pool acquisition"
+    },
+    {
+      "time": "2026-10-27T08:46:44.300085500Z",
+      "type": "org.springframework.dao.DataAccessResourceFailureException",
+      "root": "java.sql.SQLTransientConnectionException",
+      "stage": "bearer current-account lookup before MVC",
+      "timeoutMs": 3020,
+      "source": "CurrentAccountAuthorities.convert -> findCurrentAuthorizationById -> Hikari pool acquisition"
+    },
+    {
+      "time": "2026-10-27T08:46:44.380766900Z",
+      "type": "org.springframework.dao.DataAccessResourceFailureException",
+      "root": "java.sql.SQLTransientConnectionException",
+      "stage": "bearer current-account lookup before MVC",
+      "timeoutMs": 3000,
+      "source": "CurrentAccountAuthorities.convert -> findCurrentAuthorizationById -> Hikari pool acquisition"
+    }
+  ],
+  "conclusions": [
+    "32/566 errors: 28 HTTP503 and four HTTP500. All four servlet ERROR stack traces are bearer account-check pool-acquisition failures.",
+    "The 28 HTTP503 statuses are controller-side unavailable responses. Pool timeout logs support exhaustion; historical request IDs were absent, so one-to-one request/exception correlation cannot be reconstructed.",
+    "No request bodies, tokens or credentials included. Added class-only per-request failure diagnostics for subsequent runs."
+  ]
+}
