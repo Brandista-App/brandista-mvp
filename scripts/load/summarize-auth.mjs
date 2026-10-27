@@ -1,12 +1,19 @@
 // Offline analysis of sanitized PERF-002 request timings. No HTTP/database access.
 import fs from 'node:fs'
+import path from 'node:path'
+import { gunzipSync } from 'node:zlib'
 const file=process.argv[2]
 if(!file)throw new Error('Provide one auth-N.json evidence file')
 let data
-try{data=JSON.parse(fs.readFileSync(file,'utf8'))}catch{throw new Error('Invalid evidence: '+file)}
+try{const bytes=fs.readFileSync(file);data=JSON.parse((file.endsWith('.gz')?gunzipSync(bytes):bytes).toString('utf8'))}catch{throw new Error('Invalid evidence: '+file)}
 const percentile=(a,p)=>a.length?[...a].sort((a,b)=>a-b)[Math.min(a.length-1,Math.ceil(a.length*p)-1)]:null
 const stats=a=>({samples:a.length,p50:percentile(a,.5),p95:percentile(a,.95),p99:percentile(a,.99),max:a.length?Math.max(...a):null,mean:a.length?a.reduce((a,b)=>a+b,0)/a.length:null})
-const result={file,requests:data.requests.length,droppedTraces:data.droppedTraces,inflightAtSnapshot:data.inflightAtSnapshot,threadCpuAvailable:data.threadCpuAvailable,groups:{}}
+const users=Number(path.basename(file).match(/^auth-(\d+)\.json(?:\.gz)?$/)?.[1])
+const load=JSON.parse(fs.readFileSync(path.join(path.dirname(file),'results.json'),'utf8')).find(s=>s.users===users)
+if(!load)throw new Error('Matching load stage required alongside auth evidence')
+const first=Math.min(...load.samples.map(s=>Date.parse(s.time))),last=Math.max(...load.samples.map(s=>Date.parse(s.time)))
+const samples=data.threadSamples.filter(s=>Date.parse(s.time)>=first&&Date.parse(s.time)<=last)
+const result={file,users,clientAuthLatency:load.routes.authentication,requests:data.requests.length,droppedTraces:data.droppedTraces,inflightAtSnapshot:data.inflightAtSnapshot,threadCpuAvailable:data.threadCpuAvailable,groups:{}}
 for(const route of [...new Set(data.requests.map(r=>r.route))]) {
  const rows=data.requests.filter(r=>r.route===route)
  const keys=[...new Set(rows.flatMap(r=>Object.keys(r.timingsNanos)))]
@@ -22,9 +29,9 @@ for(const route of [...new Set(data.requests.map(r=>r.route))]) {
   bcryptConnectionsAtEntry:stats(rows.map(r=>r.bcryptConnectionsAtEntry).filter(v=>v!==null)),
   peakConnectionsHeld:stats(rows.map(r=>r.peakConnectionsHeld))}
 }
-const max=key=>data.threadSamples.length?Math.max(...data.threadSamples.map(r=>r[key])):null
-result.executor={samples:data.threadSamples.length,peakThreads:max('poolSize'),peakBusy:max('busy'),peakQueued:max('queued'),
- peakHttpStates:Object.fromEntries([...new Set(data.threadSamples.flatMap(r=>Object.keys(r.httpThreadStates)))].map(k=>[k,Math.max(...data.threadSamples.map(r=>r.httpThreadStates[k]??0))]))}
+const max=key=>samples.length?Math.max(...samples.map(r=>r[key])):null
+result.executor={samples:samples.length,windowStartUtc:new Date(first).toISOString(),windowEndUtc:new Date(last).toISOString(),peakThreads:max('poolSize'),peakBusy:max('busy'),peakQueued:max('queued'),
+ peakHttpStates:Object.fromEntries([...new Set(samples.flatMap(r=>Object.keys(r.httpThreadStates)))].map(k=>[k,Math.max(...samples.map(r=>r.httpThreadStates[k]??0))]))}
 result.notes=['Timing stages are nested: do not sum them or subtract independent percentiles. Repeated calls are summed per request; invocations are also reported.',
  'JSON write includes configured converter serialization and output writes; its wall time can include output backpressure.',data.queueScope]
 console.log(JSON.stringify(result,null,2))
