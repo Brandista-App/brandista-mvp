@@ -1,0 +1,13 @@
+{
+  "tableCounts": {
+    "customer_orders": 36,
+    "merchant_order_fulfillments": 72,
+    "merchant_order_events": 4,
+    "customer_order_items": 72,
+    "products": 1002,
+    "users": 504
+  },
+  "method": "isolated consistent mysqldump and restore to a new schema",
+  "status": "PASS",
+  "seconds": 10.5877238
+}

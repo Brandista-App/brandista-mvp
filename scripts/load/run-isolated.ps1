@@ -1,4 +1,4 @@
-param([int]$HoldSeconds = 30)
+param([int]$HoldSeconds = 30, [ValidateSet(10,50,100,250,500)][int]$MaximumUsers = 500)
 $ErrorActionPreference = 'Stop'
 if ($HoldSeconds -lt 10 -or $HoldSeconds -gt 120) { throw 'HoldSeconds must be 10–120.' }
 Set-Location (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent)
@@ -6,7 +6,7 @@ $taskId = 'brandista-prod001-' + [guid]::NewGuid().ToString('N').Substring(0,10)
 $taskContainer = $null
 $taskMonitor = $null
 $taskPrior = @{}
-$taskVariables = @('MYSQL_ROOT_PASSWORD','BRANDISTA_PROD001_URL','BRANDISTA_PROD001_PASSWORD','BRANDISTA_PROD001_LOAD','PROD001_HOLD_MS','BRANDISTA_PROD001_OUTPUT')
+$taskVariables = @('MYSQL_ROOT_PASSWORD','BRANDISTA_PROD001_URL','BRANDISTA_PROD001_PASSWORD','BRANDISTA_PROD001_LOAD','PROD001_HOLD_MS','PROD001_MAX_USERS','BRANDISTA_PROD001_OUTPUT')
 foreach ($taskVariable in $taskVariables) { $taskPrior[$taskVariable] = [Environment]::GetEnvironmentVariable($taskVariable) }
 try {
     $env:MYSQL_ROOT_PASSWORD = [Convert]::ToBase64String([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
@@ -28,10 +28,11 @@ try {
     $env:BRANDISTA_PROD001_PASSWORD=$env:MYSQL_ROOT_PASSWORD
     $env:BRANDISTA_PROD001_LOAD='1'
     $env:PROD001_HOLD_MS=[string]($HoldSeconds*1000)
+    $env:PROD001_MAX_USERS=[string]$MaximumUsers
     $taskEvidence=Join-Path (Get-Location) "target/prod001-load/$taskId"
     New-Item -ItemType Directory -Force $taskEvidence | Out-Null
     $env:BRANDISTA_PROD001_OUTPUT=$taskEvidence
-    @{sourceSha=(git rev-parse HEAD);workingTree=(git status --short);startedUtc=[DateTime]::UtcNow.ToString('o');mysqlImage=(docker inspect $taskContainer --format '{{.Image}}');nodeVersion=(node --version);databaseMemoryMiB=640;databaseCpuLimit=1;jvmHeapMiB=512} | ConvertTo-Json -Depth 3 > (Join-Path $taskEvidence 'environment.json')
+    @{maximumUsers=$MaximumUsers;holdSeconds=$HoldSeconds;workloadSha=(git hash-object scripts/load/mixed-load.mjs);probeSha=(git hash-object src/test/java/com/brandista/brandista/production/Perf002Diagnostics.java);otherRunningContainers=@(docker ps --filter "label!=brandista.task=prod001" --format "{{.Names}}");host=(node -e "console.log(JSON.stringify({cpus:require('os').cpus().length,totalMemory:require('os').totalmem(),freeMemory:require('os').freemem()}))" | ConvertFrom-Json);sourceSha=(git rev-parse HEAD);workingTree=(git status --short);startedUtc=[DateTime]::UtcNow.ToString('o');mysqlImage=(docker inspect $taskContainer --format '{{.Image}}');nodeVersion=(node --version);databaseMemoryMiB=640;databaseCpuLimit=1;jvmHeapMiB=512} | ConvertTo-Json -Depth 5 > (Join-Path $taskEvidence 'environment.json')
     $taskMonitor=Start-Job -ArgumentList $taskContainer,(Join-Path $taskEvidence 'mysql-resource-samples.jsonl') -ScriptBlock {
         param($taskDb,$taskFile)
         while($true){
@@ -46,6 +47,7 @@ try {
     }
     & .\mvnw.cmd --batch-mode --no-transfer-progress '-Dtest=ProductionLoadHarnessTests' '-DargLine=-Xmx512m' test
     if($LASTEXITCODE -ne 0){throw 'Isolated load/acceptance failed; inspect target/prod001-load/ and Surefire logs.'}
+    docker inspect $taskContainer --format '{{json .State}}' > (Join-Path $taskEvidence 'container-state.json')
     $taskRestoreClock=[Diagnostics.Stopwatch]::StartNew()
     # Synthetic data only, target/ is ignored. No production database is read.
     docker exec $taskContainer sh -c 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqldump -uroot --single-transaction --no-tablespaces --set-gtid-purged=OFF brandista_prod001' > (Join-Path $taskEvidence 'synthetic-backup.sql')

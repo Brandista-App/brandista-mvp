@@ -1,0 +1,24 @@
+{
+  "workingTree": [
+    " M scripts/load/mixed-load.mjs",
+    " M scripts/load/run-isolated.ps1",
+    " M src/test/java/com/brandista/brandista/production/Perf002Diagnostics.java"
+  ],
+  "maximumUsers": 50,
+  "jvmHeapMiB": 512,
+  "otherRunningContainers": [],
+  "mysqlImage": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+  "sourceSha": "4068298db6741727a4ce56429c32c03d87b00ff9",
+  "probeSha": "597a3340c7e8ca24ffb2599612d3130780940836",
+  "workloadSha": "12df7cc6a2e60f8c2e8c5f2f6364e065b04ae94e",
+  "nodeVersion": "v24.21.0",
+  "databaseMemoryMiB": 640,
+  "host": {
+    "cpus": 4,
+    "totalMemory": 8489750528,
+    "freeMemory": 1025875968
+  },
+  "startedUtc": "2026-10-27T08:55:39.2079713Z",
+  "databaseCpuLimit": 1,
+  "holdSeconds": 30
+}

@@ -1,0 +1,9 @@
+{
+  "platform": "win32",
+  "arch": "x64",
+  "logicalCpuCount": 4,
+  "availableParallelism": 4,
+  "hostMemoryBytes": 8489750528,
+  "nodeVersion": "v24.21.0",
+  "recordedUtc": "2026-10-26T19:17:19.206Z"
+}

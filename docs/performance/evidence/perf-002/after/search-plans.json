@@ -1,0 +1,101 @@
+[ {
+  "parameterizedSql" : "select count(p1_0.id) from products p1_0 join brands b1_0 on b1_0.id=p1_0.brand_id join categories c1_0 on c1_0.id=p1_0.category_id where p1_0.publication_status=? and b1_0.status=? and c1_0.status=? and (lower(p1_0.name) like ? escape '!' or lower(p1_0.description) like ? escape '!')",
+  "syntheticBindings" : [ "PUBLISHED", "ACTIVE", "ACTIVE", "%synthetic%", "%synthetic%" ],
+  "analyzeWarmRepeats" : [ [ {
+    "EXPLAIN" : "-> Aggregate: count(p1_0.id)  (cost=218 rows=1) (actual time=307..307 rows=1 loops=1)\n    -> Nested loop inner join  (cost=118 rows=1002) (actual time=252..259 rows=1002 loops=1)\n        -> Nested loop inner join  (cost=0.819 rows=2) (actual time=204..204 rows=2 loops=1)\n            -> Covering index lookup on c1_0 using idx_categories_status_name (status='ACTIVE')  (cost=0.35 rows=1) (actual time=204..204 rows=1 loops=1)\n            -> Covering index lookup on b1_0 using idx_brands_status_name (status='ACTIVE')  (cost=0.469 rows=2) (actual time=0.0156..0.0249 rows=2 loops=1)\n        -> Filter: ((p1_0.category_id = c1_0.id) and (p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=33.3 rows=501) (actual time=0.0905..3.46 rows=501 loops=2)\n            -> Index lookup on p1_0 using idx_products_brand_id (brand_id=b1_0.id)  (cost=33.3 rows=501) (actual time=0.0806..2.76 rows=501 loops=2)\n"
+  } ], [ {
+    "EXPLAIN" : "-> Aggregate: count(p1_0.id)  (cost=218 rows=1) (actual time=4.9..4.9 rows=1 loops=1)\n    -> Nested loop inner join  (cost=118 rows=1002) (actual time=0.0621..4.82 rows=1002 loops=1)\n        -> Nested loop inner join  (cost=0.819 rows=2) (actual time=0.0198..0.0272 rows=2 loops=1)\n            -> Covering index lookup on c1_0 using idx_categories_status_name (status='ACTIVE')  (cost=0.35 rows=1) (actual time=0.0133..0.0155 rows=1 loops=1)\n            -> Covering index lookup on b1_0 using idx_brands_status_name (status='ACTIVE')  (cost=0.469 rows=2) (actual time=0.0051..0.01 rows=2 loops=1)\n        -> Filter: ((p1_0.category_id = c1_0.id) and (p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=33.3 rows=501) (actual time=0.0339..2.34 rows=501 loops=2)\n            -> Index lookup on p1_0 using idx_products_brand_id (brand_id=b1_0.id)  (cost=33.3 rows=501) (actual time=0.0314..1.9 rows=501 loops=2)\n"
+  } ], [ {
+    "EXPLAIN" : "-> Aggregate: count(p1_0.id)  (cost=218 rows=1) (actual time=4.32..4.32 rows=1 loops=1)\n    -> Nested loop inner join  (cost=118 rows=1002) (actual time=0.0528..4.24 rows=1002 loops=1)\n        -> Nested loop inner join  (cost=0.819 rows=2) (actual time=0.0145..0.0243 rows=2 loops=1)\n            -> Covering index lookup on c1_0 using idx_categories_status_name (status='ACTIVE')  (cost=0.35 rows=1) (actual time=0.0092..0.0115 rows=1 loops=1)\n            -> Covering index lookup on b1_0 using idx_brands_status_name (status='ACTIVE')  (cost=0.469 rows=2) (actual time=0.0046..0.0119 rows=2 loops=1)\n        -> Filter: ((p1_0.category_id = c1_0.id) and (p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=33.3 rows=501) (actual time=0.0408..2.06 rows=501 loops=2)\n            -> Index lookup on p1_0 using idx_products_brand_id (brand_id=b1_0.id)  (cost=33.3 rows=501) (actual time=0.0374..1.68 rows=501 loops=2)\n"
+  } ] ],
+  "explain" : [ {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "c1_0",
+    "partitions" : null,
+    "type" : "ref",
+    "possible_keys" : "PRIMARY,idx_categories_status_name",
+    "key" : "idx_categories_status_name",
+    "key_len" : "66",
+    "ref" : "const",
+    "rows" : 1,
+    "filtered" : 100.0,
+    "Extra" : "Using index"
+  }, {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "b1_0",
+    "partitions" : null,
+    "type" : "ref",
+    "possible_keys" : "PRIMARY,idx_brands_status_name",
+    "key" : "idx_brands_status_name",
+    "key_len" : "66",
+    "ref" : "const",
+    "rows" : 2,
+    "filtered" : 100.0,
+    "Extra" : "Using index"
+  }, {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "p1_0",
+    "partitions" : null,
+    "type" : "ref",
+    "possible_keys" : "idx_products_public_name,idx_products_brand_id,idx_products_category_id,idx_products_public_price,idx_products_public_brand,idx_products_public_category",
+    "key" : "idx_products_brand_id",
+    "key_len" : "8",
+    "ref" : "brandista_prod001.b1_0.id",
+    "rows" : 501,
+    "filtered" : 100.0,
+    "Extra" : "Using where"
+  } ]
+}, {
+  "parameterizedSql" : "select p1_0.id,p1_0.availability,p1_0.brand_id,b1_0.id,b1_0.created_at,b1_0.description,b1_0.logo_reference,b1_0.name,b1_0.slug,b1_0.status,b1_0.updated_at,p1_0.category_id,c1_0.id,c1_0.created_at,c1_0.description,c1_0.name,c1_0.slug,c1_0.status,c1_0.updated_at,p1_0.created_at,p1_0.description,p1_0.name,p1_0.price,p1_0.publication_status,p1_0.slug,p1_0.stock_quantity,p1_0.updated_at from products p1_0 join brands b1_0 on b1_0.id=p1_0.brand_id join categories c1_0 on c1_0.id=p1_0.category_id where p1_0.publication_status=? and b1_0.status=? and c1_0.status=? and (lower(p1_0.name) like ? escape '!' or lower(p1_0.description) like ? escape '!') order by p1_0.price,p1_0.id limit ?,?",
+  "syntheticBindings" : [ "PUBLISHED", "ACTIVE", "ACTIVE", "%synthetic%", "%synthetic%", 0, 20 ],
+  "analyzeWarmRepeats" : [ [ {
+    "EXPLAIN" : "-> Limit: 20 row(s)  (cost=804 rows=20) (actual time=5.38..5.52 rows=20 loops=1)\n    -> Nested loop inner join  (cost=804 rows=1002) (actual time=5.38..5.51 rows=20 loops=1)\n        -> Nested loop inner join  (cost=454 rows=1002) (actual time=5.36..5.4 rows=20 loops=1)\n            -> Sort: p1_0.price, p1_0.id  (cost=103 rows=1002) (actual time=5.26..5.27 rows=20 loops=1)\n                -> Filter: ((p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=103 rows=1002) (actual time=0.0534..3.98 rows=1002 loops=1)\n                    -> Table scan on p1_0  (cost=103 rows=1002) (actual time=0.0451..2.78 rows=1002 loops=1)\n            -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=0.00218..0.00237 rows=1 loops=20)\n                -> Single-row index lookup on c1_0 using PRIMARY (id=p1_0.category_id)  (cost=0.25 rows=1) (actual time=0.0016..0.00165 rows=1 loops=20)\n        -> Filter: (b1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=0.00486..0.00507 rows=1 loops=20)\n            -> Single-row index lookup on b1_0 using PRIMARY (id=p1_0.brand_id)  (cost=0.25 rows=1) (actual time=0.00426..0.00434 rows=1 loops=20)\n"
+  } ], [ {
+    "EXPLAIN" : "-> Limit: 20 row(s)  (cost=804 rows=20) (actual time=5.01..5.07 rows=20 loops=1)\n    -> Nested loop inner join  (cost=804 rows=1002) (actual time=5..5.07 rows=20 loops=1)\n        -> Nested loop inner join  (cost=454 rows=1002) (actual time=4.99..5.01 rows=20 loops=1)\n            -> Sort: p1_0.price, p1_0.id  (cost=103 rows=1002) (actual time=4.97..4.97 rows=20 loops=1)\n                -> Filter: ((p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=103 rows=1002) (actual time=0.0491..3.97 rows=1002 loops=1)\n                    -> Table scan on p1_0  (cost=103 rows=1002) (actual time=0.0433..2.95 rows=1002 loops=1)\n            -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=0.00139..0.00148 rows=1 loops=20)\n                -> Single-row index lookup on c1_0 using PRIMARY (id=p1_0.category_id)  (cost=0.25 rows=1) (actual time=0.00109..0.00113 rows=1 loops=20)\n        -> Filter: (b1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=0.00265..0.00276 rows=1 loops=20)\n            -> Single-row index lookup on b1_0 using PRIMARY (id=p1_0.brand_id)  (cost=0.25 rows=1) (actual time=0.00236..0.0024 rows=1 loops=20)\n"
+  } ], [ {
+    "EXPLAIN" : "-> Limit: 20 row(s)  (cost=804 rows=20) (actual time=2.72..2.79 rows=20 loops=1)\n    -> Nested loop inner join  (cost=804 rows=1002) (actual time=2.72..2.79 rows=20 loops=1)\n        -> Nested loop inner join  (cost=454 rows=1002) (actual time=2.71..2.73 rows=20 loops=1)\n            -> Sort: p1_0.price, p1_0.id  (cost=103 rows=1002) (actual time=2.7..2.7 rows=20 loops=1)\n                -> Filter: ((p1_0.publication_status = 'PUBLISHED') and ((lower(p1_0.`name`) like '%synthetic%' escape '!') or (lower(p1_0.`description`) like '%synthetic%' escape '!')))  (cost=103 rows=1002) (actual time=0.0703..2.27 rows=1002 loops=1)\n                    -> Table scan on p1_0  (cost=103 rows=1002) (actual time=0.0646..1.72 rows=1002 loops=1)\n            -> Filter: (c1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=965e-6..0.00107 rows=1 loops=20)\n                -> Single-row index lookup on c1_0 using PRIMARY (id=p1_0.category_id)  (cost=0.25 rows=1) (actual time=690e-6..730e-6 rows=1 loops=20)\n        -> Filter: (b1_0.`status` = 'ACTIVE')  (cost=0.25 rows=1) (actual time=0.00269..0.00279 rows=1 loops=20)\n            -> Single-row index lookup on b1_0 using PRIMARY (id=p1_0.brand_id)  (cost=0.25 rows=1) (actual time=0.00241..0.00244 rows=1 loops=20)\n"
+  } ] ],
+  "explain" : [ {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "p1_0",
+    "partitions" : null,
+    "type" : "ALL",
+    "possible_keys" : "idx_products_public_name,idx_products_brand_id,idx_products_category_id,idx_products_public_price,idx_products_public_brand,idx_products_public_category",
+    "key" : null,
+    "key_len" : null,
+    "ref" : null,
+    "rows" : 1002,
+    "filtered" : 100.0,
+    "Extra" : "Using where; Using filesort"
+  }, {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "c1_0",
+    "partitions" : null,
+    "type" : "eq_ref",
+    "possible_keys" : "PRIMARY,idx_categories_status_name",
+    "key" : "PRIMARY",
+    "key_len" : "8",
+    "ref" : "brandista_prod001.p1_0.category_id",
+    "rows" : 1,
+    "filtered" : 100.0,
+    "Extra" : "Using where"
+  }, {
+    "id" : 1,
+    "select_type" : "SIMPLE",
+    "table" : "b1_0",
+    "partitions" : null,
+    "type" : "eq_ref",
+    "possible_keys" : "PRIMARY,idx_brands_status_name",
+    "key" : "PRIMARY",
+    "key_len" : "8",
+    "ref" : "brandista_prod001.p1_0.brand_id",
+    "rows" : 1,
+    "filtered" : 100.0,
+    "Extra" : "Using where"
+  } ]
+} ]

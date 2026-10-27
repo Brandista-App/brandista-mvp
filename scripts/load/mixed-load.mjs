@@ -11,7 +11,9 @@ if (fixture.guard !== 'brandista-prod001-disposable' ||
     !/^http:\/\/127\.0\.0\.1:\d+$/.test(fixture.management) || fixture.users.length !== 500)
   throw new Error('Only the parent-created isolated loopback fixture is allowed')
 let stage, aborted = false, pending = 0
-const stages = [10, 50, 100, 250, 500]
+const maximumUsers=Number(process.env.PROD001_MAX_USERS || 500)
+if(![10,50,100,250,500].includes(maximumUsers))throw new Error("Invalid stage cap")
+const stages = [10, 50, 100, 250, 500].filter(n=>n<=maximumUsers)
 const percentile = (values, p) => values.length ? [...values].sort((a,b)=>a-b)[Math.min(values.length-1,Math.ceil(values.length*p)-1)] : null
 async function request(label, path, token, body, method = body ? 'POST' : 'GET', extra = {}) {
   const start = performance.now(); pending++

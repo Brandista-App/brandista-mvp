@@ -1,0 +1,7 @@
+{
+  "journey" : "two brands, invitation activation, published stock, mixed COD, idempotent replay, tenant denial, per-brand visibility, A delivered/B placed, customer history",
+  "status" : "PASS",
+  "provisioning" : "OperatorProvisioning.INITIAL_CREATE (test-only service invocation; interactive CLI not tested)",
+  "invitationDelivery" : "authorized in-memory test capture; no production email",
+  "database" : "disposable MySQL 8.4.11"
+}
