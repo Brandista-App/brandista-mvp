@@ -2,6 +2,12 @@ name: Backend tests
 on:
   pull_request:
     paths:
+      - 'Dockerfile'
+      - '.dockerignore'
+      - '.gitattributes'
+      - 'docker/**'
+      - 'scripts/test-render-ca.py'
+      - 'docs/deployment/**'
       - 'src/**'
       - 'pom.xml'
       - '.mvn/**'
@@ -28,3 +34,17 @@ jobs:
         run: sh ./mvnw --batch-mode --no-transfer-progress verify
       - name: Check load generator syntax (load is opt-in and isolated)
         run: node --check scripts/load/mixed-load.mjs
+
+  docker-trust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build the real non-root Docker image
+        run: docker build --progress=plain -t brandista-render-ca:test .
+      - name: Verify runtime CA trust, preserved public CAs and fail-closed setup
+        run: python3 scripts/test-render-ca.py
