@@ -1,0 +1,20 @@
+{
+  "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+  "holdSeconds": 30,
+  "jvmHeapMiB": 512,
+  "mysqlImage": "sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+  "host": {
+    "cpus": 4,
+    "totalMemory": 8489750528,
+    "freeMemory": 1448304640
+  },
+  "maximumUsers": 50,
+  "workloadSha": "12df7cc6a2e60f8c2e8c5f2f6364e065b04ae94e",
+  "nodeVersion": "v24.21.0",
+  "probeSha": "597a3340c7e8ca24ffb2599612d3130780940836",
+  "workingTree": null,
+  "startedUtc": "2026-10-27T09:13:50.4522246Z",
+  "otherRunningContainers": [],
+  "databaseMemoryMiB": 640,
+  "databaseCpuLimit": 1
+}

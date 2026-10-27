@@ -1,0 +1,765 @@
+[
+  {
+    "label": "baseline-1",
+    "sourceSha": "4068298db6741727a4ce56429c32c03d87b00ff9",
+    "users": 10,
+    "seconds": 36.9658941,
+    "requests": 762,
+    "rps": 20.61359581723197,
+    "p95": 933.0576000000001,
+    "p99": 2030.8274999999994,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 10,
+      "p50": 534.9562999999998,
+      "p95": 1586.1990999999998,
+      "p99": 1586.1990999999998,
+      "errors": 0,
+      "statuses": {
+        "200": 10
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 406650880,
+    "peakDbActive": 10,
+    "peakDbPending": 0,
+    "peakCpu": 0.4257839683969763,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 207.0659574468085,
+      "hikaricp.connections.acquire": 4.0968464893617025
+    },
+    "rowLockWaits": 5,
+    "rowLockMs": 459,
+    "currentAccountHold": {
+      "samples": 164,
+      "p50": 78.4912,
+      "p95": 493.9341,
+      "p99": 1123.7577,
+      "max": 2214.6111,
+      "mean": 146.88331951219516
+    },
+    "searchHold": {
+      "samples": 196,
+      "p50": 150.5266,
+      "p95": 517.2609,
+      "p99": 1302.2493,
+      "max": 2263.9381,
+      "mean": 208.70050000000006
+    },
+    "bcrypt": {
+      "invocations": 10,
+      "wallMsPerRequest": {
+        "samples": 10,
+        "p50": 187.8037,
+        "p95": 375.0733,
+        "p99": 375.0733,
+        "max": 375.0733,
+        "mean": 204.04915999999997
+      },
+      "cpuMsPerRequest": {
+        "samples": 10,
+        "p50": 125,
+        "p95": 171.875,
+        "p99": 171.875,
+        "max": 171.875,
+        "mean": 129.6875
+      }
+    },
+    "executor": {
+      "samples": 35,
+      "windowStartUtc": "2026-10-27T08:58:02.008Z",
+      "windowEndUtc": "2026-10-27T08:58:36.577Z",
+      "peakThreads": 10,
+      "peakBusy": 10,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 14,
+        "WAITING": 7,
+        "TIMED_WAITING": 10
+      }
+    },
+    "committedOrders": 15
+  },
+  {
+    "label": "baseline-1",
+    "sourceSha": "4068298db6741727a4ce56429c32c03d87b00ff9",
+    "users": 50,
+    "seconds": 38.300151799999995,
+    "requests": 1547,
+    "rps": 40.39148481912806,
+    "p95": 1979.7474000000075,
+    "p99": 3214.9683000000005,
+    "errorRate": 0.0006464124111182935,
+    "httpErrors": 1,
+    "auth": {
+      "requests": 50,
+      "p50": 1167.4407999999967,
+      "p95": 1826.135500000004,
+      "p99": 2045.156799999997,
+      "errors": 0,
+      "statuses": {
+        "200": 50
+      }
+    },
+    "pass": false,
+    "aborted": false,
+    "failedRoutes": [
+      "cart-add",
+      "checkout-place"
+    ],
+    "minFreeBytes": 1011515392,
+    "peakDbActive": 10,
+    "peakDbPending": 40,
+    "peakCpu": 0.6249121934076884,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 192.14986666666667,
+      "hikaricp.connections.acquire": 588.6738569296375
+    },
+    "rowLockWaits": 40,
+    "rowLockMs": 8729,
+    "currentAccountHold": {
+      "samples": 267,
+      "p50": 139.9466,
+      "p95": 328.9937,
+      "p99": 530.2404,
+      "max": 552.8441,
+      "mean": 158.46763333333345
+    },
+    "searchHold": {
+      "samples": 410,
+      "p50": 186.358,
+      "p95": 446.2316,
+      "p99": 650.5764,
+      "max": 712.5656,
+      "mean": 216.24793560975604
+    },
+    "bcrypt": {
+      "invocations": 50,
+      "wallMsPerRequest": {
+        "samples": 50,
+        "p50": 226.332,
+        "p95": 276.8303,
+        "p99": 336.8223,
+        "max": 336.8223,
+        "mean": 226.11844600000006
+      },
+      "cpuMsPerRequest": {
+        "samples": 50,
+        "p50": 125,
+        "p95": 171.875,
+        "p99": 171.875,
+        "max": 171.875,
+        "mean": 125
+      }
+    },
+    "executor": {
+      "samples": 38,
+      "windowStartUtc": "2026-10-27T08:58:42.025Z",
+      "windowEndUtc": "2026-10-27T08:59:20.207Z",
+      "peakThreads": 50,
+      "peakBusy": 49,
+      "peakQueued": 1,
+      "peakHttpStates": {
+        "RUNNABLE": 18,
+        "TIMED_WAITING": 47,
+        "WAITING": 4
+      }
+    },
+    "committedOrders": 36
+  },
+  {
+    "label": "after-1",
+    "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+    "users": 10,
+    "seconds": 36.291169,
+    "requests": 1212,
+    "rps": 33.39655440694126,
+    "p95": 317.0652999999984,
+    "p99": 482.32930000000124,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 10,
+      "p50": 279.2620999999999,
+      "p95": 546.8507,
+      "p99": 546.8507,
+      "errors": 0,
+      "statuses": {
+        "200": 10
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 304726016,
+    "peakDbActive": 9,
+    "peakDbPending": 0,
+    "peakCpu": 0.5586976908667799,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 97.9364569961489,
+      "hikaricp.connections.acquire": 0.489333568677792
+    },
+    "rowLockWaits": 11,
+    "rowLockMs": 598,
+    "currentAccountHold": {
+      "samples": 332,
+      "p50": 8.0081,
+      "p95": 32.3632,
+      "p99": 51.1371,
+      "max": 127.1759,
+      "mean": 11.860271987951803
+    },
+    "searchHold": {
+      "samples": 290,
+      "p50": 119.0319,
+      "p95": 280.1331,
+      "p99": 337.1714,
+      "max": 413.6991,
+      "mean": 137.75934103448287
+    },
+    "bcrypt": {
+      "invocations": 10,
+      "wallMsPerRequest": {
+        "samples": 10,
+        "p50": 204.1613,
+        "p95": 350.4654,
+        "p99": 350.4654,
+        "max": 350.4654,
+        "mean": 242.54144000000002
+      },
+      "cpuMsPerRequest": {
+        "samples": 10,
+        "p50": 140.625,
+        "p95": 187.5,
+        "p99": 187.5,
+        "max": 187.5,
+        "mean": 150
+      }
+    },
+    "executor": {
+      "samples": 34,
+      "windowStartUtc": "2026-10-27T09:07:34.615Z",
+      "windowEndUtc": "2026-10-27T09:08:09.000Z",
+      "peakThreads": 10,
+      "peakBusy": 9,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 13,
+        "WAITING": 7,
+        "TIMED_WAITING": 8
+      }
+    },
+    "committedOrders": 30
+  },
+  {
+    "label": "after-1",
+    "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+    "users": 50,
+    "seconds": 40.79560789999999,
+    "requests": 1953,
+    "rps": 47.87280054233486,
+    "p95": 1494.2311999999947,
+    "p99": 2081.3396000000066,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 50,
+      "p50": 740.2303000000029,
+      "p95": 2717.5558999999994,
+      "p99": 2840.172200000001,
+      "errors": 0,
+      "statuses": {
+        "200": 50
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 313331712,
+    "peakDbActive": 10,
+    "peakDbPending": 37,
+    "peakCpu": 0.5899010973324136,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 159.5289672544081,
+      "hikaricp.connections.acquire": 445.437664063812
+    },
+    "rowLockWaits": 56,
+    "rowLockMs": 12639,
+    "currentAccountHold": {
+      "samples": 367,
+      "p50": 19.3141,
+      "p95": 51.0259,
+      "p99": 73.8601,
+      "max": 140.4093,
+      "mean": 22.420586103542245
+    },
+    "searchHold": {
+      "samples": 512,
+      "p50": 169.0248,
+      "p95": 326.7441,
+      "p99": 406.4474,
+      "max": 1039.6837,
+      "mean": 188.29152714843747
+    },
+    "bcrypt": {
+      "invocations": 50,
+      "wallMsPerRequest": {
+        "samples": 50,
+        "p50": 215.6135,
+        "p95": 319.4453,
+        "p99": 358.8523,
+        "max": 358.8523,
+        "mean": 224.00726400000008
+      },
+      "cpuMsPerRequest": {
+        "samples": 50,
+        "p50": 125,
+        "p95": 156.25,
+        "p99": 187.5,
+        "max": 187.5,
+        "mean": 132.1875
+      }
+    },
+    "executor": {
+      "samples": 41,
+      "windowStartUtc": "2026-10-27T09:08:14.435Z",
+      "windowEndUtc": "2026-10-27T09:08:55.097Z",
+      "peakThreads": 50,
+      "peakBusy": 48,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 17,
+        "TIMED_WAITING": 50,
+        "WAITING": 4
+      }
+    },
+    "committedOrders": 61
+  },
+  {
+    "label": "baseline-2",
+    "sourceSha": "4068298db6741727a4ce56429c32c03d87b00ff9",
+    "users": 10,
+    "seconds": 36.909146199999995,
+    "requests": 939,
+    "rps": 25.44084858836426,
+    "p95": 456.6891000000005,
+    "p99": 736.7839999999997,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 10,
+      "p50": 334.5479000000005,
+      "p95": 513.2038000000002,
+      "p99": 513.2038000000002,
+      "errors": 0,
+      "statuses": {
+        "200": 10
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 481456128,
+    "peakDbActive": 10,
+    "peakDbPending": 1,
+    "peakCpu": 0.5097294486536199,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 158.09880749574106,
+      "hikaricp.connections.acquire": 0.5503794718909711
+    },
+    "rowLockWaits": 4,
+    "rowLockMs": 658,
+    "currentAccountHold": {
+      "samples": 221,
+      "p50": 81.0234,
+      "p95": 245.2173,
+      "p99": 302.3447,
+      "max": 427.0477,
+      "mean": 102.99567556561084
+    },
+    "searchHold": {
+      "samples": 236,
+      "p50": 186.492,
+      "p95": 366.125,
+      "p99": 414.3008,
+      "max": 437.3161,
+      "mean": 202.47379576271186
+    },
+    "bcrypt": {
+      "invocations": 10,
+      "wallMsPerRequest": {
+        "samples": 10,
+        "p50": 246.5169,
+        "p95": 381.5629,
+        "p99": 381.5629,
+        "max": 381.5629,
+        "mean": 249.26839
+      },
+      "cpuMsPerRequest": {
+        "samples": 10,
+        "p50": 156.25,
+        "p95": 187.5,
+        "p99": 187.5,
+        "max": 187.5,
+        "mean": 151.5625
+      }
+    },
+    "executor": {
+      "samples": 36,
+      "windowStartUtc": "2026-10-27T09:11:41.871Z",
+      "windowEndUtc": "2026-10-27T09:12:17.275Z",
+      "peakThreads": 10,
+      "peakBusy": 10,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 14,
+        "WAITING": 7,
+        "TIMED_WAITING": 10
+      }
+    },
+    "committedOrders": 20
+  },
+  {
+    "label": "baseline-2",
+    "sourceSha": "4068298db6741727a4ce56429c32c03d87b00ff9",
+    "users": 50,
+    "seconds": 38.2256614,
+    "requests": 1718,
+    "rps": 44.94363045867403,
+    "p95": 1869.7543000000005,
+    "p99": 2883.8398000000016,
+    "errorRate": 0.0005820721769499418,
+    "httpErrors": 1,
+    "auth": {
+      "requests": 50,
+      "p50": 1071.596000000005,
+      "p95": 2123.1238999999987,
+      "p99": 2232.518200000006,
+      "errors": 0,
+      "statuses": {
+        "200": 50
+      }
+    },
+    "pass": false,
+    "aborted": false,
+    "failedRoutes": [
+      "cart-read",
+      "cart-clear",
+      "merchant-stock"
+    ],
+    "minFreeBytes": 524976128,
+    "peakDbActive": 10,
+    "peakDbPending": 37,
+    "peakCpu": 0.4895807380817726,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 171.65081652257442,
+      "hikaricp.connections.acquire": 515.6176502640423
+    },
+    "rowLockWaits": 43,
+    "rowLockMs": 4452,
+    "currentAccountHold": {
+      "samples": 303,
+      "p50": 125.893,
+      "p95": 305.5243,
+      "p99": 690.3107,
+      "max": 1015.7049,
+      "mean": 150.4516683168317
+    },
+    "searchHold": {
+      "samples": 454,
+      "p50": 172.3243,
+      "p95": 318.6602,
+      "p99": 523.8619,
+      "max": 978.025,
+      "mean": 189.64769867841403
+    },
+    "bcrypt": {
+      "invocations": 50,
+      "wallMsPerRequest": {
+        "samples": 50,
+        "p50": 211.0412,
+        "p95": 278.0186,
+        "p99": 363.9862,
+        "max": 363.9862,
+        "mean": 220.16369600000004
+      },
+      "cpuMsPerRequest": {
+        "samples": 50,
+        "p50": 125,
+        "p95": 140.625,
+        "p99": 156.25,
+        "max": 156.25,
+        "mean": 117.5
+      }
+    },
+    "executor": {
+      "samples": 38,
+      "windowStartUtc": "2026-10-27T09:12:22.525Z",
+      "windowEndUtc": "2026-10-27T09:13:00.632Z",
+      "peakThreads": 50,
+      "peakBusy": 50,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 20,
+        "TIMED_WAITING": 49,
+        "WAITING": 4
+      }
+    },
+    "committedOrders": 45
+  },
+  {
+    "label": "after-2",
+    "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+    "users": 10,
+    "seconds": 36.046845000000005,
+    "requests": 1179,
+    "rps": 32.70743944442294,
+    "p95": 348.93300000000454,
+    "p99": 488.78930000000037,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 10,
+      "p50": 296.3933000000002,
+      "p95": 557.9009999999998,
+      "p99": 557.9009999999998,
+      "errors": 0,
+      "statuses": {
+        "200": 10
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 455389184,
+    "peakDbActive": 10,
+    "peakDbPending": 0,
+    "peakCpu": 0.58456011564591,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 104.80568407138138,
+      "hikaricp.connections.acquire": 0.6691573694646398
+    },
+    "rowLockWaits": 11,
+    "rowLockMs": 526,
+    "currentAccountHold": {
+      "samples": 320,
+      "p50": 8.5564,
+      "p95": 45.8016,
+      "p99": 60.0076,
+      "max": 78.8677,
+      "mean": 13.184399999999988
+    },
+    "searchHold": {
+      "samples": 283,
+      "p50": 128.2848,
+      "p95": 291.6339,
+      "p99": 360.1678,
+      "max": 402.4961,
+      "mean": 147.36152120141338
+    },
+    "bcrypt": {
+      "invocations": 10,
+      "wallMsPerRequest": {
+        "samples": 10,
+        "p50": 246.4809,
+        "p95": 369.5446,
+        "p99": 369.5446,
+        "max": 369.5446,
+        "mean": 235.34037000000004
+      },
+      "cpuMsPerRequest": {
+        "samples": 10,
+        "p50": 125,
+        "p95": 171.875,
+        "p99": 171.875,
+        "max": 171.875,
+        "mean": 128.125
+      }
+    },
+    "executor": {
+      "samples": 35,
+      "windowStartUtc": "2026-10-27T09:15:28.812Z",
+      "windowEndUtc": "2026-10-27T09:16:03.490Z",
+      "peakThreads": 10,
+      "peakBusy": 10,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 14,
+        "WAITING": 6,
+        "TIMED_WAITING": 10
+      }
+    },
+    "committedOrders": 29
+  },
+  {
+    "label": "after-2",
+    "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+    "users": 50,
+    "seconds": 39.5398299,
+    "requests": 1948,
+    "rps": 49.26677744761871,
+    "p95": 1521.7722000000067,
+    "p99": 2090.2522000000026,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 50,
+      "p50": 1034.642399999997,
+      "p95": 2418.3942000000025,
+      "p99": 2562.8899999999994,
+      "errors": 0,
+      "statuses": {
+        "200": 50
+      }
+    },
+    "pass": true,
+    "aborted": false,
+    "failedRoutes": [],
+    "minFreeBytes": 433713152,
+    "peakDbActive": 10,
+    "peakDbPending": 35,
+    "peakCpu": 0.4808649211082827,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 156.7009659806804,
+      "hikaricp.connections.acquire": 447.07809340613187
+    },
+    "rowLockWaits": 63,
+    "rowLockMs": 10240,
+    "currentAccountHold": {
+      "samples": 371,
+      "p50": 18.9602,
+      "p95": 56.5023,
+      "p99": 97.7084,
+      "max": 118.5527,
+      "mean": 22.978003234501323
+    },
+    "searchHold": {
+      "samples": 509,
+      "p50": 173.1659,
+      "p95": 352.2988,
+      "p99": 434.3829,
+      "max": 629.5706,
+      "mean": 190.17309724950897
+    },
+    "bcrypt": {
+      "invocations": 50,
+      "wallMsPerRequest": {
+        "samples": 50,
+        "p50": 226.4453,
+        "p95": 296.2357,
+        "p99": 314.0838,
+        "max": 314.0838,
+        "mean": 227.73999199999992
+      },
+      "cpuMsPerRequest": {
+        "samples": 50,
+        "p50": 125,
+        "p95": 156.25,
+        "p99": 156.25,
+        "max": 156.25,
+        "mean": 120.625
+      }
+    },
+    "executor": {
+      "samples": 40,
+      "windowStartUtc": "2026-10-27T09:16:09.186Z",
+      "windowEndUtc": "2026-10-27T09:16:48.607Z",
+      "peakThreads": 50,
+      "peakBusy": 48,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 18,
+        "TIMED_WAITING": 50,
+        "WAITING": 4
+      }
+    },
+    "committedOrders": 60
+  },
+  {
+    "label": "after-100",
+    "sourceSha": "26b2dbf696095906192ef54e04dcfb85aef83bc8",
+    "users": 10,
+    "seconds": 15.663618399999999,
+    "requests": 286,
+    "rps": 18.258871781503565,
+    "p95": 804.197900000001,
+    "p99": 1303.4074,
+    "errorRate": 0,
+    "httpErrors": 0,
+    "auth": {
+      "requests": 10,
+      "p50": 303.9858000000004,
+      "p95": 424.27099999999973,
+      "p99": 424.27099999999973,
+      "errors": 0,
+      "statuses": {
+        "200": 10
+      }
+    },
+    "pass": false,
+    "aborted": true,
+    "failedRoutes": [],
+    "minFreeBytes": 255369216,
+    "peakDbActive": 10,
+    "peakDbPending": 1,
+    "peakCpu": 0.5668477981918378,
+    "poolMeansMs": {
+      "hikaricp.connections.usage": 149.3076923076923,
+      "hikaricp.connections.acquire": 3.244045635897436
+    },
+    "rowLockWaits": 2,
+    "rowLockMs": 380,
+    "currentAccountHold": {
+      "samples": 90,
+      "p50": 10.417501,
+      "p95": 57.417,
+      "p99": 151.7019,
+      "max": 151.7019,
+      "mean": 16.09558448888889
+    },
+    "searchHold": {
+      "samples": 62,
+      "p50": 127.637801,
+      "p95": 579.644399,
+      "p99": 875.2619,
+      "max": 875.2619,
+      "mean": 180.32280646774194
+    },
+    "bcrypt": {
+      "invocations": 10,
+      "wallMsPerRequest": {
+        "samples": 10,
+        "p50": 240.6377,
+        "p95": 319.880399,
+        "p99": 319.880399,
+        "max": 319.880399,
+        "mean": 239.89551
+      },
+      "cpuMsPerRequest": {
+        "samples": 10,
+        "p50": 140.625,
+        "p95": 171.875,
+        "p99": 171.875,
+        "max": 171.875,
+        "mean": 140.625
+      }
+    },
+    "executor": {
+      "samples": 14,
+      "windowStartUtc": "2026-10-27T09:19:46.566Z",
+      "windowEndUtc": "2026-10-27T09:20:00.514Z",
+      "peakThreads": 10,
+      "peakBusy": 9,
+      "peakQueued": 0,
+      "peakHttpStates": {
+        "RUNNABLE": 13,
+        "WAITING": 6,
+        "TIMED_WAITING": 10
+      }
+    },
+    "committedOrders": 9
+  }
+]

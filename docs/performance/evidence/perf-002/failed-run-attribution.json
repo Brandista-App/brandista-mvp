@@ -117,5 +117,6 @@
     "32/566 errors: 28 HTTP503 and four HTTP500. All four servlet ERROR stack traces are bearer account-check pool-acquisition failures.",
     "The 28 HTTP503 statuses are controller-side unavailable responses. Pool timeout logs support exhaustion; historical request IDs were absent, so one-to-one request/exception correlation cannot be reconstructed.",
     "No request bodies, tokens or credentials included. Added class-only per-request failure diagnostics for subsequent runs."
-  ]
+  ],
+  "poolAcquisitionTimeoutErrorLogEntries": 32
 }

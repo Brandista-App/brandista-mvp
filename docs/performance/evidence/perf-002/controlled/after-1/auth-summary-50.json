@@ -1,0 +1,804 @@
+{
+  "file": "docs/performance/evidence/perf-002/controlled/after-1/auth-50.json.gz",
+  "users": 50,
+  "clientAuthLatency": {
+    "requests": 50,
+    "p50": 740.2303000000029,
+    "p95": 2717.5558999999994,
+    "p99": 2840.172200000001,
+    "errors": 0,
+    "statuses": {
+      "200": 50
+    }
+  },
+  "requests": 1953,
+  "droppedTraces": 0,
+  "inflightAtSnapshot": 0,
+  "threadCpuAvailable": true,
+  "groups": {
+    "login": {
+      "requests": 50,
+      "statuses": {
+        "200": 50
+      },
+      "timings": {
+        "db.acquire": {
+          "invocations": 100,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 392.1123,
+            "p95": 2357.8294,
+            "p99": 2499.2942,
+            "max": 2499.2942,
+            "mean": 709.009956
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 0,
+            "mean": 0
+          }
+        },
+        "db.hold": {
+          "invocations": 100,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 78.5206,
+            "p95": 154.2769,
+            "p99": 180.973,
+            "max": 180.973,
+            "mean": 84.65845999999998
+          },
+          "cpuMsPerRequest": null
+        },
+        "db.hold.userDetails": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 35.1179,
+            "p95": 101.4632,
+            "p99": 110.0144,
+            "max": 110.0144,
+            "mean": 42.566568000000004
+          },
+          "cpuMsPerRequest": null
+        },
+        "repository.user.findByEmail.userDetails": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 185.993,
+            "p95": 1072.3819,
+            "p99": 2031.9294,
+            "max": 2031.9294,
+            "mean": 358.7133180000001
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 1.25
+          }
+        },
+        "auth.userDetails": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 186.0735,
+            "p95": 1072.4592,
+            "p99": 2032.0155,
+            "max": 2032.0155,
+            "mean": 358.83401
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 1.5625
+          }
+        },
+        "auth.bcrypt": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 215.6135,
+            "p95": 319.4453,
+            "p99": 358.8523,
+            "max": 358.8523,
+            "mean": 224.00726400000008
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 125,
+            "p95": 156.25,
+            "p99": 187.5,
+            "max": 187.5,
+            "mean": 132.1875
+          }
+        },
+        "auth.manager": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 431.6298,
+            "p95": 1286.67,
+            "p99": 2267.7402,
+            "max": 2267.7402,
+            "mean": 583.039892
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 125,
+            "p95": 156.25,
+            "p99": 187.5,
+            "max": 187.5,
+            "mean": 134.0625
+          }
+        },
+        "db.hold.request": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 31.5923,
+            "p95": 115.1321,
+            "p99": 148.3037,
+            "max": 148.3037,
+            "mean": 42.09189199999999
+          },
+          "cpuMsPerRequest": null
+        },
+        "repository.user.findByEmail.request": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 268.9447,
+            "p95": 1511.9298,
+            "p99": 1651.6218,
+            "max": 1651.6218,
+            "mean": 437.9054460000001
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.625
+          }
+        },
+        "auth.jwt": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 0.5592,
+            "p95": 2.8215,
+            "p99": 3.367,
+            "max": 3.367,
+            "mean": 0.7766799999999998
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.9375
+          }
+        },
+        "auth.loginService": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 707.3929,
+            "p95": 2711.5808,
+            "p99": 2761.8401,
+            "max": 2761.8401,
+            "mean": 1022.1407600000001
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 140.625,
+            "p95": 171.875,
+            "p99": 187.5,
+            "max": 187.5,
+            "mean": 136.25
+          }
+        },
+        "http.jsonWrite": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 0.3269,
+            "p95": 0.9361,
+            "p99": 1.1728,
+            "max": 1.1728,
+            "mean": 0.416702
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.3125
+          }
+        },
+        "http.server": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 712.0264,
+            "p95": 2714.518,
+            "p99": 2766.789,
+            "max": 2766.789,
+            "mean": 1026.5208279999997
+          },
+          "cpuMsPerRequest": {
+            "samples": 50,
+            "p50": 140.625,
+            "p95": 171.875,
+            "p99": 187.5,
+            "max": 187.5,
+            "mean": 139.6875
+          }
+        },
+        "http.dispatchQueue": {
+          "invocations": 50,
+          "wallMsPerRequest": {
+            "samples": 50,
+            "p50": 1.2732,
+            "p95": 94.0168,
+            "p99": 115.2701,
+            "max": 115.2701,
+            "mean": 29.37354
+          },
+          "cpuMsPerRequest": null
+        }
+      },
+      "threadWaitedMs": {
+        "samples": 50,
+        "p50": 391,
+        "p95": 2357,
+        "p99": 2499,
+        "max": 2499,
+        "mean": 705.72
+      },
+      "threadBlockedMs": {
+        "samples": 50,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "bcryptConnectionsAtEntry": {
+        "samples": 50,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "peakConnectionsHeld": {
+        "samples": 50,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 1,
+        "mean": 1
+      }
+    },
+    "other": {
+      "requests": 1024,
+      "statuses": {
+        "200": 1024
+      },
+      "timings": {
+        "db.acquire": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 451.0213,
+            "p95": 985.3951,
+            "p99": 1446.9166,
+            "max": 1834.5761,
+            "mean": 488.3357164062503
+          },
+          "cpuMsPerRequest": {
+            "samples": 1024,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 15.625,
+            "mean": 0.152587890625
+          }
+        },
+        "db.hold": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 138.6782,
+            "p95": 328.9779,
+            "p99": 448.0494,
+            "max": 1077.2428,
+            "mean": 160.21681191406284
+          },
+          "cpuMsPerRequest": null
+        },
+        "db.hold.request": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 138.6782,
+            "p95": 328.9779,
+            "p99": 448.0494,
+            "max": 1077.2428,
+            "mean": 160.21681191406284
+          },
+          "cpuMsPerRequest": null
+        },
+        "http.jsonWrite": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 0.3267,
+            "p95": 0.6438,
+            "p99": 1.2806,
+            "max": 2.2552,
+            "mean": 0.37647597656250015
+          },
+          "cpuMsPerRequest": {
+            "samples": 1024,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.2593994140625
+          }
+        },
+        "http.server": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 594.6532,
+            "p95": 1184.356,
+            "p99": 1566.8407,
+            "max": 2202.0906,
+            "mean": 651.1900680664062
+          },
+          "cpuMsPerRequest": {
+            "samples": 1024,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 31.25,
+            "max": 46.875,
+            "mean": 5.523681640625
+          }
+        },
+        "http.dispatchQueue": {
+          "invocations": 1024,
+          "wallMsPerRequest": {
+            "samples": 1024,
+            "p50": 0.08,
+            "p95": 1.6979,
+            "p99": 19.2589,
+            "max": 85.2281,
+            "mean": 0.9178939453125008
+          },
+          "cpuMsPerRequest": null
+        }
+      },
+      "threadWaitedMs": {
+        "samples": 1024,
+        "p50": 451,
+        "p95": 985,
+        "p99": 1446,
+        "max": 1834,
+        "mean": 488.1708984375
+      },
+      "threadBlockedMs": {
+        "samples": 1024,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "bcryptConnectionsAtEntry": {
+        "samples": 0,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "mean": null
+      },
+      "peakConnectionsHeld": {
+        "samples": 1024,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 1,
+        "mean": 1
+      }
+    },
+    "search": {
+      "requests": 512,
+      "statuses": {
+        "200": 512
+      },
+      "timings": {
+        "db.acquire": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 440.9851,
+            "p95": 982.7078,
+            "p99": 1235.6728,
+            "max": 1750.7977,
+            "mean": 481.9680333984374
+          },
+          "cpuMsPerRequest": {
+            "samples": 512,
+            "p50": 0,
+            "p95": 0,
+            "p99": 0,
+            "max": 15.625,
+            "mean": 0.030517578125
+          }
+        },
+        "db.hold": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 169.0248,
+            "p95": 326.7441,
+            "p99": 406.4474,
+            "max": 1039.6837,
+            "mean": 188.29152714843747
+          },
+          "cpuMsPerRequest": null
+        },
+        "db.hold.request": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 169.0248,
+            "p95": 326.7441,
+            "p99": 406.4474,
+            "max": 1039.6837,
+            "mean": 188.29152714843747
+          },
+          "cpuMsPerRequest": null
+        },
+        "http.jsonWrite": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 0.4049,
+            "p95": 0.7629,
+            "p99": 1.243,
+            "max": 4.6177,
+            "mean": 0.4594968750000001
+          },
+          "cpuMsPerRequest": {
+            "samples": 512,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.518798828125
+          }
+        },
+        "http.server": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 612.6938,
+            "p95": 1263.2433,
+            "p99": 1438.6732,
+            "max": 2045.1859,
+            "mean": 673.4916201171868
+          },
+          "cpuMsPerRequest": {
+            "samples": 512,
+            "p50": 0,
+            "p95": 31.25,
+            "p99": 31.25,
+            "max": 46.875,
+            "mean": 7.99560546875
+          }
+        },
+        "http.dispatchQueue": {
+          "invocations": 512,
+          "wallMsPerRequest": {
+            "samples": 512,
+            "p50": 0.0806,
+            "p95": 1.1138,
+            "p99": 3.6783,
+            "max": 83.5764,
+            "mean": 0.45491015624999975
+          },
+          "cpuMsPerRequest": null
+        }
+      },
+      "threadWaitedMs": {
+        "samples": 512,
+        "p50": 440,
+        "p95": 983,
+        "p99": 1235,
+        "max": 1750,
+        "mean": 481.810546875
+      },
+      "threadBlockedMs": {
+        "samples": 512,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "bcryptConnectionsAtEntry": {
+        "samples": 0,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "mean": null
+      },
+      "peakConnectionsHeld": {
+        "samples": 512,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 1,
+        "mean": 1
+      }
+    },
+    "protected": {
+      "requests": 367,
+      "statuses": {
+        "200": 266,
+        "201": 101
+      },
+      "timings": {
+        "db.acquire": {
+          "invocations": 734,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 805.9655,
+            "p95": 1528.5595,
+            "p99": 2137.9516,
+            "max": 2883.5133,
+            "mean": 759.809638147138
+          },
+          "cpuMsPerRequest": {
+            "samples": 367,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.21287465940054495
+          }
+        },
+        "db.hold": {
+          "invocations": 734,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 249.377,
+            "p95": 729.0741,
+            "p99": 1207.3979,
+            "max": 1362.6285,
+            "mean": 317.105776839237
+          },
+          "cpuMsPerRequest": null
+        },
+        "db.hold.currentAccount": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 19.3141,
+            "p95": 51.0259,
+            "p99": 73.8601,
+            "max": 140.4093,
+            "mean": 22.420586103542245
+          },
+          "cpuMsPerRequest": null
+        },
+        "repository.user.findCurrentAuthorizationById.currentAccount": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 439.9159,
+            "p95": 902.677,
+            "p99": 1291.4736,
+            "max": 1934.3444,
+            "mean": 436.07241089918267
+          },
+          "cpuMsPerRequest": {
+            "samples": 367,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 15.625,
+            "max": 31.25,
+            "mean": 1.1069482288828338
+          }
+        },
+        "auth.currentAccount": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 440.1064,
+            "p95": 902.7539,
+            "p99": 1291.5602,
+            "max": 1934.4313,
+            "mean": 436.19329645776605
+          },
+          "cpuMsPerRequest": {
+            "samples": 367,
+            "p50": 0,
+            "p95": 15.625,
+            "p99": 15.625,
+            "max": 31.25,
+            "mean": 1.2772479564032697
+          }
+        },
+        "db.hold.request": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 230.0304,
+            "p95": 707.9822,
+            "p99": 1186.4724,
+            "max": 1343.3144,
+            "mean": 294.6851907356946
+          },
+          "cpuMsPerRequest": null
+        },
+        "http.jsonWrite": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 0.3687,
+            "p95": 0.9279,
+            "p99": 1.5148,
+            "max": 2.7159,
+            "mean": 0.44262179836512294
+          },
+          "cpuMsPerRequest": {
+            "samples": 367,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.510899182561308
+          }
+        },
+        "http.server": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 1070.2204,
+            "p95": 1973.7817,
+            "p99": 2476.2401,
+            "max": 3161.3473,
+            "mean": 1082.3721400544953
+          },
+          "cpuMsPerRequest": {
+            "samples": 367,
+            "p50": 15.625,
+            "p95": 46.875,
+            "p99": 62.5,
+            "max": 78.125,
+            "mean": 12.21900544959128
+          }
+        },
+        "http.dispatchQueue": {
+          "invocations": 367,
+          "wallMsPerRequest": {
+            "samples": 367,
+            "p50": 0.0766,
+            "p95": 0.8333,
+            "p99": 2.305,
+            "max": 16.694,
+            "mean": 0.24961743869209793
+          },
+          "cpuMsPerRequest": null
+        },
+        "repository.user.findByIdForUpdate.request": {
+          "invocations": 205,
+          "wallMsPerRequest": {
+            "samples": 205,
+            "p50": 18.3542,
+            "p95": 49.0232,
+            "p99": 74.646,
+            "max": 124.1348,
+            "mean": 22.74461024390246
+          },
+          "cpuMsPerRequest": {
+            "samples": 205,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.4573170731707317
+          }
+        },
+        "repository.user.findById.request": {
+          "invocations": 31,
+          "wallMsPerRequest": {
+            "samples": 31,
+            "p50": 20.2584,
+            "p95": 52.4724,
+            "p99": 82.3606,
+            "max": 82.3606,
+            "mean": 20.510938709677426
+          },
+          "cpuMsPerRequest": {
+            "samples": 31,
+            "p50": 0,
+            "p95": 0,
+            "p99": 15.625,
+            "max": 15.625,
+            "mean": 0.5040322580645161
+          }
+        }
+      },
+      "threadWaitedMs": {
+        "samples": 367,
+        "p50": 806,
+        "p95": 1528,
+        "p99": 2138,
+        "max": 2883,
+        "mean": 759.6675749318802
+      },
+      "threadBlockedMs": {
+        "samples": 367,
+        "p50": 0,
+        "p95": 0,
+        "p99": 0,
+        "max": 0,
+        "mean": 0
+      },
+      "bcryptConnectionsAtEntry": {
+        "samples": 0,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "mean": null
+      },
+      "peakConnectionsHeld": {
+        "samples": 367,
+        "p50": 1,
+        "p95": 1,
+        "p99": 1,
+        "max": 1,
+        "mean": 1
+      }
+    }
+  },
+  "executor": {
+    "samples": 41,
+    "windowStartUtc": "2026-10-27T09:08:14.435Z",
+    "windowEndUtc": "2026-10-27T09:08:55.097Z",
+    "peakThreads": 50,
+    "peakBusy": 48,
+    "peakQueued": 0,
+    "peakHttpStates": {
+      "RUNNABLE": 17,
+      "TIMED_WAITING": 50,
+      "WAITING": 4
+    }
+  },
+  "notes": [
+    "Timing stages are nested: do not sum them or subtract independent percentiles. Repeated calls are summed per request; invocations are also reported.",
+    "JSON write includes configured converter serialization and output writes; its wall time can include output backpressure.",
+    "socket-dispatch runnable enqueue to start; unavailable for requests without a fresh dispatch. Excludes network/kernel accept backlog."
+  ]
+}
