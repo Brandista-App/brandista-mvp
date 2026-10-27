@@ -5,3 +5,8 @@
 target
 *.iml
 .env*
+
+# Runtime-only trust material must not enter the build context.
+*.pem
+*.key
+*.p12
