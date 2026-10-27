@@ -24,7 +24,7 @@ The original accepted PERF-001 result at 50 users had login p95 3163.25 ms. This
 
 ## Post-change run
 
-Pending accepted completion. Docker was initially stopped; the failed startup generated no accepted measurements. Starting Docker also restored existing workspace containers, so shared-host conditions must be considered when comparing the saved baseline. Higher stages and performance improvement remain NOT VERIFIED until complete evidence is available. Local closed-loop measurements do not establish commercial concurrency capacity.
+Docker was initially stopped; the failed startup generated no accepted measurements. Starting Docker also restored existing workspace containers, so shared-host conditions limit comparison with the saved baseline. Completed results below fail the 50-user acceptance gates. Higher post-change stages and overall performance improvement remain NOT VERIFIED. Local closed-loop measurements do not establish commercial concurrency capacity.
 
 ## Observed post-change results (2026-10-27)
 
