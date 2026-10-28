@@ -253,6 +253,42 @@ class OperatorProvisioningIntegrationTests {
         assertThat(jdbc.queryForList("SELECT * FROM security_audit_events ORDER BY id")).containsAll(before);
     }
 
+    @Test void assistedRecoveryChangesLoginPasswordAndPreservesOwnerIdentityAndGrant() {
+        String oldPassword = new String(secret());
+        var created = enabled.execute(INITIAL_CREATE, com.brandista.operator.OwnerAccountInspection.EMAIL,
+                null, oldPassword.toCharArray());
+        User owner = users.findById(created.targetUserId()).orElseThrow();
+        String token = login(owner, oldPassword);
+        assertThat(getIdentity(token).getStatusCode()).isEqualTo(HttpStatus.OK);
+        String newPassword = new String(secret());
+        assertThat(enabled.execute(RESET_PASSWORD, owner.getEmail(), owner.getId(), newPassword.toCharArray()).outcome())
+                .isEqualTo(Outcome.SUCCESS);
+        assertThat(http.postForEntity("/api/v1/auth/login", Map.of("email", owner.getEmail(),
+                "password", oldPassword), String.class).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(getIdentity(login(owner, newPassword)).getStatusCode()).isEqualTo(HttpStatus.OK);
+        var state = com.brandista.operator.OwnerAccountInspection.inspect(jdbc);
+        assertThat(state.ready()).isTrue();
+        assertThat(state.id()).isEqualTo(owner.getId());
+        assertThat(state.baseRole()).isEqualTo("CUSTOMER");
+        assertThat(state.toString()).doesNotContain(oldPassword, newPassword, owner.getPasswordHash(), token);
+        // Existing JWT behavior is explicitly documented; a password reset alone does not revoke sessions.
+        assertThat(getIdentity(token).getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test void persistedInspectionRejectsMissingDisabledRevokedAndNonBcryptOwner() {
+        assertThat(com.brandista.operator.OwnerAccountInspection.inspect(jdbc)).isNull();
+        long id = enabled.execute(INITIAL_CREATE, com.brandista.operator.OwnerAccountInspection.EMAIL,
+                null, secret()).targetUserId();
+        assertThat(com.brandista.operator.OwnerAccountInspection.inspect(jdbc).ready()).isTrue();
+        jdbc.update("UPDATE users SET password_hash='invalid-synthetic-hash' WHERE id=?", id);
+        assertThat(com.brandista.operator.OwnerAccountInspection.inspect(jdbc).ready()).isFalse();
+        jdbc.update("UPDATE users SET password_hash=?, status='DISABLED' WHERE id=?", passwords.encode(new String(secret())), id);
+        assertThat(com.brandista.operator.OwnerAccountInspection.inspect(jdbc).ready()).isFalse();
+        jdbc.update("UPDATE users SET status='ENABLED' WHERE id=?", id);
+        jdbc.update("UPDATE user_platform_grants SET revoked_at=CURRENT_TIMESTAMP WHERE user_id=?", id);
+        assertThat(com.brandista.operator.OwnerAccountInspection.inspect(jdbc).ready()).isFalse();
+    }
+
     private OperatorProvisioning service(boolean on, boolean recovery, SecurityAudit writer) {
         return new OperatorProvisioning(jdbc, invariant, writer, passwords, validator, transactions, on, recovery);
     }

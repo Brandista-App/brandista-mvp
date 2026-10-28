@@ -9,6 +9,8 @@ on:
       - 'scripts/test-render-ca.py'
       - 'scripts/test-deployment-runtime.py'
       - 'scripts/verify-admin-*-mysql.ps1'
+      - 'scripts/production-owner.ps1'
+      - 'scripts/test-production-owner.ps1'
       - 'docs/deployment/**'
       - 'src/**'
       - 'pom.xml'
@@ -22,6 +24,15 @@ on:
 permissions:
   contents: read
 jobs:
+  owner-wrapper:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Verify operator wrapper contracts without database access
+        shell: pwsh
+        run: ./scripts/test-production-owner.ps1
+
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
