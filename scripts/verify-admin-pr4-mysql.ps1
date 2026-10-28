@@ -1,4 +1,6 @@
 $ErrorActionPreference = 'Stop'
+$mavenCommand = if ($env:OS -eq 'Windows_NT') { Join-Path $PSScriptRoot '../mvnw.cmd' } else { 'sh' }
+$mavenPrefix = if ($env:OS -eq 'Windows_NT') { @() } else { @(Join-Path $PSScriptRoot '../mvnw') }
 Set-Location (Split-Path $PSScriptRoot -Parent)
 New-Item -ItemType Directory -Force target | Out-Null
 $containerName = 'brandista-admin-pr4-isolated-' + [guid]::NewGuid().ToString('N').Substring(0, 10)
@@ -48,7 +50,7 @@ try {
     if ($LASTEXITCODE -ne 0 -or $portBinding -notmatch '^127\.0\.0\.1:(\d+)$') { throw 'Unexpected isolated port binding' }
     $env:BRANDISTA_PR4_TEST_MYSQL_URL = "jdbc:mysql://127.0.0.1:$($Matches[1])/brandista_pr4_verify?useSSL=false&allowPublicKeyRetrieval=true"
     $env:BRANDISTA_PR4_TEST_MYSQL_PASSWORD = $env:MYSQL_ROOT_PASSWORD
-    & .\mvnw.cmd --batch-mode --no-transfer-progress '-Dtest=BrandInvitationIntegrationTests' test *> target/admin-pr4-mysql.log
+    & $mavenCommand @mavenPrefix --batch-mode --no-transfer-progress '-Dtest=BrandInvitationIntegrationTests' test *> target/admin-pr4-mysql.log
     if ($LASTEXITCODE -ne 0) { throw 'MySQL invitation/onboarding tests failed; inspect target/admin-pr4-mysql.log' }
     Write-Output 'PASS: isolated MySQL 8.4.11 V12 -> V13 commerce/security preservation and invitation/onboarding integration tests.'
 } finally {
