@@ -1,0 +1,41 @@
+name: Read-only Render observation
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/deployment-observation.yml'
+permissions:
+  contents: read
+jobs:
+  observe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Record external readiness independently of local WSL/network
+        shell: python
+        run: |
+          import concurrent.futures, datetime, json, pathlib, socket, time, urllib.request, urllib.error
+          base = 'https://brandista-mvp.onrender.com'
+          def observe(path):
+              started = time.monotonic()
+              result = {'path': path, 'utc': datetime.datetime.now(datetime.timezone.utc).isoformat()}
+              try:
+                  with urllib.request.urlopen(base + path, timeout=120) as response:
+                      result['httpStatus'] = response.status
+              except urllib.error.HTTPError as error:
+                  result['httpStatus'] = error.code
+              except Exception as error:
+                  result.update(httpStatus=None, errorType=type(error).__name__)
+              result['seconds'] = round(time.monotonic() - started, 3)
+              result['withinRenderHealthBudget'] = result['httpStatus'] == 200 and result['seconds'] < 5
+              return result
+          with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+              observations = list(pool.map(observe, ['/readyz', '/livez', '/api/v1/brands']))
+          report = {'base': base, 'method': 'unauthenticated GET only; no production writes', 'observations': observations}
+          pathlib.Path('render-observation.json').write_text(json.dumps(report, indent=2))
+          print(json.dumps(report, indent=2))
+          print('Collection completed. A green collection job does not mean the live service is healthy.')
+      - uses: actions/upload-artifact@v7
+        with:
+          name: read-only-render-observation
+          path: render-observation.json
+          retention-days: 14
