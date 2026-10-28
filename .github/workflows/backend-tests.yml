@@ -7,6 +7,8 @@ on:
       - '.gitattributes'
       - 'docker/**'
       - 'scripts/test-render-ca.py'
+      - 'scripts/test-deployment-runtime.py'
+      - 'scripts/verify-admin-*-mysql.ps1'
       - 'docs/deployment/**'
       - 'src/**'
       - 'pom.xml'
@@ -48,3 +50,39 @@ jobs:
         run: docker build --progress=plain -t brandista-render-ca:test .
       - name: Verify runtime CA trust, preserved public CAs and fail-closed setup
         run: python3 scripts/test-render-ca.py
+      - name: Verify production image with TLS MySQL and 512 MiB limit
+        run: python3 scripts/test-deployment-runtime.py
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: deployment-runtime-evidence
+          path: target/deployment-runtime/evidence/
+          if-no-files-found: warn
+          retention-days: 14
+
+  mysql-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [pr2, pr3, pr4, pr6b, pr7a]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Disposable MySQL migration and API integration
+        shell: pwsh
+        run: ./scripts/verify-admin-${{ matrix.suite }}-mysql.ps1
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: mysql-${{ matrix.suite }}-evidence
+          path: |
+            target/admin-*-mysql.log
+            target/surefire-reports/TEST-*.xml
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,4 +1,6 @@
 $ErrorActionPreference = 'Stop'
+$mavenCommand = if ($env:OS -eq 'Windows_NT') { Join-Path $PSScriptRoot '../mvnw.cmd' } else { 'sh' }
+[string[]]$mavenPrefix = if ($env:OS -eq 'Windows_NT') { @() } else { @(Join-Path $PSScriptRoot '../mvnw') }
 Set-Location (Split-Path $PSScriptRoot -Parent)
 New-Item -ItemType Directory -Force target | Out-Null
 $containerName = 'brandista-pr6b-isolated-' + [guid]::NewGuid().ToString('N')
@@ -24,8 +26,9 @@ try {
     $env:BRANDISTA_PR6B_TEST_MYSQL_URL = "jdbc:mysql://127.0.0.1:$($Matches[1])/brandista_pr6b_verify?useSSL=false&allowPublicKeyRetrieval=true"
     $env:BRANDISTA_PR6B_TEST_MYSQL_PASSWORD = $env:MYSQL_ROOT_PASSWORD
     Write-Output "Target: new disposable container $containerName; $portBinding/brandista_pr6b_verify; synthetic test fixtures only."
-    & .\mvnw.cmd --batch-mode --no-transfer-progress '-Dtest=AccountLifecycleIntegrationTests' test *> target/admin-pr6b-mysql.log
+    & $mavenCommand @mavenPrefix --batch-mode --no-transfer-progress '-Dtest=AccountLifecycleIntegrationTests' test *> target/admin-pr6b-mysql.log
     if ($LASTEXITCODE -ne 0) { throw 'PR6B MySQL tests failed; inspect target/admin-pr6b-mysql.log securely' }
+    if (!(Select-String -Path target/admin-pr6b-mysql.log -Pattern 'Tests run: [1-9]' -Quiet) -or !(Select-String -Path target/admin-pr6b-mysql.log -Pattern 'BUILD SUCCESS' -Quiet)) { throw 'Maven did not produce successful nonzero test evidence' }
     Write-Output 'PASS: isolated MySQL 8.4.11 PR6B lifecycle, authorization, audit and concurrency integration tests.'
 } finally {
     $env:MYSQL_ROOT_PASSWORD = $priorRootSecret

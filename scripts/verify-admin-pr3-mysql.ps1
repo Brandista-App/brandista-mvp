@@ -1,4 +1,6 @@
 $ErrorActionPreference = 'Stop'
+$mavenCommand = if ($env:OS -eq 'Windows_NT') { Join-Path $PSScriptRoot '../mvnw.cmd' } else { 'sh' }
+[string[]]$mavenPrefix = if ($env:OS -eq 'Windows_NT') { @() } else { @(Join-Path $PSScriptRoot '../mvnw') }
 Set-Location (Split-Path $PSScriptRoot -Parent)
 New-Item -ItemType Directory -Force target | Out-Null
 $containerName = 'brandista-admin-pr3-isolated-' + [guid]::NewGuid().ToString('N').Substring(0, 10)
@@ -47,8 +49,9 @@ try {
     if ($LASTEXITCODE -ne 0 -or $portBinding -notmatch '^127\.0\.0\.1:(\d+)$') { throw 'Unexpected isolated port binding' }
     $env:BRANDISTA_PR3_TEST_MYSQL_URL = "jdbc:mysql://127.0.0.1:$($Matches[1])/brandista_pr3_verify?useSSL=false&allowPublicKeyRetrieval=true"
     $env:BRANDISTA_PR3_TEST_MYSQL_PASSWORD = $env:MYSQL_ROOT_PASSWORD
-    & .\mvnw.cmd --batch-mode --no-transfer-progress '-Dtest=MerchantIsolationIntegrationTests' test *> target/admin-pr3-mysql.log
+    & $mavenCommand @mavenPrefix --batch-mode --no-transfer-progress '-Dtest=MerchantIsolationIntegrationTests' test *> target/admin-pr3-mysql.log
     if ($LASTEXITCODE -ne 0) { throw 'MySQL merchant isolation tests failed; inspect target/admin-pr3-mysql.log' }
+    if (!(Select-String -Path target/admin-pr3-mysql.log -Pattern 'Tests run: [1-9]' -Quiet) -or !(Select-String -Path target/admin-pr3-mysql.log -Pattern 'BUILD SUCCESS' -Quiet)) { throw 'Maven did not produce successful nonzero test evidence' }
     Write-Output 'PASS: isolated MySQL 8.4.11 V11 -> V12 commerce/security preservation and merchant isolation integration tests.'
 } finally {
     $env:MYSQL_ROOT_PASSWORD = $priorRootSecret
