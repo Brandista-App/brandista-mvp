@@ -14,6 +14,11 @@ import time
 import urllib.error
 import urllib.request
 
+INVESTIGATE = os.environ.get("HEALTH_INVESTIGATION") == "true"
+CPU = os.environ.get("RUNTIME_CPU_LIMIT", "0.5")
+if CPU not in ("0.5", "0.1"):
+    raise ValueError("Only isolated fixture CPU limits 0.5 and 0.1 are supported")
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WORK = ROOT / "target" / "deployment-runtime"
 EVIDENCE = WORK / "evidence"
@@ -24,6 +29,7 @@ containers, hidden, results = [], [], []
 root_password, migration_password, runtime_password = [secrets.token_hex(24) for _ in range(3)]
 jwt = base64.b64encode(secrets.token_bytes(32)).decode()
 hidden.extend([root_password, migration_password, runtime_password, jwt])
+health_observations = []
 
 
 def run(*args, input=None, check=True, env=None):
@@ -54,7 +60,7 @@ def request(base, path, method="GET", body=None, headers=None):
                                  headers={"Content-Type": "application/json", **(headers or {})})
     start = time.monotonic()
     try:
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(req, timeout=5) as response:
             return response.status, response.read(), time.monotonic() - start, response.headers
     except urllib.error.HTTPError as error:
         return error.code, error.read(), time.monotonic() - start, error.headers
@@ -69,14 +75,34 @@ def expect(base, path, status, **kwargs):
     return body, headers
 
 
-def wait_ready(name, base, timeout=180):
+def observe(base, path, label, headers=None):
+    started = time.monotonic()
+    item = {"label": label, "path": path}
+    try:
+        code, body, elapsed, _ = request(base, path, headers=headers)
+        item.update(httpStatus=code, seconds=round(elapsed, 3))
+        try:
+            item["healthStatus"] = json.loads(body).get("status")
+        except (ValueError, AttributeError):
+            pass
+    except (OSError, urllib.error.URLError) as error:
+        item.update(httpStatus=None, seconds=round(time.monotonic()-started, 3),
+                    errorType=type(getattr(error, "reason", error)).__name__)
+    health_observations.append(item)
+    (EVIDENCE / "health-observations.json").write_text(json.dumps(health_observations, indent=2))
+    return item
+
+
+def wait_ready(name, base, timeout=None):
+    timeout = timeout or (900 if INVESTIGATE else 180)
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
         state = json.loads(run("docker", "inspect", "--format", "{{json .State}}", name).stdout)
         if not state["Running"]:
             raise AssertionError(f"{name}: exited {state['ExitCode']}, OOMKilled={state['OOMKilled']}")
         try:
-            if request(base, "/readyz")[0] == 200:
+            probe = observe(base, "/readyz", "startup:" + name) if INVESTIGATE else {"httpStatus": request(base, "/readyz")[0]}
+            if probe["httpStatus"] == 200:
                 return
         except (OSError, TimeoutError):
             pass
@@ -90,7 +116,8 @@ def launch(label, user, password, options=None):
     values = {
         "RENDER": "true", "AIVEN_CA_CERT": "/etc/secrets/ca.pem",
         "SPRING_PROFILES_ACTIVE": "production", "SERVER_PORT": "10000",
-        "SPRING_DATASOURCE_URL": "jdbc:mysql://brandista-db:3306/brandista?sslMode=VERIFY_IDENTITY&connectTimeout=3000&socketTimeout=3000",
+        "SPRING_DATASOURCE_URL": "jdbc:mysql://brandista-db:3306/brandista?sslMode=VERIFY_IDENTITY" +
+            ("" if INVESTIGATE else "&connectTimeout=3000&socketTimeout=3000"),
         "SPRING_DATASOURCE_USERNAME": user, "SPRING_DATASOURCE_PASSWORD": password,
         "JWT_SECRET_BASE64": jwt,
         "CORS_ALLOWED_ORIGINS": "https://brandistaapp.com,https://admin.brandistaapp.com",
@@ -102,7 +129,7 @@ def launch(label, user, password, options=None):
     env_path.chmod(0o600)
     containers.append(name)
     run("docker", "run", "-d", "--name", name, "--network", network,
-        "--memory=512m", "--memory-swap=512m", "--cpus=0.5",
+        "--memory=512m", "--memory-swap=512m", "--cpus=" + CPU,
         "--env-file", str(env_path), "-v", f"{WORK / 'ca.pem'}:/etc/secrets/ca.pem:ro",
         "-p", "127.0.0.1::10000", "brandista-render-ca:test")
     port = run("docker", "port", name, "10000/tcp").stdout.strip().rsplit(":", 1)[1]
@@ -111,8 +138,8 @@ def launch(label, user, password, options=None):
 
 try:
     ergonomics = run("docker", "run", "--rm", "--memory=512m", "--memory-swap=512m",
-                     "--cpus=0.5", "--entrypoint", "java", "brandista-render-ca:test",
-                     "-XshowSettings:system", "-XshowSettings:vm", "-version")
+                     "--cpus=" + CPU, "--entrypoint", "java", "brandista-render-ca:test",
+                     "-XshowSettings:all", "-version")
     (EVIDENCE / "linux-jvm-ergonomics.txt").write_text(ergonomics.stdout + ergonomics.stderr)
     # Synthetic CA/server certificates. Private files are never artifact inputs.
     run("openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
@@ -163,12 +190,33 @@ try:
            "brandista_app", runtime_password, check=False).returncode == 0:
         raise AssertionError("Runtime unexpectedly has audit UPDATE privilege")
 
-    for label, bounded in [("default", False), ("bounded", True)]:
+    configurations = [("default", False)] if INVESTIGATE else [("default", False), ("bounded", True)]
+    for label, bounded in configurations:
         started = time.monotonic()
         app, base = launch(label, "brandista_app", runtime_password, options=bounded)
         wait_ready(app, base)
         entry = {"configuration": label, "startupSeconds": round(time.monotonic() - started, 3),
-                 "memoryLimitBytes": 512 * 1024 * 1024, "cpuQuota": 0.5, "samples": []}
+                 "memoryLimitBytes": 512 * 1024 * 1024, "cpuQuota": float(CPU), "samples": []}
+        if INVESTIGATE:
+            entry["sourceRevision"] = "773623a9ddea2211be5088a5ce5e3667f286b261"
+            entry["jdbcTimeoutOverrides"] = False
+            networks = json.loads(run("docker", "inspect", "--format", "{{json .NetworkSettings.Networks}}", app).stdout)
+            address = networks[network]["IPAddress"]
+            for host in ("brandista-mvp.onrender.com", "api.brandistaapp.com"):
+                for path in ("/readyz", "/livez"):
+                    probe = observe("http://"+address+":10000", path, "bridge:"+host, {"Host": host})
+                    if probe["httpStatus"] != 200:
+                        raise AssertionError("App-port bridge/Render Host-header health failed")
+            for path in ("/actuator/health/readiness", "/actuator/health/liveness"):
+                # Same network namespace reaches the intentionally private loopback listener.
+                script = ('exec 3<>/dev/tcp/127.0.0.1/9091; printf "GET ' + path +
+                          ' HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n" >&3; cat <&3')
+                reply = run("docker", "exec", app, "bash", "-c", script).stdout
+                if reply.splitlines()[0].split()[1] != "200":
+                    raise AssertionError("Loopback management health failed")
+            private = observe("http://"+address+":9091", "/actuator/health/readiness", "bridge:private-management")
+            if private["httpStatus"] is not None:
+                raise AssertionError("Management unexpectedly reachable on bridge IP")
         for _ in range(6):
             for path in ("/livez", "/readyz", "/api/v1/brands"):
                 expect(base, path, 200)
@@ -193,9 +241,22 @@ try:
         expect(base, "/api/v1/brand-applications", 201, method="POST", body={
             "brandName": "Synthetic " + label, "contactName": "CI Fixture",
             "contactEmail": account["email"], "website": "https://example.invalid"})
+        if INVESTIGATE:
+            run("docker", "pause", database)
+            try:
+                # A frozen server keeps TCP established but cannot answer a JDBC ping.
+                entry["silentDatabase"] = observe(base, "/readyz", "database-paused")
+                expect(base, "/livez", 200)
+                observe(base, "/livez", "database-paused")
+            finally:
+                run("docker", "unpause", database)
+            wait_ready(app, base, timeout=90)
         run("docker", "stop", database)
         expect(base, "/livez", 200)
         expect(base, "/readyz", 503)
+        if INVESTIGATE:
+            observe(base, "/readyz", "database-stopped")
+            observe(base, "/livez", "database-stopped")
         run("docker", "start", database)
         wait_ready(app, base, timeout=90)
         entry["databaseOutageAndRecovery"] = "PASS: livez=200, readyz=503, recovered=200"
@@ -212,7 +273,7 @@ try:
             raise AssertionError("Unexpected application shutdown/OOM")
         results.append(entry)
         (EVIDENCE / "results.json").write_text(json.dumps(results, indent=2))
-        print("PASS:", label, "512 MiB / 0.5 CPU TLS MySQL runtime, API/CORS/authorization and outage/recovery")
+        print("PASS:", label, "512 MiB /", CPU, "CPU TLS MySQL runtime, API/CORS/authorization and outage/recovery")
 finally:
     for name in reversed(containers):
         logs = run("docker", "logs", name, check=False)
