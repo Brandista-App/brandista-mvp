@@ -59,3 +59,9 @@ No production password, database credential, password hash or JWT is included in
 ## Approval boundary
 
 Review the PR and runbook first. Production account creation, existing-account grant/password change, credential administration, merge/deploy and restart remain separately gated by explicit owner approval for the target and operation. Supply passwords only through the private local prompts; never through chat, PRs, scripts or shell arguments. No destructive database rollback is needed or provided.
+
+## PR #35 owner-wrapper exit-code correction
+
+The logs for run 40744533484 / job 123014685743 show all assertions printing PASS immediately before the runner exits 1. The expected Java-failure mock leaves global LASTEXITCODE=2; the Actions PowerShell epilogue consumes that stale native status, and the dot-sourced -Command wrapper reports failure. The contract script now saves and restores both the presence and value of the caller's native exit variable in finally. It does not force success or suppress assertion exceptions.
+
+Added `scripts/test-production-owner-exit.ps1` and a separate Windows CI step. Child-process regressions cover a pristine exit variable, an existing zero status, preservation of an existing nonzero status, and real terminating assertion failure. The runner-style local harness exits 0 with the fix; the regression rejects a copy of the original unfixed script. Existing wrapper contract assertions remain enabled. No provisioning implementation, production database, deployment setting or production credential was changed by this correction. Final hosted CI status is available on PR #35's latest commit.

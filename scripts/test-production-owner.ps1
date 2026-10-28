@@ -1,6 +1,10 @@
 # Isolated wrapper contract tests. Java and prompts are mocked; no DB/network/password is used.
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
+# The Java mock writes the native-process exit variable. Preserve caller state so
+# Actions' pwsh epilogue cannot mistake the expected failure fixture for this test's result.
+$hadNativeExit = Test-Path variable:global:LASTEXITCODE
+$priorNativeExit = if ($hadNativeExit) { $global:LASTEXITCODE } else { $null }
 $testRoot = Join-Path $PSScriptRoot '../target/owner-wrapper-test'
 New-Item -ItemType Directory -Force $testRoot | Out-Null
 $fixtureJar = Join-Path $testRoot 'fixture.jar'
@@ -67,4 +71,6 @@ try {
     foreach ($name in $names) { [Environment]::SetEnvironmentVariable($name, $prior[$name]) }
     Remove-Item Function:Read-Host,Function:java -ErrorAction SilentlyContinue
     Remove-Variable ownerWrapperFixture -Scope Global -ErrorAction SilentlyContinue
+    if ($hadNativeExit) { $global:LASTEXITCODE = $priorNativeExit }
+    else { Remove-Variable LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue }
 }

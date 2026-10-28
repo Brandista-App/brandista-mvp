@@ -11,6 +11,7 @@ on:
       - 'scripts/verify-admin-*-mysql.ps1'
       - 'scripts/production-owner.ps1'
       - 'scripts/test-production-owner.ps1'
+      - 'scripts/test-production-owner-exit.ps1'
       - 'docs/deployment/**'
       - 'src/**'
       - 'pom.xml'
@@ -32,6 +33,9 @@ jobs:
       - name: Verify operator wrapper contracts without database access
         shell: pwsh
         run: ./scripts/test-production-owner.ps1
+      - name: Verify PowerShell runner exit and failure propagation
+        shell: pwsh
+        run: ./scripts/test-production-owner-exit.ps1
 
   verify:
     runs-on: ubuntu-latest
