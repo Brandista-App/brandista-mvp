@@ -23,11 +23,11 @@ jobs:
           path: target/surefire-reports/
   image:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
-        cpu: ['0.5', '0.1']
+        cpu: ['0.15']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -42,6 +42,7 @@ jobs:
         env:
           HEALTH_INVESTIGATION: 'true'
           RUNTIME_CPU_LIMIT: ${{ matrix.cpu }}
+          CONTROLLED_015: 'true'
         run: python3 scripts/test-deployment-runtime.py
       - uses: actions/upload-artifact@v7
         if: always()

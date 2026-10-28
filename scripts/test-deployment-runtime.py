@@ -11,13 +11,19 @@ import pathlib
 import secrets
 import subprocess
 import time
+import datetime
+import re
+import threading
 import urllib.error
 import urllib.request
 
 INVESTIGATE = os.environ.get("HEALTH_INVESTIGATION") == "true"
 CPU = os.environ.get("RUNTIME_CPU_LIMIT", "0.5")
-if CPU not in ("0.5", "0.1"):
-    raise ValueError("Only isolated fixture CPU limits 0.5 and 0.1 are supported")
+if CPU not in ("0.5", "0.1", "0.15"):
+    raise ValueError("Only isolated fixture CPU limits 0.5, 0.1 and 0.15 are supported")
+CONTROLLED = os.environ.get("CONTROLLED_015") == "true"
+if CONTROLLED and (CPU != "0.15" or not INVESTIGATE):
+    raise ValueError("Controlled reproduction requires investigation mode and exactly 0.15 CPU")
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 WORK = ROOT / "target" / "deployment-runtime"
@@ -30,11 +36,19 @@ root_password, migration_password, runtime_password = [secrets.token_hex(24) for
 jwt = base64.b64encode(secrets.token_bytes(32)).decode()
 hidden.extend([root_password, migration_password, runtime_password, jwt])
 health_observations = []
+resource_samples = []
+sample_lock = threading.Lock()
+sample_stop = threading.Event()
+sample_thread = None
+phase = "fixture-preparation"
+target_app = None
+target_started_at = None
+target_ready = False
 
 
-def run(*args, input=None, check=True, env=None):
+def run(*args, input=None, check=True, env=None, timeout=180):
     result = subprocess.run(args, input=input, text=True, capture_output=True,
-                            cwd=ROOT, env=env, timeout=180)
+                            cwd=ROOT, env=env, timeout=timeout)
     if check and result.returncode:
         # Never print a command/environment containing disposable credentials.
         raise RuntimeError("Fixture command failed: " + args[0] + ": " + scrub(result.stderr[-2000:]))
@@ -45,6 +59,74 @@ def scrub(value):
     for secret in hidden:
         value = value.replace(secret, "[REDACTED]")
     return value
+
+
+def private_http(name, path):
+    script = ('exec 3<>/dev/tcp/127.0.0.1/9091; printf "GET ' + path +
+              ' HTTP/1.0\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n" >&3; cat <&3')
+    return run("docker", "exec", name, "bash", "-c", script, check=False, timeout=8)
+
+
+def capture_resources(name, sample_phase):
+    sample = {"phase": sample_phase, "atUtc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+              "elapsedSeconds": round(time.monotonic() - target_started_at, 3)}
+    try:
+        command = r'''for metric in cpu.max cpu.stat memory.current memory.peak memory.events; do
+printf '\n@@%s\n' "$metric"
+cat "/sys/fs/cgroup/$metric" 2>/dev/null || true
+done
+printf '\n@@process\n'
+cat /proc/1/status'''
+        raw = run("docker", "exec", name, "sh", "-c", command, check=False, timeout=8)
+        parts = {}
+        key = None
+        for line in raw.stdout.splitlines():
+            if line.startswith("@@"):
+                key = line[2:]
+                parts[key] = []
+            elif key:
+                parts[key].append(line)
+        sample["cpuMax"] = " ".join(parts.get("cpu.max", [])).strip()
+        sample["cpuStat"] = {row.split()[0]: int(row.split()[1]) for row in parts.get("cpu.stat", []) if len(row.split()) == 2}
+        for metric in ("memory.current", "memory.peak"):
+            value = "".join(parts.get(metric, [])).strip()
+            sample[metric] = int(value) if value else None
+        sample["memory.events"] = {row.split()[0]: int(row.split()[1]) for row in parts.get("memory.events", []) if len(row.split()) == 2}
+        sample["process"] = [row for row in parts.get("process", []) if row.startswith(("VmRSS:", "VmHWM:", "Threads:"))]
+        metrics = private_http(name, "/actuator/prometheus")
+        allowed = {"hikaricp_connections", "hikaricp_connections_active", "hikaricp_connections_idle",
+                   "hikaricp_connections_pending", "hikaricp_connections_max", "hikaricp_connections_min",
+                   "hikaricp_connections_timeout_total", "hikaricp_connections_acquire_seconds_count",
+                   "hikaricp_connections_acquire_seconds_sum"}
+        pool = {}
+        for line in metrics.stdout.splitlines():
+            metric_name = line.split("{", 1)[0].split(" ", 1)[0]
+            if metric_name in allowed:
+                pool[metric_name] = float(line.split()[-1])
+        sample["pool"] = pool
+    except (OSError, ValueError, subprocess.TimeoutExpired) as error:
+        sample["samplingErrorType"] = type(error).__name__
+    with sample_lock:
+        previous = next((x for x in reversed(resource_samples) if x.get("cpuStat")), None)
+        if previous and sample.get("cpuStat"):
+            elapsed = sample["elapsedSeconds"] - previous["elapsedSeconds"]
+            if elapsed > 0:
+                sample["cpuUsageCoresSincePreviousSample"] = round((sample["cpuStat"]["usage_usec"] - previous["cpuStat"]["usage_usec"]) / (elapsed * 1000000), 5)
+        resource_samples.append(sample)
+        (EVIDENCE / "resource-samples.json").write_text(json.dumps(resource_samples, indent=2))
+    return sample
+
+
+def collect_resources(name):
+    while not sample_stop.is_set():
+        capture_resources(name, phase)
+        sample_stop.wait(10)
+
+
+def startup_milestone(name):
+    logs = run("docker", "logs", name, check=False)
+    match = re.search(r"Started BrandistaApplication in ([0-9.]+) seconds", logs.stdout + logs.stderr)
+    return float(match.group(1)) if match else None
 
 
 def sql(statement, user="root", password=root_password, check=True):
@@ -110,7 +192,7 @@ def wait_ready(name, base, timeout=None):
     raise AssertionError("Application did not become ready within bounded fixture startup window")
 
 
-def launch(label, user, password, options=None):
+def launch(label, user, password, options=None, cpu=None):
     name = "brandista-" + label + "-" + nonce
     env_path = WORK / (label + ".env")
     values = {
@@ -129,7 +211,7 @@ def launch(label, user, password, options=None):
     env_path.chmod(0o600)
     containers.append(name)
     run("docker", "run", "-d", "--name", name, "--network", network,
-        "--memory=512m", "--memory-swap=512m", "--cpus=" + CPU,
+        "--memory=512m", "--memory-swap=512m", "--cpus=" + (cpu or CPU),
         "--env-file", str(env_path), "-v", f"{WORK / 'ca.pem'}:/etc/secrets/ca.pem:ro",
         "-p", "127.0.0.1::10000", "brandista-render-ca:test")
     port = run("docker", "port", name, "10000/tcp").stdout.strip().rsplit(":", 1)[1]
@@ -172,7 +254,9 @@ try:
         f"CREATE USER 'brandista_app'@'%' IDENTIFIED BY '{runtime_password}' REQUIRE SSL;")
 
     # Apply the exact image's Flyway migrations, then remove DDL credentials.
-    migrator, base = launch("migrate", "brandista_migrator", migration_password, options=True)
+    # Prepare a current V14 database without making setup CPU the target condition.
+    migrator, base = launch("migrate", "brandista_migrator", migration_password, options=True,
+                            cpu="0.5" if CONTROLLED else None)
     wait_ready(migrator, base)
     history = sql("SELECT version,success FROM brandista.flyway_schema_history ORDER BY installed_rank").stdout
     if len(history.strip().splitlines()) != 14 or history.strip().splitlines()[-1] != "14\t1":
@@ -194,9 +278,37 @@ try:
     for label, bounded in configurations:
         started = time.monotonic()
         app, base = launch(label, "brandista_app", runtime_password, options=bounded)
+        if CONTROLLED:
+            target_app, target_started_at = app, started
+            phase = "startup"
+            limits = json.loads(run("docker", "inspect", "--format", "{{json .HostConfig}}", app).stdout)
+            verified = {k: limits[k] for k in ("NanoCpus", "Memory", "MemorySwap")}
+            if verified != {"NanoCpus": 150000000, "Memory": 536870912, "MemorySwap": 536870912}:
+                raise AssertionError("Controlled fixture limits do not match 0.15 CPU / 512 MiB / no swap")
+            (EVIDENCE / "verified-container-limits.json").write_text(json.dumps(verified, indent=2))
+            sample_thread = threading.Thread(target=collect_resources, args=(app,), daemon=True)
+            sample_thread.start()
         wait_ready(app, base)
+        target_ready = True
         entry = {"configuration": label, "startupSeconds": round(time.monotonic() - started, 3),
                  "memoryLimitBytes": 512 * 1024 * 1024, "cpuQuota": float(CPU), "samples": []}
+        if CONTROLLED:
+            entry["springStartupSeconds"] = startup_milestone(app)
+            phase = "healthy-post-start"
+            entry["initialPoolAndResources"] = capture_resources(app, phase)
+            # Match the owner's eleven-minute interval after successful startup.
+            deadline = time.monotonic() + 660
+            healthy = []
+            while time.monotonic() < deadline:
+                for path in ("/livez", "/readyz"):
+                    healthy.append(observe(base, path, "healthy-post-start"))
+                time.sleep(min(10, max(0, deadline-time.monotonic())))
+            entry["healthySoakSeconds"] = 660
+            entry["healthySoakProbeCount"] = len(healthy)
+            entry["healthySoakFailures"] = [x for x in healthy if x["httpStatus"] != 200 or x["seconds"] >= 5]
+            if entry["healthySoakFailures"]:
+                (EVIDENCE / "results.json").write_text(json.dumps([entry], indent=2))
+                raise AssertionError("Post-start healthy-DB probes failed; see recorded status/timing")
         if INVESTIGATE:
             entry["sourceRevision"] = "773623a9ddea2211be5088a5ce5e3667f286b261"
             entry["jdbcTimeoutOverrides"] = False
@@ -242,15 +354,23 @@ try:
             "brandName": "Synthetic " + label, "contactName": "CI Fixture",
             "contactEmail": account["email"], "website": "https://example.invalid"})
         if INVESTIGATE:
+            phase = "database-frozen"
             run("docker", "pause", database)
             try:
                 # A frozen server keeps TCP established but cannot answer a JDBC ping.
                 entry["silentDatabase"] = observe(base, "/readyz", "database-paused")
                 expect(base, "/livez", 200)
                 observe(base, "/livez", "database-paused")
+                if CONTROLLED:
+                    entry["frozenPoolAndResources"] = capture_resources(app, phase)
             finally:
                 run("docker", "unpause", database)
+            phase = "database-unfrozen-recovery"
             wait_ready(app, base, timeout=90)
+            if CONTROLLED:
+                observe(base, "/readyz", "database-unfrozen-recovered")
+                entry["unfrozenPoolAndResources"] = capture_resources(app, phase)
+        phase = "database-stopped"
         run("docker", "stop", database)
         expect(base, "/livez", 200)
         expect(base, "/readyz", 503)
@@ -258,8 +378,15 @@ try:
             observe(base, "/readyz", "database-stopped")
             observe(base, "/livez", "database-stopped")
         run("docker", "start", database)
+        phase = "database-restarted-recovery"
         wait_ready(app, base, timeout=90)
         entry["databaseOutageAndRecovery"] = "PASS: livez=200, readyz=503, recovered=200"
+        if CONTROLLED:
+            for _ in range(3):
+                observe(base, "/readyz", "database-restarted-recovered")
+                observe(base, "/livez", "database-restarted-recovered")
+            entry["recoveredPoolAndResources"] = capture_resources(app, phase)
+            phase = "controlled-shutdown"
         entry["processMemoryStatus"] = "\n".join(line for line in run(
             "docker", "exec", app, "cat", "/proc/1/status").stdout.splitlines()
             if line.startswith(("VmRSS:", "VmHWM:", "Threads:")))
@@ -275,6 +402,17 @@ try:
         (EVIDENCE / "results.json").write_text(json.dumps(results, indent=2))
         print("PASS:", label, "512 MiB /", CPU, "CPU TLS MySQL runtime, API/CORS/authorization and outage/recovery")
 finally:
+    if sample_thread:
+        sample_stop.set()
+        sample_thread.join(timeout=20)
+    if target_app:
+        spring_started = startup_milestone(target_app)
+        classification = {"springStartedLogSeen": spring_started is not None,
+                          "springStartupSeconds": spring_started, "firstReadiness200Seen": target_ready,
+                          "lastPhase": phase,
+                          "classification": "started-and-ready" if target_ready else
+                              "started-but-never-ready" if spring_started is not None else "startup-failure"}
+        (EVIDENCE / "startup-classification.json").write_text(json.dumps(classification, indent=2))
     for name in reversed(containers):
         logs = run("docker", "logs", name, check=False)
         (EVIDENCE / (name + ".log")).write_text(scrub(logs.stdout + logs.stderr))
