@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $mavenCommand = if ($env:OS -eq 'Windows_NT') { Join-Path $PSScriptRoot '../mvnw.cmd' } else { 'sh' }
-$mavenPrefix = if ($env:OS -eq 'Windows_NT') { @() } else { @(Join-Path $PSScriptRoot '../mvnw') }
+[string[]]$mavenPrefix = if ($env:OS -eq 'Windows_NT') { @() } else { @(Join-Path $PSScriptRoot '../mvnw') }
 Set-Location (Split-Path $PSScriptRoot -Parent)
 New-Item -ItemType Directory -Force target | Out-Null
 $containerName = 'brandista-pr7a-isolated-' + [guid]::NewGuid().ToString('N')
@@ -31,6 +31,7 @@ try {
     Write-Output "Target: new disposable container $containerName; $portBinding/brandista_pr7a_verify; synthetic test fixtures only."
     & $mavenCommand @mavenPrefix --batch-mode --no-transfer-progress '-Dtest=MerchantOrderIntegrationTests,MerchantOrderMigrationTests' test *> target/admin-pr7a-mysql.log
     if ($LASTEXITCODE -ne 0) { throw 'PR7A MySQL tests failed; inspect target/admin-pr7a-mysql.log securely' }
+    if (!(Select-String -Path target/admin-pr7a-mysql.log -Pattern 'Tests run: [1-9]' -Quiet) -or !(Select-String -Path target/admin-pr7a-mysql.log -Pattern 'BUILD SUCCESS' -Quiet)) { throw 'Maven did not produce successful nonzero test evidence' }
     Write-Output 'PASS: isolated MySQL 8.4.11 PR7A populated V13-V14 upgrade, merchant order authorization, finance, audit and concurrency tests.'
 } finally {
     $env:MYSQL_ROOT_PASSWORD = $priorRootSecret
