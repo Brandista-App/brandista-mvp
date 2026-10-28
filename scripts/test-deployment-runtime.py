@@ -110,6 +110,10 @@ def launch(label, user, password, options=None):
 
 
 try:
+    ergonomics = run("docker", "run", "--rm", "--memory=512m", "--memory-swap=512m",
+                     "--cpus=0.5", "--entrypoint", "java", "brandista-render-ca:test",
+                     "-XshowSettings:system", "-XshowSettings:vm", "-version")
+    (EVIDENCE / "linux-jvm-ergonomics.txt").write_text(ergonomics.stdout + ergonomics.stderr)
     # Synthetic CA/server certificates. Private files are never artifact inputs.
     run("openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "2",
         "-subj", "/CN=Brandista disposable CI CA", "-addext", "basicConstraints=critical,CA:TRUE",
