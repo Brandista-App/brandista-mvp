@@ -387,3 +387,5 @@ The SRS does not define a maximum item quantity; the API requires a positive 32-
 ## Privileged identity foundation
 
 Existing CUSTOMER/ADMIN login contracts are retained. Explicit platform grants and current-account authorization are described in [Admin PR 1: privilege model and revocation](docs/admin/PR1-PRIVILEGED-IDENTITY.md). No account is promoted and no administrative credentials are provisioned automatically. Run the full backend checks with `./mvnw verify` (Windows: `.\mvnw.cmd verify`).
+
+For approved production owner provisioning, read the [inspection findings](docs/production/SUPER-ADMIN-FINDINGS.md) and [Windows Aiven provisioning and assisted recovery runbook](docs/production/SUPER-ADMIN-RUNBOOK.md). The fixed-owner offline console uses the existing audited service, verifies TLS and persisted state, and does not run migrations. Production mutation and deployment require separate explicit approval.
