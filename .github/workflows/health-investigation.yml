@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         cpu: ['0.15']
-        case: [production, missing-profile]
+        case: [production, missing-profile, startup-retry]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -45,6 +45,7 @@ jobs:
           RUNTIME_CPU_LIMIT: ${{ matrix.cpu }}
           CONTROLLED_015: 'true'
           NEGATIVE_PROFILE_CONTROL: ${{ matrix.case == 'missing-profile' && 'true' || 'false' }}
+          STARTUP_RETRY_CONTROL: ${{ matrix.case == 'startup-retry' && 'true' || 'false' }}
         run: python3 scripts/test-deployment-runtime.py
       - uses: actions/upload-artifact@v7
         if: always()

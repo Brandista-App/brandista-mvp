@@ -23,6 +23,9 @@ if CPU not in ("0.5", "0.1", "0.15"):
     raise ValueError("Only isolated fixture CPU limits 0.5, 0.1 and 0.15 are supported")
 CONTROLLED = os.environ.get("CONTROLLED_015") == "true"
 NEGATIVE_PROFILE = os.environ.get("NEGATIVE_PROFILE_CONTROL") == "true"
+STARTUP_RETRY = os.environ.get("STARTUP_RETRY_CONTROL") == "true"
+if STARTUP_RETRY and (not CONTROLLED or NEGATIVE_PROFILE):
+    raise ValueError("Startup retry control requires the controlled production-profile case")
 if CONTROLLED and (CPU != "0.15" or not INVESTIGATE):
     raise ValueError("Controlled reproduction requires investigation mode and exactly 0.15 CPU")
 
@@ -211,6 +214,8 @@ def launch(label, user, password, options=None, cpu=None):
                       DB_POOL_MAX="4", DB_POOL_MIN="2", HTTP_THREADS_MAX="16")
     if NEGATIVE_PROFILE and label == "default":
         values.pop("SPRING_PROFILES_ACTIVE")
+    if STARTUP_RETRY and label == "default":
+        values["SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT"] = "60000"
     env_path.write_text("".join(f"{k}={v}\n" for k, v in values.items()))
     env_path.chmod(0o600)
     containers.append(name)
@@ -298,6 +303,7 @@ try:
                  "memoryLimitBytes": 512 * 1024 * 1024, "cpuQuota": float(CPU), "samples": []}
         if CONTROLLED:
             entry["springStartupSeconds"] = startup_milestone(app)
+            entry["startupRetryTimeoutOverrideMs"] = 60000 if STARTUP_RETRY else None
             if NEGATIVE_PROFILE:
                 phase = "missing-profile-control"
                 probes = [observe(base, path, phase) for path in (
