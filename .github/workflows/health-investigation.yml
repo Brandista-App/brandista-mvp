@@ -15,7 +15,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: sh ./mvnw --batch-mode --no-transfer-progress -Dtest=HealthContractIntegrationTests test
+      - run: sh ./mvnw --batch-mode --no-transfer-progress -Dtest=HealthContractIntegrationTests,DefaultProfileHealthContractIntegrationTests test
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -28,6 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         cpu: ['0.15']
+        case: [production, missing-profile]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -43,10 +44,11 @@ jobs:
           HEALTH_INVESTIGATION: 'true'
           RUNTIME_CPU_LIMIT: ${{ matrix.cpu }}
           CONTROLLED_015: 'true'
+          NEGATIVE_PROFILE_CONTROL: ${{ matrix.case == 'missing-profile' && 'true' || 'false' }}
         run: python3 scripts/test-deployment-runtime.py
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: health-image-cpu-${{ matrix.cpu }}
+          name: health-image-cpu-${{ matrix.cpu }}-${{ matrix.case }}
           path: target/deployment-runtime/evidence/
           retention-days: 14

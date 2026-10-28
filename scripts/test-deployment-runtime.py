@@ -22,6 +22,7 @@ CPU = os.environ.get("RUNTIME_CPU_LIMIT", "0.5")
 if CPU not in ("0.5", "0.1", "0.15"):
     raise ValueError("Only isolated fixture CPU limits 0.5, 0.1 and 0.15 are supported")
 CONTROLLED = os.environ.get("CONTROLLED_015") == "true"
+NEGATIVE_PROFILE = os.environ.get("NEGATIVE_PROFILE_CONTROL") == "true"
 if CONTROLLED and (CPU != "0.15" or not INVESTIGATE):
     raise ValueError("Controlled reproduction requires investigation mode and exactly 0.15 CPU")
 
@@ -183,7 +184,8 @@ def wait_ready(name, base, timeout=None):
         if not state["Running"]:
             raise AssertionError(f"{name}: exited {state['ExitCode']}, OOMKilled={state['OOMKilled']}")
         try:
-            probe = observe(base, "/readyz", "startup:" + name) if INVESTIGATE else {"httpStatus": request(base, "/readyz")[0]}
+            probe_path = "/actuator/health/readiness" if NEGATIVE_PROFILE and "-default-" in name else "/readyz"
+            probe = observe(base, probe_path, "startup:" + name) if INVESTIGATE else {"httpStatus": request(base, probe_path)[0]}
             if probe["httpStatus"] == 200:
                 return
         except (OSError, TimeoutError):
@@ -207,6 +209,8 @@ def launch(label, user, password, options=None, cpu=None):
     if options:
         values.update(JAVA_TOOL_OPTIONS="-Xms64m -Xmx256m -XX:+ExitOnOutOfMemoryError",
                       DB_POOL_MAX="4", DB_POOL_MIN="2", HTTP_THREADS_MAX="16")
+    if NEGATIVE_PROFILE and label == "default":
+        values.pop("SPRING_PROFILES_ACTIVE")
     env_path.write_text("".join(f"{k}={v}\n" for k, v in values.items()))
     env_path.chmod(0o600)
     containers.append(name)
@@ -294,6 +298,23 @@ try:
                  "memoryLimitBytes": 512 * 1024 * 1024, "cpuQuota": float(CPU), "samples": []}
         if CONTROLLED:
             entry["springStartupSeconds"] = startup_milestone(app)
+            if NEGATIVE_PROFILE:
+                phase = "missing-profile-control"
+                probes = [observe(base, path, phase) for path in (
+                    "/readyz", "/livez", "/actuator/health/readiness", "/actuator/health/liveness")]
+                if [probe["httpStatus"] for probe in probes] != [404, 404, 200, 200]:
+                    raise AssertionError("Missing-profile negative control did not match expected routing")
+                logs = run("docker", "logs", app, check=False)
+                if "No active profile set" not in logs.stdout + logs.stderr:
+                    raise AssertionError("Negative control unexpectedly had an active profile")
+                entry["missingProfileProbes"] = probes
+                entry["sourceRevision"] = "773623a9ddea2211be5088a5ce5e3667f286b261"
+                entry["resources"] = capture_resources(app, phase)
+                results.append(entry)
+                (EVIDENCE / "results.json").write_text(json.dumps(results, indent=2))
+                print("PASS: exact 0.15 CPU missing-profile control: aliases 404, actuator groups 200")
+                run("docker", "stop", app)
+                continue
             phase = "healthy-post-start"
             entry["initialPoolAndResources"] = capture_resources(app, phase)
             # Match the owner's eleven-minute interval after successful startup.
