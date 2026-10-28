@@ -1,121 +1,91 @@
-# Production Super Admin: Windows operator runbook
+# Production owner setup: one-command Windows workflow
 
-Prepared 2026-10-28. See [inspection findings](SUPER-ADMIN-FINDINGS.md) and [existing PR2 operations](../admin/PR2-SUPER-ADMIN-OPERATIONS.md).
+Revision: 2026-10-29. This supersedes PR #35's owner launcher. See [implementation findings](SUPER-ADMIN-FINDINGS.md), [verification record](SUPER-ADMIN-VERIFICATION.md), and the existing [audited recovery and custodian operations](../admin/PR2-SUPER-ADMIN-OPERATIONS.md).
 
-## Current delivery status
+## Run after review and merge
 
-The existing offline service is reused. The new console is fixed to `uzair@brandistaapp.com`, permits VERIFY / INITIAL_CREATE / INITIAL_GRANT / RESET_PASSWORD only, and verifies the committed enabled account, BCrypt format and active grant after success. Repeated create fails safely. There is no automatic recovery retry or password/role overwrite. VERIFY performs SELECTs only. No public endpoint, schema change, automatic seeder or production web configuration change is introduced.
-
-Read-only live checks: Render reports the existing base revision b5f6d5d as live; API /readyz and admin /login both returned HTTP 200. Current Render health-check configuration is /livez. No deployment or setting change was performed. Production provisioning, owner account existence, direct workstation Aiven connection, authenticated portal login and owner persistence across restarts remain **NOT VERIFIED**. Obtain explicit owner approval naming the target database and operation before either mutation switch is used. A typed confirmation is a local execution safeguard; it is not a substitute for approval.
-
-## Prerequisites and database access
-
-Use a trusted Windows Terminal / PowerShell session with Java 21, Maven wrapper access and the reviewed jar. Disable transcripts, recording and tracing. Do not use IDE consoles, pipe passwords, run under screen sharing, or paste secrets into chat. Java reads the account password directly with `Console.readPassword`; database/truststore passwords use `Read-Host -AsSecureString`. Password-manager generate a unique password meeting the existing 12-code-point minimum / 72-UTF-8-byte maximum.
-
-In Aiven's approved account, independently obtain the exact **MySQL service DNS hostname, service port, CA certificate and operator identity**, not a local Docker connection. The launcher accepts only `*.aivencloud.com` DNS names and fixes database `brandista`; if the approved service uses a different domain, review the validation before use. Never guess a hostname/port from examples. Network allowlists must permit this trusted workstation. Existing Render docs use runtime `brandista_app`; request a separate short-lived operator account rather than changing its credentials.
-
-Have the DBA apply/review existing additive migrations through V14 using the normal migration identity first. This console disables Flyway and checks required successful schema-history entries. It cannot apply pending migrations. Do not run generic bootstrap against production without this safeguard. No DDL is needed for this change.
-
-DBA access design (do not execute GRANTs without authorization): observer needs SELECT on `users`, `user_platform_grants`, `flyway_schema_history`. Initial-create operator needs SELECT/INSERT on `users` and `user_platform_grants`; SELECT/UPDATE on singleton `security_provisioning_state`; INSERT on `security_audit_events`; SELECT on schema history. Existing grant/recovery also needs UPDATE on `user_platform_grants`; RESET_PASSWORD needs UPDATE on `users.password_hash` and `users.updated_at`. Reduce column privileges where practical. No DELETE, DROP, ALTER, CREATE, global grant, or audit UPDATE/DELETE is needed. Grant schema-history SELECT explicitly. Restrict source IP, expire/revoke operator access afterward, and keep audit exports protected. Application runtime rights are separate.
-
-The observer can see credential columns at SQL privilege level unless a DBA supplies a column-specific grant or view; the supplied projection returns only a format boolean. Never SELECT the hash itself.
-
-## Build and CA trust preparation
-
-Run from the reviewed backend checkout, **before entering production secrets**:
+From a normal interactive Windows Terminal or PowerShell console, run this single line:
 
 ```powershell
-$env:JAVA_HOME = Split-Path (Split-Path (Get-Command java).Source)
-.\mvnw.cmd --batch-mode --no-transfer-progress verify
-if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
-Get-FileHash .\target\brandista-0.0.1-SNAPSHOT.jar -Algorithm SHA256
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File "D:\brandista workplace\super-admin-provisioning\scripts\production-owner.ps1"
 ```
 
-Save the Aiven CA outside Git in an access-restricted operator folder. Verify its SHA-256 fingerprint through the approved Aiven service/account. Create a new truststore at a new path with only that approved CA; keytool prompts for the store password and certificate trust confirmation:
+The execution-policy override applies only to that new process. No machine/user policy is changed. PowerShell 7 can run the same script using `pwsh.exe` in place of `powershell.exe`. IDE output panes, ISE and redirected input are not supported: they fail clearly before requesting passwords. Do not pipe or redirect this command.
 
-```powershell
-$ownerCa = Read-Host 'Absolute path to approved Aiven CA PEM'
-$ownerTrust = Read-Host 'Absolute path for a NEW operator Aiven PKCS12 file (.p12)'
-if (Test-Path -LiteralPath $ownerTrust) { throw 'Use a new truststore path' }
-keytool -printcert -file $ownerCa
-# Compare the fingerprint independently before importing.
-keytool -importcert -alias brandista-aiven-ca -file $ownerCa -keystore $ownerTrust -storetype PKCS12
-if ($LASTEXITCODE -ne 0) { throw 'CA import failed' }
-keytool -list -keystore $ownerTrust -storetype PKCS12
-if ($LASTEXITCODE -ne 0) { throw 'Truststore verification failed' }
+Unavoidable prerequisites: Java **21 JDK** (including javac) and Git on PATH; the existing clean Brandista backend checkout at the stated path; GitHub/Maven network access for the reviewed source and first build; the approved Aiven CA-only PKCS12 file at `%USERPROFILE%\brandista-aiven-truststore.p12`; its password; the exact approved Aiven service hostname/port; and an authorized least-privilege database identity. This command does not obtain credentials, generate a default Super Admin password or guess service settings.
+
+The launcher checks Java and Git, verifies the repository origin, fetches reviewed `origin/main`, and updates an ancestor checkout with a safe fast-forward. Unreviewed/diverged revisions and tracked edits are rejected without overwriting files. After updating itself, it relaunches the current reviewed script. It builds with the existing Maven wrapper's full `verify` before secrets are requested. A cached JAR is reused only when its SHA-256 and recorded reviewed commit match; a missing or altered cache rebuilds. Build output remains under ignored `target/owner-setup-build.log`. Clean terminal environment is required; inherited application/DB configuration is excluded temporarily and restored afterward.
+
+An approved operator may explicitly select a reviewed release SHA using `-ReviewedCommit <full-SHA>`; it must equal the clean checkout HEAD. This option does not skip build verification, TLS, database checks, confirmation or authorization. CI uses it to exercise the PR commit before merge. Normal production usage requires no such option.
+
+## Expected prompts and behavior
+
+1. The reviewed Git revision and build/cache result appear. No database connection has happened.
+2. Enter the approved Aiven **DNS hostname** and **port**. These are non-secret prompts. The database is fixed to `brandista`; credentials or arbitrary JDBC query parameters are never accepted in these fields.
+3. At `Truststore password (hidden):`, enter the existing PKCS12 password. Java unlocks the store, requires valid CA certificate entries and rejects empty/wrong/expired stores before connecting.
+4. Confirm `CONNECT brandista` to authorize read-only verification of the displayed target. Cancellation makes no database connection.
+5. At `Aiven database username (hidden):` and `Aiven database password (hidden):`, enter the approved credentials. These are read directly inside Java's real Console, with echo disabled. Passwords never go into PowerShell variables, argv or environment JSON.
+6. Java connects with Connector/J `sslMode=VERIFY_IDENTITY`, the explicit PKCS12 CA store and no system-store fallback. It checks the actual `SELECT DATABASE()` value is `brandista`, verifies an encrypted session, checks successful Flyway V1-V14 history, and reads the owner projection without returning password hashes.
+7. If `ACCOUNT_EXISTS` and ready, the command succeeds without asking for an account password or changing any user/grant/audit record. If the account exists but is not enabled/granted/BCrypt, it reports `ACCOUNT_NOT_READY` and stops unchanged. No silent promotion, password reset or enablement is offered.
+8. If `ACCOUNT_ABSENT`, the tool checks the permanent bootstrap marker and historical grants. Prior initialization blocks initial creation; it never resets that marker or silently chooses recovery.
+9. If eligible, explicitly type `CREATE uzair@brandistaapp.com IN brandista`. Enter and confirm the chosen Super Admin password at the hidden Java prompts. The existing policy is at least 12 Unicode code points and at most 72 UTF-8 bytes; use a unique password-manager-generated password.
+10. The existing offline audited service performs `INITIAL_CREATE` once. It creates an enabled CUSTOMER base identity with an explicit active SUPER_ADMIN grant, using the existing BCrypt encoder. The committed state is read again and matched to the returned numeric ID.
+
+Expected creation success:
+
+```text
+SUCCESS: uzair@brandistaapp.com was created and verified in brandista; ENABLED, BCrypt format verified, SUPER_ADMIN grant active. User ID: <id>.
+Owner setup completed successfully. Use the private password to sign in at https://admin.brandistaapp.com/login.
 ```
 
-This workstation launcher uses Connector/J's per-connection truststore, `sslMode=VERIFY_IDENTITY` and `fallbackToSystemTrustStore=false`. The certificate and DNS name must verify; no TLS bypass is offered. This is separate from Render's merged JVM truststore and must not be copied into the Render configuration. See [Connector/J server authentication documentation](https://dev.mysql.com/doc/connector-j/en/connector-j-server-authentication.html).
+Expected existing-account success includes `No account changes were made.` Existing-account execution is safely repeatable. It does not ask for or test the existing login password; portal login remains the owner's private verification step.
 
-## Read-only preflight and initial creation
+To perform only the same read-only verification, append `-VerifyOnly` to the one-line command. Absence returns a distinct Java status 10 and a nonzero launcher result; type no subsequent `VERIFY` command in PowerShell. The tool no longer depends on a menu being reached after a database failure.
 
-Use a clean dedicated terminal without Java option injectors or custom Spring config locations. Enter host and port as non-secret values:
+## Safe diagnostics and exit codes
 
-```powershell
-$ownerDbHost = Read-Host 'Approved Aiven MySQL DNS hostname'
-$ownerDbPort = [int](Read-Host 'Approved Aiven MySQL port')
-.\scripts\production-owner.ps1 -DatabaseHost $ownerDbHost -DatabasePort $ownerDbPort -TrustStore $ownerTrust
-```
+| Java code/category | Meaning |
+| --- | --- |
+| 0 / SUCCESS | Existing or newly created owner verified ready in the actual connected database |
+| 10 / ACCOUNT_ABSENT | Read-only verification completed; owner absent |
+| 11 / ACCOUNT_NOT_READY | Existing owner retained unchanged; separately approved recovery needed |
+| 12 / CANCELLED | Operator declined connection or creation |
+| 20 / CONSOLE_UNAVAILABLE | No real terminal; no password requested or database connection |
+| 21 / INPUT_INVALID | Invalid options, password policy or confirmation; no account operation |
+| 22 / TRUSTSTORE_INVALID | Missing, unreadable, empty, wrong-password or invalid/expired CA PKCS12 store |
+| 23 / TLS_FAILED | TLS chain, hostname or encrypted-session verification failure; no bypass offered |
+| 24 / DATABASE_CREDENTIALS | Database username/password rejected |
+| 25 / CONNECTION_FAILED | DNS, timeout, refused connection or unavailable database |
+| 26 / MIGRATIONS_MISSING | Required successful Flyway history/table/column missing; no migration attempted |
+| 27 / DATABASE_MISMATCH | Actual database is not brandista, or brandista does not exist |
+| 28 / DATABASE_PERMISSION | Approved identity lacks privileges for the operation |
+| 29 / OPERATOR_STARTUP | Reviewed offline application could not initialize |
+| 30 / INITIALIZATION_BLOCKED or PROVISIONING_REJECTED | Prior bootstrap/history or service safety check prevents creation |
+| 31 / STATE_UNCERTAIN | An operation was attempted but final state could not be verified; never retry automatically |
 
-Supply the observer username and masked database/store passwords. At Java's mode prompt enter `VERIFY`. An absent account prints ABSENT and exits nonzero; an existing account prints only ID, email, base role, status and booleans. Any connection/schema error stops without an operation. This is the step that determines whether the owner exists in actual Aiven; local test results cannot answer it.
+The PowerShell launcher preserves failure as a nonzero process result (normally 1 for its terminating exception) and includes the Java code/category. Failures before an operation print `NO_ACCOUNT_CHANGES`. After an uncertain mutation, use the same one-line command with `-VerifyOnly` first. Driver exception messages, SQL parameter values, passwords, hashes, tokens and complete configuration are never shown. Diagnostics classify exception types and numeric SQL codes only. There is no automatic mutation retry.
 
-After the owner's explicit approval for **INITIAL_CREATE on this Aiven database**, use the short-lived operator identity:
+## Database permissions and schema
 
-```powershell
-.\scripts\production-owner.ps1 -DatabaseHost $ownerDbHost -DatabasePort $ownerDbPort -TrustStore $ownerTrust -AuthorizeMutation
-```
+Use a short-lived operator identity, not a broad Aiven DBA or changed Render credential. Read-only mode needs SELECT on users, user_platform_grants, security_provisioning_state and flyway_schema_history. Initial creation additionally needs INSERT on users and user_platform_grants, UPDATE on security_provisioning_state and INSERT on security_audit_events. Two pooled connections are available for independent failure auditing. Do not grant DELETE, DROP, ALTER, CREATE, global grants, or audit UPDATE/DELETE. Apply normal existing additive migrations using a separately approved deployment/migration identity **before** this tool. This console disables Flyway and SQL initialization.
 
-Select `INITIAL_CREATE`; type `APPROVED INITIAL_CREATE uzair@brandistaapp.com` when prompted. Enter and confirm the privately chosen account password. Success requires both audited transaction completion and a subsequent SELECT showing committed enabled state, BCrypt format and SUPER_ADMIN grant. Exit 0 means verified persistence; exit 1 means absent/unready VERIFY or rejected service result; exit 2 means abort/configuration/verification failure. PowerShell throws on nonzero. If failure follows a mutation, inspect using VERIFY before any retry because the transaction might have committed.
+The operator verifies `brandista` from the live connection itself. This development task does not establish the production account state or production DB name by making a connection: production access still requires explicit owner approval. No local fixture is treated as production evidence.
 
-If the email already exists, **stop**. Never change its password or base role automatically. If independently verified ownership and the numeric ID are explicitly approved, INITIAL_GRANT preserves its existing password and base role; use the same launcher with AuthorizeMutation, select INITIAL_GRANT and confirm that operation. A disabled account is rejected. ALREADY_INITIALIZED means this database has prior bootstrap/grant history: do not clear the singleton or use recovery to bypass it. Follow the separate reviewed PR2 recovery/grant procedure only with approval for that exact action. The fixed-owner console intentionally cannot create extra custodians.
-
-Secrets exist transiently in the trusted process environment through `SPRING_APPLICATION_JSON`; they are not argv or files. The launcher restores the prior environment and disposes secure buffers in finally. PowerShell/Java immutable strings cannot guarantee complete memory erasure, so use a trusted host and short-lived credentials. Do not run Maven/tests while production secret environment values are loaded.
-
-## Independent read-only SQL verification
-
-Use an approved MySQL client with TLS VERIFY_IDENTITY, the verified Aiven CA, and an observer identity. Enter its password at the client's secure prompt. Never pass `-pPASSWORD`. Run:
+Independent read-only SQL (approved observer, verified TLS client, secure password prompt):
 
 ```sql
-SELECT u.id, u.email, u.role AS base_role, u.status,
+SELECT u.id,u.email,u.role AS base_role,u.status,
        (CHAR_LENGTH(u.password_hash)=60 AND
-        (u.password_hash LIKE '$2a$%' OR u.password_hash LIKE '$2b$%' OR
-         u.password_hash LIKE '$2y$%')) AS bcrypt_format,
-       EXISTS (SELECT 1 FROM user_platform_grants g
-               WHERE g.user_id=u.id AND g.grant_type='SUPER_ADMIN'
-                 AND g.revoked_at IS NULL) AS active_super_admin
+        (u.password_hash LIKE '$2a$%' OR u.password_hash LIKE '$2b$%' OR u.password_hash LIKE '$2y$%')) AS bcrypt_format,
+       EXISTS (SELECT 1 FROM user_platform_grants g WHERE g.user_id=u.id
+               AND g.grant_type='SUPER_ADMIN' AND g.revoked_at IS NULL) AS active_super_admin
 FROM users u WHERE u.email='uzair@brandistaapp.com';
 ```
 
-Expect exactly one row, ENABLED, bcrypt_format=1, active_super_admin=1. Base role CUSTOMER is expected for new creation. Format alone does not prove that the chosen password matches; actual login supplies that evidence. Review the matching INITIAL_CREATE / INITIAL_GRANT / RESET_PASSWORD audit outcome by target numeric ID without dumping arbitrary database rows.
+## Login, recovery and deployment boundaries
 
-## Safe actual production verification
+After success, privately sign in at `https://admin.brandistaapp.com/login` in admin mode. The login API returns the independent base role (normally CUSTOMER); the portal verifies SUPER_ADMIN using `/api/v1/super-admin/identity`. Check matching user ID, enabled state and grant. Do not copy JWTs, authorization headers, passwords or HAR captures into tickets. Negative-password/ordinary-account checks and persistence across a Render restart/redeploy require separately approved live actions.
 
-1. Record approved commit/jar digest and backend deployed revision. Check `https://api.brandistaapp.com/readyz` returns 200 (production profile). Run VERIFY against Aiven; retain only redacted status booleans and numeric ID.
-2. In a private browser window open `https://admin.brandistaapp.com/login`, choose administrator mode, and enter `uzair@brandistaapp.com` plus the private password. Do not paste credentials into tools/chat, export HAR, copy response bodies or capture DevTools screenshots containing tokens.
-3. Confirm POST `https://api.brandistaapp.com/api/v1/auth/login` is 200. Its account ID/email must match the projection; account.role may correctly be CUSTOMER. The subsequent GET `/api/v1/super-admin/identity` must be 200 with the same userId and platformGrants containing SUPER_ADMIN. This probe is the portal's authoritative capability check. The portal must open the admin workspace. Record statuses only, never accessToken or Authorization headers.
-4. Sign out; make one deliberately incorrect-password login attempt and confirm rejection (401). Avoid repeated retries. Sign in again with the correct password.
-5. With separately approved ordinary customer, legacy ADMIN-without-grant and brand-member test identities, confirm `/api/v1/super-admin/identity` denies access (403 with valid authentication). Do not grant these accounts privileges or create production fixtures for this check. Isolated tests cover this when no approved live identities are available; label the live check pending.
-6. After a **separately approved** normal Render restart and redeploy, rerun observer VERIFY and repeat portal login. Match the same account ID, email, enabled state and grant; no startup seeder should run. Never trigger a deploy/restart merely to complete this checklist without approval.
+The one-command setup never resets passwords or grants on existing accounts. Approved administrator-assisted recovery remains available through the existing [PR2 offline procedure](../admin/PR2-SUPER-ADMIN-OPERATIONS.md), with verified ID/email and separately authorized RESET_PASSWORD/recovery gates. No operational email forgot-password flow is claimed. A password reset alone does not revoke existing JWTs; suspected compromise requires approved custodian replacement/revocation while preserving the last active custodian.
 
-## Password recovery until email reset is configured
-
-There is no operational email forgot-password flow in this revision. Do not offer a public reset-token request, claim delivery, log tokens, or repurpose invitation emails. Token expiry/single-use and request-rate-limit tests are not applicable to this assisted-only workflow. A future email-reset implementation requires a reviewed provider, hashed random single-use expiring tokens, transactional consumption, enumeration-safe responses, rate limits and security audit tests before claiming availability.
-
-For assisted recovery, the owner contacts a trusted operator through the established private support channel. Verify account ownership out of band and obtain explicit approval for RESET_PASSWORD on the verified numeric ID/database. Use observer VERIFY first. The enabled account must already have an active SUPER_ADMIN grant. Then:
-
-```powershell
-.\scripts\production-owner.ps1 -DatabaseHost $ownerDbHost -DatabasePort $ownerDbPort -TrustStore $ownerTrust -AuthorizeMutation -AuthorizePasswordRecovery
-```
-
-Select `RESET_PASSWORD`, enter the independently verified user ID, and type `APPROVED RESET_PASSWORD uzair@brandistaapp.com`. Have the owner enter/confirm a new unique password privately at Java's masked prompts on the trusted terminal. No password is sent to the operator through tickets or email. The audited service changes only password hash and updated_at; account ID, email, role, status and grant persist. Verify new login succeeds and old password fails; retain statuses only. Remove operator access afterward.
-
-Password reset alone **does not invalidate existing JWTs**. For suspected compromise, follow PR2 approved custodian replacement and revoke/disable workflow, preserving at least one verified active custodian. Do not weaken last-admin protection or reset the bootstrap marker. If the only custodian is disabled or compromised, escalate to the separately approved PR2 recovery process; this fixed-owner workflow fails closed.
-
-## Deployment checklist and rollback
-
-- Review findings, source, tests, TLS validation and full PR before merge. No changes to Render settings or new migrations are required. Review enabled auto-deploy before merging; this task does not authorize merge/deploy.
-- Verify current deployed V10-V14 history, database backup/restore readiness, least-privilege identities, CA fingerprint, workstation access and owner approval.
-- Build/test without production secrets, record jar digest, run observer preflight, then obtain exact mutation approval. Provision once; remove operator credentials afterward.
-- Complete the production checklist above and record PASS / FAIL / PENDING per item. Production completion requires explicit approval and successful live evidence, including approved restart/redeploy.
-- Before mutation, rollback is to stop and discard/revert these operator-only files; production data is untouched. After mutation, reverting the jar leaves the existing persistent account intact and usable by the prior compatible backend. Never restore a stale whole-database backup or delete users/grants/audit rows to undo provisioning.
-- For unintended grants/password compromise use approved audited PR2 recovery/revocation/custodian rotation; first verify another custodian. Recover passwords through RESET_PASSWORD, not hash restoration. No destructive SQL rollback is supplied.
+This PR adds no HTTP provisioning endpoint, schema migration, startup seeder, authentication change, Render setting change or deployment. Merge/deploy requires separate approval because main may auto-deploy. Before mutation, rollback means stopping/reverting the operator files; production data remains untouched. After mutation, keep the compatible persistent account and use approved audited recovery/custodian rotation if needed. Never reset bootstrap state, delete accounts/grants/audit records, restore stale hashes or overwrite the production database to undo provisioning.
