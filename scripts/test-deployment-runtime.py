@@ -24,6 +24,9 @@ if CPU not in ("0.5", "0.1", "0.15"):
 CONTROLLED = os.environ.get("CONTROLLED_015") == "true"
 NEGATIVE_PROFILE = os.environ.get("NEGATIVE_PROFILE_CONTROL") == "true"
 STARTUP_RETRY = os.environ.get("STARTUP_RETRY_CONTROL") == "true"
+SOURCE_REVISION = os.environ.get("RUNTIME_SOURCE_REVISION", "773623a9ddea2211be5088a5ce5e3667f286b261")
+if not re.fullmatch("[a-f0-9]{40}", SOURCE_REVISION):
+    raise ValueError("Expected a full source revision in controlled evidence")
 if STARTUP_RETRY and (not CONTROLLED or NEGATIVE_PROFILE):
     raise ValueError("Startup retry control requires the controlled production-profile case")
 if CONTROLLED and (CPU != "0.15" or not INVESTIGATE):
@@ -314,7 +317,7 @@ try:
                 if "No active profile set" not in logs.stdout + logs.stderr:
                     raise AssertionError("Negative control unexpectedly had an active profile")
                 entry["missingProfileProbes"] = probes
-                entry["sourceRevision"] = "773623a9ddea2211be5088a5ce5e3667f286b261"
+                entry["sourceRevision"] = SOURCE_REVISION
                 entry["resources"] = capture_resources(app, phase)
                 results.append(entry)
                 (EVIDENCE / "results.json").write_text(json.dumps(results, indent=2))
@@ -337,7 +340,7 @@ try:
                 (EVIDENCE / "results.json").write_text(json.dumps([entry], indent=2))
                 raise AssertionError("Post-start healthy-DB probes failed; see recorded status/timing")
         if INVESTIGATE:
-            entry["sourceRevision"] = "773623a9ddea2211be5088a5ce5e3667f286b261"
+            entry["sourceRevision"] = SOURCE_REVISION
             entry["jdbcTimeoutOverrides"] = False
             networks = json.loads(run("docker", "inspect", "--format", "{{json .NetworkSettings.Networks}}", app).stdout)
             address = networks[network]["IPAddress"]

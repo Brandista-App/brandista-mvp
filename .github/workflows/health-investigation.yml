@@ -28,22 +28,23 @@ jobs:
       fail-fast: false
       matrix:
         cpu: ['0.15']
-        case: [production, missing-profile, startup-retry]
+        case: [patched-production]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: 773623a9ddea2211be5088a5ce5e3667f286b261
+          ref: 4023d2fe03c508654744ad77f9bdc2a02d8ba04a
           path: production-source
-      - name: Build the exact deployed source revision
+      - name: Build pinned startup-retry candidate with no runtime timeout override
         run: |
-          test "$(git -C production-source rev-parse HEAD)" = 773623a9ddea2211be5088a5ce5e3667f286b261
+          test "$(git -C production-source rev-parse HEAD)" = 4023d2fe03c508654744ad77f9bdc2a02d8ba04a
           docker build --progress=plain -t brandista-render-ca:test production-source
       - name: Exercise default JDBC TLS configuration and health failure modes
         env:
           HEALTH_INVESTIGATION: 'true'
           RUNTIME_CPU_LIMIT: ${{ matrix.cpu }}
           CONTROLLED_015: 'true'
+          RUNTIME_SOURCE_REVISION: 4023d2fe03c508654744ad77f9bdc2a02d8ba04a
           NEGATIVE_PROFILE_CONTROL: ${{ matrix.case == 'missing-profile' && 'true' || 'false' }}
           STARTUP_RETRY_CONTROL: ${{ matrix.case == 'startup-retry' && 'true' || 'false' }}
         run: python3 scripts/test-deployment-runtime.py
