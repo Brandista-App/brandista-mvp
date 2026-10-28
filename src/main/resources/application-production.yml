@@ -9,6 +9,9 @@ spring:
       maximum-pool-size: ${DB_POOL_MAX:10}
       minimum-idle: ${DB_POOL_MIN:2}
       connection-timeout: 3000
+      # Retry initial TLS connection setup on CPU-constrained cold starts.
+      # This does not extend the 3-second runtime pool-acquisition timeout.
+      initialization-fail-timeout: ${DB_POOL_INITIALIZATION_TIMEOUT_MS:60000}
       validation-timeout: 1000
       max-lifetime: 1500000
   transaction:
