@@ -41,7 +41,9 @@ ANSI = re.compile(r'\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*(?:\x07|\x1b\\))')
 
 
 def clean_env():
-    return {k: v for k, v in os.environ.items() if not k.startswith(
+    # WinPTY builds the raw Windows environment block itself. Use one casing for
+    # every key so a pwsh parent cannot give Windows PowerShell duplicate keys.
+    return {k.upper(): v for k, v in os.environ.items() if not k.upper().startswith(
         ('SPRING_', 'BRANDISTA_', 'MYSQL_', 'JWT_', 'AIVEN_', 'JAVA_TOOL_OPTIONS',
          'JDK_JAVA_OPTIONS', '_JAVA_OPTIONS', 'CLASSPATH', 'MAVEN_OPTS'))}
 
@@ -149,7 +151,8 @@ jar = TARGET/'brandista-0.0.1-SNAPSHOT.jar'
 if not jar.is_file(): raise SystemExit('Build the real executable JAR first')
 head = run(['git','rev-parse','HEAD']).stdout.strip()
 store, profile = certificate_files()
-env = dict(clean_env(), USERPROFILE=str(profile), PSModuleAnalysisCachePath=str(WORK/'module-analysis-cache'))
+env = dict(clean_env(), USERPROFILE=str(profile), PSMODULEANALYSISCACHEPATH=str(WORK/'module-analysis-cache'))
+assert len(env) == len({key.upper() for key in env}), 'Duplicate Windows environment keys in console fixture'
 with socket.socket() as port_socket:
     port_socket.bind(('127.0.0.1',0)); port = port_socket.getsockname()[1]
 datadir = WORK/'mysql-data'
