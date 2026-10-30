@@ -25,6 +25,14 @@ function Invoke-OwnerTool([string]$Executable, [string[]]$Arguments) {
         return [PSCustomObject]@{ Output=$text; ExitCode=$LASTEXITCODE }
     } finally { $ErrorActionPreference = $priorPreference }
 }
+function Get-OwnerSha256([string]$Path) {
+    # .NET is available in both 5.1 and 7; do not depend on cross-edition
+    # PSModulePath / script-module autoloading for the reviewed artifact check.
+    $stream = [IO.File]::OpenRead($Path)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try { return ([BitConverter]::ToString($algorithm.ComputeHash($stream))).Replace('-','') }
+    finally { $algorithm.Dispose(); $stream.Dispose() }
+}
 $versionResult = Invoke-OwnerTool (Get-Command java).Source @('-version')
 $javaVersion = $versionResult.Output
 if ($versionResult.ExitCode -ne 0 -or $javaVersion -notmatch 'version "21[.\"]') { throw 'Java 21 JDK is required; no passwords were requested.' }
@@ -68,7 +76,7 @@ try {
     if ((Test-Path -LiteralPath $jarPath) -and (Test-Path -LiteralPath $markerPath)) {
         try {
             $marker = Get-Content -LiteralPath $markerPath -Raw | ConvertFrom-Json
-            $cached = $marker.commit -eq $head -and $marker.sha256 -eq (Get-FileHash -LiteralPath $jarPath -Algorithm SHA256).Hash
+            $cached = $marker.commit -eq $head -and $marker.sha256 -eq (Get-OwnerSha256 $jarPath)
         } catch { $cached = $false }
     }
     if (!$cached) {
@@ -79,7 +87,7 @@ try {
         try { $ErrorActionPreference='Continue'; & (Join-Path $repo 'mvnw.cmd') --batch-mode --no-transfer-progress verify *> (Join-Path $repo 'target/owner-setup-build.log'); $buildExit=$LASTEXITCODE }
         finally { $ErrorActionPreference=$buildPreference; Pop-Location }
         if ($buildExit -ne 0 -or !(Test-Path -LiteralPath $jarPath)) { throw 'Reviewed application build failed; no database connection or passwords requested. Build log: target/owner-setup-build.log' }
-        @{ commit=$head; sha256=(Get-FileHash -LiteralPath $jarPath -Algorithm SHA256).Hash } | ConvertTo-Json | Set-Content -LiteralPath $markerPath
+        @{ commit=$head; sha256=(Get-OwnerSha256 $jarPath) } | ConvertTo-Json | Set-Content -LiteralPath $markerPath
     } else { Write-Host 'Verified matching reviewed JAR is available; no rebuild needed.' }
     if (!(Test-Path -LiteralPath $TrustStore -PathType Leaf)) { throw 'Truststore is missing. Expected the approved Aiven CA PKCS12 file at the supplied path (default: user profile/brandista-aiven-truststore.p12).' }
     $storePath = (Resolve-Path -LiteralPath $TrustStore).Path

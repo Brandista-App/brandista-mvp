@@ -52,6 +52,14 @@ class OwnerProvisioningConsoleTests {
         assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"42S02",1146))).isEqualTo(Failure.MIGRATIONS_MISSING);
         assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"42000",1049))).isEqualTo(Failure.DATABASE_MISMATCH);
         assertThat(OwnerDiagnostics.classify(new IllegalStateException(sensitive,new SSLHandshakeException(sensitive)))).isEqualTo(Failure.TLS_FAILED);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"08001",0,
+                new java.security.cert.CertificateException(sensitive)))).isEqualTo(Failure.TLS_FAILED);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"08001",0,
+                new SQLException(sensitive,"28000",1045)))).isEqualTo(Failure.DATABASE_CREDENTIALS);
+        var chained = new SQLException(sensitive, "08001", 0);
+        chained.setNextException(new SQLException(sensitive, "08001", 0,
+                new java.security.cert.CertificateException(sensitive)));
+        assertThat(OwnerDiagnostics.classify(chained)).isEqualTo(Failure.TLS_FAILED);
         assertThat(OwnerDiagnostics.classify(new java.net.ConnectException(sensitive))).isEqualTo(Failure.CONNECTION_FAILED);
         assertThat(OwnerDiagnostics.classify(new IllegalStateException(sensitive))).isEqualTo(Failure.OPERATOR_STARTUP);
         for(var reason:Failure.values()) assertThat(reason.explanation).doesNotContain(sensitive,"do-not-render");

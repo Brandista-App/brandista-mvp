@@ -47,6 +47,9 @@ $env:OWNER_WRAPPER_EXIT='0'
 $env:SPRING_APPLICATION_JSON='{"synthetic_prior":true}'
 $arguments=@{DatabaseHost='fixture.aivencloud.com';DatabasePort=12345;TrustStore=$fixtureStore;ReviewedCommit=$head;VerifyOnly=$true}
 $launcher=Join-Path $fixtureRepo 'scripts/production-owner.ps1'
+# The production hash check must work even if the script cmdlet cannot autoload
+# across PowerShell editions, as reproduced by the real 5.1 console job.
+function Get-FileHash { throw 'Production launcher must use the edition-independent SHA256 implementation' }
 try {
     & $launcher @arguments
     $argv=Get-Content $argsFile -Raw
@@ -70,6 +73,7 @@ try {
 } finally {
     foreach($name in $names){[Environment]::SetEnvironmentVariable($name,$prior[$name])}
     Remove-Item Function:git -ErrorAction SilentlyContinue
+    Remove-Item Function:Get-FileHash -ErrorAction SilentlyContinue
     Remove-Variable ownerWrapperFixture -Scope Global -ErrorAction SilentlyContinue
     if($hadNativeExit){$global:LASTEXITCODE=$priorNativeExit}else{Remove-Variable LASTEXITCODE -Scope Global -ErrorAction SilentlyContinue}
 }

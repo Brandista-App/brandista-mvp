@@ -4,6 +4,12 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.security.cert.CertificateException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
 import javax.net.ssl.SSLException;
 
 /** Closed diagnostics only. Driver messages and configuration values are never rendered. */
@@ -27,10 +33,12 @@ public final class OwnerDiagnostics {
         Failure(int exit, String explanation) { this.exit = exit; this.explanation = explanation; }
     }
     public static Failure classify(Throwable error) {
+        var causes = causes(error);
         // Prefer TLS over a surrounding connection exception, without parsing sensitive messages.
-        for (Throwable t = error; t != null; t = t.getCause()) if (t instanceof SSLException) return Failure.TLS_FAILED;
+        for (Throwable t : causes)
+            if (t instanceof SSLException || t instanceof CertificateException) return Failure.TLS_FAILED;
         boolean connectionFailure = false;
-        for (Throwable t = error; t != null; t = t.getCause()) {
+        for (Throwable t : causes) {
             if (t instanceof SQLException sql) {
                 if (sql.getErrorCode() == 1049) return Failure.DATABASE_MISMATCH;
                 if (sql.getErrorCode() == 1045 || "28000".equals(sql.getSQLState())) return Failure.DATABASE_CREDENTIALS;
@@ -44,5 +52,20 @@ public final class OwnerDiagnostics {
                 connectionFailure = true;
         }
         return connectionFailure ? Failure.CONNECTION_FAILED : Failure.OPERATOR_STARTUP;
+    }
+    private static List<Throwable> causes(Throwable error) {
+        var pending = new ArrayDeque<Throwable>();
+        var seen = Collections.newSetFromMap(new IdentityHashMap<Throwable, Boolean>());
+        var result = new ArrayList<Throwable>();
+        if (error != null) pending.add(error);
+        while (!pending.isEmpty() && result.size() < 64) {
+            Throwable current = pending.removeFirst();
+            if (!seen.add(current)) continue;
+            result.add(current);
+            if (current.getCause() != null) pending.addLast(current.getCause());
+            if (current instanceof SQLException sql && sql.getNextException() != null)
+                pending.addLast(sql.getNextException());
+        }
+        return result;
     }
 }

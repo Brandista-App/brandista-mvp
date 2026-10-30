@@ -149,7 +149,7 @@ jar = TARGET/'brandista-0.0.1-SNAPSHOT.jar'
 if not jar.is_file(): raise SystemExit('Build the real executable JAR first')
 head = run(['git','rev-parse','HEAD']).stdout.strip()
 store, profile = certificate_files()
-env = dict(clean_env(), USERPROFILE=str(profile))
+env = dict(clean_env(), USERPROFILE=str(profile), PSModuleAnalysisCachePath=str(WORK/'module-analysis-cache'))
 with socket.socket() as port_socket:
     port_socket.bind(('127.0.0.1',0)); port = port_socket.getsockname()[1]
 datadir = WORK/'mysql-data'
@@ -255,7 +255,7 @@ try:
 
     term=launch(host='127.0.0.1'); credentials(term)
     tls=term.finish(1)
-    assert 'TLS_FAILED' in tls and 'NO_ACCOUNT_CHANGES' in tls
+    assert 'TLS_FAILED' in tls and 'NO_ACCOUNT_CHANGES' in tls, scrub(tls[-2400:])
     record(args.shell+': hostname mismatch fails with TLS verification retained')
 
     sql("UPDATE brandista.flyway_schema_history SET success=0 WHERE version='14';")
