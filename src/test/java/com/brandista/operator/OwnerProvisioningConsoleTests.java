@@ -1,81 +1,67 @@
 package com.brandista.operator;
 
-import java.io.Console;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.security.KeyStore;
+import java.sql.SQLException;
 import java.util.UUID;
+import javax.net.ssl.SSLHandshakeException;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static com.brandista.operator.OwnerDiagnostics.Failure;
 
 class OwnerProvisioningConsoleTests {
-    @Test void consoleCreatesOnlyFixedOwnerVerifiesCommitRejectsRepeatAndResetsPassword() {
-        var fixture = fixture();
-        Console create = passwordConsole("INITIAL_CREATE", null, "Synthetic-console-secret-1!");
-        assertThat(OwnerProvisioningMain.execute(create, fixture.app(true, false))).isZero();
-        var before = OwnerAccountInspection.inspect(fixture.jdbc());
-        assertThat(before.ready()).isTrue();
-        assertThat(before.baseRole()).isEqualTo("CUSTOMER");
-        String hash = fixture.jdbc().queryForObject("SELECT password_hash FROM users WHERE id=?", String.class, before.id());
-        assertThat(OwnerProvisioningMain.execute(passwordConsole("INITIAL_CREATE", null, "Synthetic-console-secret-2!"),
-                fixture.app(true, false))).isEqualTo(1);
-        assertThat(fixture.jdbc().queryForObject("SELECT password_hash FROM users WHERE id=?", String.class, before.id())).isEqualTo(hash);
-        assertThat(OwnerProvisioningMain.execute(passwordConsole("RESET_PASSWORD", before.id(), "Synthetic-console-secret-3!"),
-                fixture.app(true, true))).isZero();
-        assertThat(OwnerAccountInspection.inspect(fixture.jdbc())).isEqualTo(before);
-        assertThat(fixture.jdbc().queryForObject("SELECT password_hash FROM users WHERE id=?", String.class, before.id())).isNotEqualTo(hash);
-        assertThat(fixture.jdbc().queryForObject("SELECT COUNT(*) FROM users", Integer.class)).isEqualTo(1);
+    @Test void acceptsOnlyNonSecretKnownOptionsAndDoesNotAcceptArbitrarySpringOverrides() {
+        var options=OwnerProvisioningMain.Options.parse(new String[]{"--host","localhost","--port","12345","--truststore","fixture.p12","--verify-only"});
+        assertThat(options.verifyOnly()).isTrue();
+        assertThat(options.port()).isEqualTo(12345);
+        for(String[] args:new String[][]{{},{"--password","secret"},{"--spring.flyway.enabled","true"},
+                {"--host","localhost","--port","0","--truststore","x"},
+                {"--host","localhost/other","--port","3306","--truststore","x"}})
+            assertThatThrownBy(()->OwnerProvisioningMain.Options.parse(args)).isInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test void readOnlyMissingOwnerAndCancelledConfirmationCannotCreateAccount() {
-        var fixture = fixture();
-        Console verify = mock(Console.class);
-        when(verify.readLine(anyString())).thenReturn("VERIFY");
-        assertThat(OwnerProvisioningMain.execute(verify, fixture.app(false, false))).isEqualTo(1);
-        Console cancel = mock(Console.class);
-        when(cancel.readLine(anyString())).thenReturn("INITIAL_CREATE", "CANCEL");
-        assertThat(OwnerProvisioningMain.execute(cancel, fixture.app(true, false))).isEqualTo(2);
-        verify(cancel, never()).readPassword(anyString());
-        assertThat(fixture.jdbc().queryForObject("SELECT COUNT(*) FROM users", Integer.class)).isZero();
-        assertThat(fixture.jdbc().queryForObject("SELECT COUNT(*) FROM security_audit_events", Integer.class)).isZero();
+    @Test void rejectsMissingMalformedAndEmptyTruststoresWithoutRawErrors() throws Exception {
+        var missing=java.nio.file.Path.of("target","missing-owner-"+UUID.randomUUID()+".p12");
+        assertThatThrownBy(()->OwnerProvisioningMain.validateTruststore(missing,"synthetic".toCharArray()))
+                .isInstanceOfSatisfying(OwnerProvisioningMain.Stop.class,e->assertThat(e.failure).isEqualTo(Failure.TRUSTSTORE_INVALID));
+        var empty=Files.createTempFile("owner-empty-", ".p12");
+        try {
+            var store=KeyStore.getInstance("PKCS12"); store.load(null,"synthetic".toCharArray());
+            try(var out=Files.newOutputStream(empty)) { store.store(out,"synthetic".toCharArray()); }
+            assertThatThrownBy(()->OwnerProvisioningMain.validateTruststore(empty,"synthetic".toCharArray()))
+                    .isInstanceOf(OwnerProvisioningMain.Stop.class);
+            assertThatThrownBy(()->OwnerProvisioningMain.validateTruststore(empty,"wrong".toCharArray()))
+                    .isInstanceOf(OwnerProvisioningMain.Stop.class);
+        } finally { Files.deleteIfExists(empty); }
     }
-
-    private Console passwordConsole(String mode, Long id, String password) {
-        Console console = mock(Console.class);
-        String approval = "APPROVED " + mode + " " + OwnerAccountInspection.EMAIL;
-        if (id == null) when(console.readLine(anyString())).thenReturn(mode, approval);
-        else when(console.readLine(anyString())).thenReturn(mode, id.toString(), approval);
-        when(console.readPassword(anyString())).thenReturn(password.toCharArray(), password.toCharArray());
-        return console;
+    @Test void validatesRealFlywayHistoryReadOnlyAndRejectsMissingVersion() {
+        String url="jdbc:h2:mem:owner-history-"+UUID.randomUUID()+";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1";
+        Flyway.configure().dataSource(url,"sa", "").load().migrate();
+        var jdbc=new JdbcTemplate(new DriverManagerDataSource(url,"sa", ""));
+        OwnerProvisioningMain.verifySchema(jdbc);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM users",Integer.class)).isZero();
+        jdbc.update("DELETE FROM flyway_schema_history WHERE version='14'");
+        assertThatThrownBy(()->OwnerProvisioningMain.verifySchema(jdbc)).isInstanceOf(OwnerProvisioningMain.Stop.class);
     }
-
-    private Fixture fixture() {
-        String url = "jdbc:h2:mem:owner-console-" + UUID.randomUUID() + ";MODE=MySQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1";
-        Flyway.configure().dataSource(url, "sa", "").load().migrate();
-        return new Fixture(url);
-    }
-
-    private record Fixture(String url) {
-        JdbcTemplate jdbc() { return new JdbcTemplate(new DriverManagerDataSource(url, "sa", "")); }
-        SpringApplication app(boolean mutation, boolean recovery) {
-            return new SpringApplication(BootstrapMain.OperatorConfiguration.class) {
-                @Override public ConfigurableApplicationContext run(String... args) {
-                    var options = new ArrayList<>(Arrays.asList(args));
-                    // Command-line isolation outranks all ambient deployment datasource settings.
-                    options.add("--spring.datasource.url=" + url);
-                    options.add("--spring.datasource.username=sa");
-                    options.add("--spring.datasource.password=");
-                    options.add("--brandista.security.provisioning.enabled=" + mutation);
-                    options.add("--brandista.security.provisioning.recovery-enabled=" + recovery);
-                    return super.run(options.toArray(String[]::new));
-                }
-            };
-        }
+    @Test void classifiesFailuresWithoutUsingPotentiallySensitiveDriverMessages() {
+        String sensitive="password=do-not-render; jdbc:mysql://private-host; token=do-not-render";
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"28000",1045))).isEqualTo(Failure.DATABASE_CREDENTIALS);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"42000",1142))).isEqualTo(Failure.DATABASE_PERMISSION);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"42S02",1146))).isEqualTo(Failure.MIGRATIONS_MISSING);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"42000",1049))).isEqualTo(Failure.DATABASE_MISMATCH);
+        assertThat(OwnerDiagnostics.classify(new IllegalStateException(sensitive,new SSLHandshakeException(sensitive)))).isEqualTo(Failure.TLS_FAILED);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"08001",0,
+                new java.security.cert.CertificateException(sensitive)))).isEqualTo(Failure.TLS_FAILED);
+        assertThat(OwnerDiagnostics.classify(new SQLException(sensitive,"08001",0,
+                new SQLException(sensitive,"28000",1045)))).isEqualTo(Failure.DATABASE_CREDENTIALS);
+        var chained = new SQLException(sensitive, "08001", 0);
+        chained.setNextException(new SQLException(sensitive, "08001", 0,
+                new java.security.cert.CertificateException(sensitive)));
+        assertThat(OwnerDiagnostics.classify(chained)).isEqualTo(Failure.TLS_FAILED);
+        assertThat(OwnerDiagnostics.classify(new java.net.ConnectException(sensitive))).isEqualTo(Failure.CONNECTION_FAILED);
+        assertThat(OwnerDiagnostics.classify(new IllegalStateException(sensitive))).isEqualTo(Failure.OPERATOR_STARTUP);
+        for(var reason:Failure.values()) assertThat(reason.explanation).doesNotContain(sensitive,"do-not-render");
     }
 }

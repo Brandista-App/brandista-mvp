@@ -12,6 +12,7 @@ on:
       - 'scripts/production-owner.ps1'
       - 'scripts/test-production-owner.ps1'
       - 'scripts/test-production-owner-exit.ps1'
+      - 'scripts/test-owner-packaged.py'
       - 'docs/deployment/**'
       - 'src/**'
       - 'pom.xml'
@@ -25,6 +26,45 @@ on:
 permissions:
   contents: read
 jobs:
+  owner-packaged-windows:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        console: [powershell, pwsh]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Build the actual operator JAR and isolated fixture classes
+        shell: pwsh
+        run: ./mvnw.cmd --batch-mode --no-transfer-progress verify
+      - name: Prepare pinned native MySQL and real Windows terminal test dependencies
+        shell: pwsh
+        run: |
+          python -m pip install pywinpty==3.1.0 cryptography==46.0.3
+          if ($LASTEXITCODE -ne 0) { throw 'Terminal test dependencies failed' }
+          Invoke-WebRequest 'https://cdn.mysql.com/Downloads/MySQL-8.4/mysql-8.4.11-winx64.zip' -OutFile target/mysql-owner.zip
+          if ((Get-FileHash target/mysql-owner.zip -Algorithm SHA256).Hash -ne 'A492371D687D2BAB088B0062581144A0044B8964BAEFDF4FAA579292B423D25C') { throw 'MySQL archive integrity check failed' }
+          Expand-Archive target/mysql-owner.zip target/mysql-owner
+      - name: Exercise real console, packaged JAR, masked input and TLS MySQL
+        shell: pwsh
+        run: python scripts/test-owner-packaged.py --mysql-bin target/mysql-owner/mysql-8.4.11-winx64/bin --shell ${{ matrix.console }}
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: owner-packaged-${{ matrix.console }}-results
+          path: target/owner-packaged-evidence/results.json
+          if-no-files-found: warn
+          retention-days: 14
+
   owner-wrapper:
     runs-on: windows-latest
     timeout-minutes: 5
