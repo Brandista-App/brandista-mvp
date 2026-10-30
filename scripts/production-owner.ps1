@@ -53,7 +53,12 @@ if (!$ReviewedCommit) {
     $ReviewedCommit = (& git -C $repo rev-parse origin/main | Out-String).Trim()
     if ($head -ne $ReviewedCommit) {
         & git -C $repo merge-base --is-ancestor HEAD origin/main
-        if ($LASTEXITCODE -ne 0) { throw 'This revision is not on reviewed origin/main. Merge/review the PR first; no checkout changes were made.' }
+        if ($LASTEXITCODE -ne 0) {
+            # A squash/rebase merge changes commit IDs while retaining the reviewed
+            # tree. Permit that exact content match, never an unreviewed tree.
+            & git -C $repo diff --quiet HEAD origin/main --
+            if ($LASTEXITCODE -ne 0) { throw 'This revision is not on reviewed origin/main. Merge/review the PR first; no checkout changes were made.' }
+        }
         $switchOutput = Invoke-OwnerTool 'git' @('-C',$repo,'switch','main')
         if ($switchOutput.ExitCode -ne 0) { throw 'Cannot safely select local main; no passwords were requested.' }
         $updateOutput = Invoke-OwnerTool 'git' @('-C',$repo,'merge','--ff-only','origin/main')

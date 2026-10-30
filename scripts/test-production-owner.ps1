@@ -29,12 +29,25 @@ exit /b 1
 "@ | Set-Content (Join-Path $fixtureRepo 'mvnw.cmd')
 $head='aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 @{commit=$head;sha256=(Get-FileHash $fixtureJar -Algorithm SHA256).Hash} | ConvertTo-Json | Set-Content (Join-Path $fixtureRepo 'target/owner-reviewed-build.json')
-$global:ownerWrapperFixture=@{repo=(Resolve-Path $fixtureRepo).Path;head=$head}
+$global:ownerWrapperFixture=@{repo=(Resolve-Path $fixtureRepo).Path;head=$head;main=$head;treeMatch=$false;switches=0;
+    marker=(Join-Path $fixtureRepo 'target/owner-reviewed-build.json');sha=(Get-FileHash $fixtureJar -Algorithm SHA256).Hash}
 function git {
     $global:LASTEXITCODE=0
     if ($args -contains '--show-toplevel') { return $global:ownerWrapperFixture.repo }
     if ($args -contains 'get-url') { return 'https://github.com/Brandista-App/brandista-mvp.git' }
     if ($args -contains '--porcelain') { return }
+    if ($args -contains 'fetch') { return }
+    if ($args -contains '--is-ancestor') { $global:LASTEXITCODE=1; return }
+    if ($args -contains 'diff') { $global:LASTEXITCODE=if($global:ownerWrapperFixture.treeMatch){0}else{1}; return }
+    if ($args -contains 'switch') { $global:ownerWrapperFixture.switches++; return }
+    if ($args -contains '--ff-only') {
+        $global:ownerWrapperFixture.head=$global:ownerWrapperFixture.main
+        # Same synthetic artifact for a content-identical reviewed fixture revision.
+        @{commit=$global:ownerWrapperFixture.head;sha256=$global:ownerWrapperFixture.sha} | ConvertTo-Json |
+            Set-Content $global:ownerWrapperFixture.marker
+        return
+    }
+    if (($args -contains 'rev-parse') -and ($args -contains 'origin/main')) { return $global:ownerWrapperFixture.main }
     if ($args -contains 'rev-parse') { return $global:ownerWrapperFixture.head }
     throw 'Unexpected Git command in fixture'
 }
@@ -60,6 +73,18 @@ try {
     try{& $launcher @arguments}catch{if($_.Exception.Message -notmatch 'code 25'){throw};$rejected=$true}
     if(!$rejected){throw 'Java failure was ignored'}
     if($env:SPRING_APPLICATION_JSON -ne '{"synthetic_prior":true}') {throw 'Failure environment restoration failed'}
+    $env:OWNER_WRAPPER_EXIT='0'
+    $defaultArguments=$arguments.Clone()
+    $defaultArguments.Remove('ReviewedCommit')
+    & $launcher @defaultArguments
+    $global:ownerWrapperFixture.main='bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    $rejected=$false
+    try{& $launcher @defaultArguments}catch{if($_.Exception.Message -notmatch 'not on reviewed'){throw};$rejected=$true}
+    if(!$rejected -or $global:ownerWrapperFixture.switches -ne 0){throw 'Unreviewed tree was allowed to update'}
+    $global:ownerWrapperFixture.treeMatch=$true
+    & $launcher @defaultArguments
+    if($global:ownerWrapperFixture.switches -ne 1 -or $global:ownerWrapperFixture.head -ne $global:ownerWrapperFixture.main){throw 'Reviewed squash-merge update failed'}
+    $arguments.ReviewedCommit=$global:ownerWrapperFixture.head
     $env:JAVA_TOOL_OPTIONS='-Dsynthetic.fixture=true'
     $rejected=$false
     try{& $launcher @arguments}catch{$rejected=$true}
@@ -69,7 +94,7 @@ try {
     $rejected=$false
     try{& $launcher @arguments}catch{if($_.Exception.Message -notmatch 'build failed'){throw};$rejected=$true}
     if(!$rejected){throw 'Tampered cached artifact was trusted'}
-    Write-Output 'PASS: launcher prerequisites, non-secret argv, reviewed revision/JAR integrity, Java/build failure propagation, environment cleanup and injection rejection.'
+    Write-Output 'PASS: launcher prerequisites, non-secret argv, reviewed revision/JAR integrity, reviewed squash update, unreviewed-tree rejection, Java/build failure propagation, environment cleanup and injection rejection.'
 } finally {
     foreach($name in $names){[Environment]::SetEnvironmentVariable($name,$prior[$name])}
     Remove-Item Function:git -ErrorAction SilentlyContinue
