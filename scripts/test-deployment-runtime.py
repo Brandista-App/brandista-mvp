@@ -148,15 +148,15 @@ try:
     migrator, base = launch("migrate", "brandista_migrator", migration_password, options=True)
     wait_ready(migrator, base)
     history = sql("SELECT version,success FROM brandista.flyway_schema_history ORDER BY installed_rank").stdout
-    if len(history.strip().splitlines()) != 14 or history.strip().splitlines()[-1] != "14\t1":
-        raise AssertionError("Flyway V1-V14 did not all succeed")
+    if history.strip().splitlines() != [f"{version}\t1" for version in range(1, 16)]:
+        raise AssertionError("Flyway V1-V15 did not all succeed")
     (EVIDENCE / "flyway-history.tsv").write_text(history)
     run("docker", "stop", migrator)
     tables = sql("SHOW TABLES FROM brandista").stdout.splitlines()
     for table in tables:
         privileges = ("SELECT" if table == "flyway_schema_history" else
                       "SELECT,UPDATE" if table == "security_provisioning_state" else
-                      "SELECT,INSERT" if table in ("security_audit_events", "merchant_order_events") else
+                      "SELECT,INSERT" if table in ("security_audit_events", "merchant_order_events", "app_content_history", "app_content_images") else
                       "SELECT,INSERT,UPDATE,DELETE")
         sql(f"GRANT {privileges} ON brandista.`{table}` TO 'brandista_app'@'%';")
     if sql("UPDATE brandista.security_audit_events SET reason=reason WHERE 1=0",

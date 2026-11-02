@@ -12,6 +12,9 @@ a previous published snapshot, replacing the current draft; the admin UI confirm
 
 Flyway V15 creates `app_content`, `app_content_history`, and `app_content_images`.
 It changes no existing identity, onboarding, inventory, order or catalogue records.
+The runtime database user needs SELECT/UPDATE on `app_content` and SELECT/INSERT on
+`app_content_history` and `app_content_images`; migration DDL belongs to the migration
+user. History/image registries do not require runtime UPDATE or DELETE permissions.
 Categories are Phase 1's collections; there is no second collection catalogue.
 Featured references must point to active brands/categories when saved/published.
 References deactivated later are omitted from public responses. Duplicate IDs,
