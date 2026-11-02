@@ -26,6 +26,31 @@ on:
 permissions:
   contents: read
 jobs:
+  mysql-content:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4.11
+        env:
+          MYSQL_ROOT_PASSWORD: content-fixture-only
+          MYSQL_DATABASE: brandista_content_verify
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pcontent-fixture-only"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw --batch-mode --no-transfer-progress -Dtest=ContentMigrationTests test
+        env:
+          CONTENT_TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/brandista_content_verify?useSSL=false&allowPublicKeyRetrieval=true
+          CONTENT_TEST_MYSQL_PASSWORD: content-fixture-only
   owner-packaged-windows:
     runs-on: windows-latest
     timeout-minutes: 35
