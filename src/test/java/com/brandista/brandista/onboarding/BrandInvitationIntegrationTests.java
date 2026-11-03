@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static com.brandista.brandista.privilege.SecurityAudit.*;
 
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={"brandista.invitations.auto-on-approval=false",
         "spring.datasource.url=jdbc:h2:mem:invitations-test;MODE=MySQL;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000",
         "spring.datasource.username=sa","spring.datasource.password=","brandista.checkout.cod-enabled=true"})
 @Import(BrandInvitationIntegrationTests.DeliveryFixture.class)
@@ -65,6 +65,8 @@ class BrandInvitationIntegrationTests {
     @Autowired OnboardingPolicy policy;
     @Autowired SecurityInvariant invariant;
     @Autowired InvitationRateLimiter limiter;
+    @Autowired InvitationTokens invitationTokens;
+    @Autowired MerchantInvitationDelivery merchantDelivery;
     @Autowired PlatformTransactionManager transactions;
     @Autowired CaptureDelivery delivery;
     @Autowired com.brandista.brandista.brand.BrandRepository brands;
@@ -320,7 +322,7 @@ class BrandInvitationIntegrationTests {
         long id=response.getBody().path("id").asLong();
         assertThat(delivery.messages.get(id).email()).isEqualTo(recipient.getEmail());
         assertThat(call(HttpMethod.POST,"/api/v1/brand-invitations/accept",recipientToken,
-                Map.of("token",raw(id),"brandId",brandB,"userId",other.getId(),"role","SUPER_ADMIN")).getStatusCode()).isEqualTo(HttpStatus.OK);
+                Map.of("token",raw(id),"termsAccepted",true,"termsVersion",BrandInvitationService.TERMS_VERSION,"brandId",brandB,"userId",other.getId(),"role","SUPER_ADMIN")).getStatusCode()).isEqualTo(HttpStatus.OK);
         activate();
         assertThat(call(HttpMethod.GET,merchant(brand),recipientToken,null).getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(call(HttpMethod.GET,merchant(brandB),recipientToken,null).getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
@@ -410,7 +412,7 @@ class BrandInvitationIntegrationTests {
         SecurityAudit failing=mock(SecurityAudit.class);
         doThrow(new IllegalStateException("Synthetic audit failure")).when(failing).onboarding(
                 eq(Operation.INVITATION_ACCEPTED),any(),any(),any(),any(),any(),any());
-        var service=new BrandInvitationService(jdbc,access,policy,invariant,failing,delivery,limiter,transactions,Duration.ofHours(24));
+        var service=new BrandInvitationService(jdbc,access,policy,invariant,failing,delivery,limiter,transactions,Duration.ofHours(48),invitationTokens,merchantDelivery,passwords);
         Jwt jwt=decoder.decode(recipientToken);
         try {
             SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt,List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))));
@@ -435,9 +437,9 @@ class BrandInvitationIntegrationTests {
     private ResponseEntity<JsonNode> create(long app) { return call(HttpMethod.POST,base(app)+"/invitations",platformToken,null); }
     private long issue(long app) { var r=create(app); assertThat(r.getStatusCode()).isEqualTo(HttpStatus.CREATED); return r.getBody().path("id").asLong(); }
     private String raw(long id) { return delivery.messages.get(id).token(); }
-    private ResponseEntity<JsonNode> reissue(long id) { return call(HttpMethod.POST,"/api/v1/super-admin/brand-invitations/"+id+"/reissue",platformToken,null); }
+    private ResponseEntity<JsonNode> reissue(long id) { jdbc.update("UPDATE brand_admin_invitations SET created_at=? WHERE id=?",LocalDateTime.now(Clock.systemUTC()).minusMinutes(2),id); return call(HttpMethod.POST,"/api/v1/super-admin/brand-invitations/"+id+"/reissue",platformToken,null); }
     private ResponseEntity<JsonNode> revoke(long id) { return call(HttpMethod.POST,"/api/v1/super-admin/brand-invitations/"+id+"/revoke",platformToken,null); }
-    private ResponseEntity<JsonNode> accept(String raw,String jwt) { return call(HttpMethod.POST,"/api/v1/brand-invitations/accept",jwt,Map.of("token",raw)); }
+    private ResponseEntity<JsonNode> accept(String raw,String jwt) { return call(HttpMethod.POST,"/api/v1/brand-invitations/accept",jwt,Map.of("token",raw,"termsAccepted",true,"termsVersion",BrandInvitationService.TERMS_VERSION)); }
     private ResponseEntity<JsonNode> activate() { return call(HttpMethod.POST,base(application)+"/activate",platformToken,null); }
     private JsonNode state() { return call(HttpMethod.GET,base(application)+"/onboarding",platformToken,null).getBody(); }
     private String merchant(long id) { return "/api/v1/merchant/brands/"+id+"/products"; }
