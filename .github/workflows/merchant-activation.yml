@@ -29,6 +29,12 @@ jobs:
         env:
           MERCHANT_TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/brandista_merchant_verify?useSSL=false&allowPublicKeyRetrieval=true
           MERCHANT_TEST_MYSQL_PASSWORD: merchant-fixture-only
+      - run: mysql -h 127.0.0.1 -u root -pmerchant-fixture-only -e 'CREATE DATABASE brandista_merchant_api_verify'
+      - name: Real MySQL merchant approval, delivery state, registration and isolation
+        run: ./mvnw --batch-mode --no-transfer-progress -Dtest=MerchantActivationIntegrationTests test
+        env:
+          MERCHANT_API_TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/brandista_merchant_api_verify?useSSL=false&allowPublicKeyRetrieval=true
+          MERCHANT_TEST_MYSQL_PASSWORD: merchant-fixture-only
   browser-acceptance:
     runs-on: ubuntu-latest
     timeout-minutes: 15

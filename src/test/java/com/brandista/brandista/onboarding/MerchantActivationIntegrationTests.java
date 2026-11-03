@@ -26,6 +26,15 @@ import static org.mockito.Mockito.*;
     "brandista.invitations.initial-delay-ms=86400000"})
 @Import(MerchantActivationIntegrationTests.ProviderFixture.class)
 class MerchantActivationIntegrationTests {
+    @org.springframework.test.context.DynamicPropertySource
+    static void mysql(org.springframework.test.context.DynamicPropertyRegistry properties){
+        String url=System.getenv("MERCHANT_API_TEST_MYSQL_URL");
+        if(url==null)return;
+        if(!url.matches("jdbc:mysql://127\\.0\\.0\\.1:[0-9]+/brandista_merchant_api_verify\\?.*"))throw new IllegalArgumentException("Only a disposable local merchant API test schema is allowed.");
+        properties.add("spring.datasource.url",()->url);
+        properties.add("spring.datasource.username",()->"root");
+        properties.add("spring.datasource.password",()->System.getenv("MERCHANT_TEST_MYSQL_PASSWORD"));
+    }
     @TestConfiguration static class ProviderFixture {
         @Bean @Primary MerchantEmailProvider fixtureProvider(){return mock(MerchantEmailProvider.class);}
     }
@@ -133,7 +142,7 @@ class MerchantActivationIntegrationTests {
         delivery.process();assertThat(state()).isEqualTo("FAILED");
         verify(provider,times(1)).send(anyString(),eq(email),anyString(),eq(raw),anyString());
     }
-    @Test void exhaustedCrashRecoveryAndChangedTokenKeysNeverSendAgain(){
+    @Test void exhaustedCrashRecoveryNeverSendsAgain(){
         jdbc.update("UPDATE merchant_invitation_delivery SET state='SENDING',attempts=6,lease_until=?,next_attempt_at=? WHERE invitation_id=?",LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),invitation);
         delivery.process();assertThat(state()).isEqualTo("FAILED");verifyNoInteractions(provider);
     }

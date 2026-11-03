@@ -141,7 +141,8 @@ public class BrandInvitationService {
         var rows=jdbc.queryForList("SELECT window_started_at,attempts FROM merchant_registration_limits WHERE bucket_hash=? FOR UPDATE",bucket);
         if(rows.isEmpty())jdbc.update("INSERT INTO merchant_registration_limits(bucket_hash,window_started_at,attempts) VALUES(?,?,1)",bucket,now());
         else {
-            var started=((java.sql.Timestamp)rows.getFirst().get("window_started_at")).toLocalDateTime();
+            Object window=rows.getFirst().get("window_started_at");
+            var started=window instanceof java.sql.Timestamp stamp?stamp.toLocalDateTime():(LocalDateTime)window;
             int count=((Number)rows.getFirst().get("attempts")).intValue();
             if(started.plusMinutes(1).isAfter(now())&&count>=(registration?5:30))throw new OnboardingFailure(TOO_MANY_REQUESTS,"Please wait before trying again.");
             jdbc.update("UPDATE merchant_registration_limits SET attempts=?,window_started_at=? WHERE bucket_hash=?",started.plusMinutes(1).isAfter(now())?count+1:1,started.plusMinutes(1).isAfter(now())?started:now(),bucket);
