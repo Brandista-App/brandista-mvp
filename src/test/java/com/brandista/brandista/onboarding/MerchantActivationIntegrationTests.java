@@ -133,6 +133,10 @@ class MerchantActivationIntegrationTests {
         delivery.process();assertThat(state()).isEqualTo("FAILED");
         verify(provider,times(1)).send(anyString(),eq(email),anyString(),eq(raw),anyString());
     }
+    @Test void exhaustedCrashRecoveryAndChangedTokenKeysNeverSendAgain(){
+        jdbc.update("UPDATE merchant_invitation_delivery SET state='SENDING',attempts=6,lease_until=?,next_attempt_at=? WHERE invitation_id=?",LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),invitation);
+        delivery.process();assertThat(state()).isEqualTo("FAILED");verifyNoInteractions(provider);
+    }
     @Test
     @org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named="MERCHANT_BROWSER_ADMIN_ROOT",matches=".+")
     void realBrowserAcceptanceLoginWorkspaceAndReplay() throws Exception {

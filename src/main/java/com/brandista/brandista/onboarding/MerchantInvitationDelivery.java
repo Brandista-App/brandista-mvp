@@ -40,6 +40,7 @@ public class MerchantInvitationDelivery {
         var row=rows.getFirst();long id=((Number)row.get("invitation_id")).longValue();
         LocalDateTime first=time(row.get("first_attempt_at"));
         if(row.get("revoked_at")!=null||row.get("accepted_at")!=null||!time(row.get("expires_at")).isAfter(now())){finish(id,"CANCELLED",null);return Map.of();}
+        if(((Number)row.get("attempts")).intValue()>=6){finish(id,"FAILED","ATTEMPTS_EXHAUSTED");return Map.of();}
         // Provider idempotency lasts 24h. Never retry an ambiguous send outside that window.
         if(first!=null&&!first.plusHours(23).isAfter(now())){finish(id,"FAILED","RETRY_WINDOW_EXPIRED");return Map.of();}
         jdbc.update("UPDATE merchant_invitation_delivery SET state='SENDING',attempts=attempts+1,first_attempt_at=COALESCE(first_attempt_at,?),lease_until=?,updated_at=? WHERE invitation_id=?",now(),now().plusMinutes(2),now(),id);
