@@ -52,6 +52,7 @@ class MerchantActivationIntegrationTests {
     final String password="Synthetic-Merchant-Password-2026!";
     @BeforeEach void fixture(){
         reset(provider);
+        jdbc.update("UPDATE merchant_invitation_delivery SET state='CANCELLED'");
         jdbc.update("DELETE FROM merchant_registration_limits");
         User operator=users.saveAndFlush(new User(UUID.randomUUID()+"@example.invalid",passwords.encode(password),UserRole.CUSTOMER,AccountStatus.ENABLED));
         grants.saveAndFlush(new PlatformGrant(operator,PlatformGrantType.SUPER_ADMIN));
@@ -68,7 +69,7 @@ class MerchantActivationIntegrationTests {
     }
     @Test void endToEndApprovalDeliveryRegistrationLoginAndBrandIsolation(){
         var row=jdbc.queryForMap("SELECT * FROM brand_admin_invitations WHERE id=?",invitation);
-        assertThat(Duration.between(((java.sql.Timestamp)row.get("created_at")).toLocalDateTime(),((java.sql.Timestamp)row.get("expires_at")).toLocalDateTime())).isEqualTo(Duration.ofHours(48));
+        assertThat(Duration.between(time(row.get("created_at")),time(row.get("expires_at")))).isEqualTo(Duration.ofHours(48));
         assertThat(row.get("token_hash")).isEqualTo(InvitationTokens.hash(raw));
         assertThat(jdbc.queryForList("SELECT * FROM merchant_invitation_delivery WHERE invitation_id=?",invitation).toString()).doesNotContain(raw);
         assertThat(state()).isEqualTo("QUEUED");
@@ -168,6 +169,7 @@ class MerchantActivationIntegrationTests {
         assertThat(process.exitValue()).as("Read sanitized target/merchant-browser.log").isZero();
         verifyNoInteractions(provider);
     }
+    private static LocalDateTime time(Object value){return value instanceof java.sql.Timestamp stamp?stamp.toLocalDateTime():(LocalDateTime)value;}
     private String state(){return jdbc.queryForObject("SELECT state FROM merchant_invitation_delivery WHERE invitation_id=?",String.class,invitation);}
     private ResponseEntity<JsonNode> complete(String token,String recipient,String secret,boolean terms){return call(HttpMethod.POST,"/api/v1/merchant-registration/complete",null,Map.of("token",token,"email",recipient,"password",secret,"termsAccepted",terms,"termsVersion",BrandInvitationService.TERMS_VERSION));}
     private String login(String recipient,String secret){var response=call(HttpMethod.POST,"/api/v1/auth/login",null,Map.of("email",recipient,"password",secret));assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);return response.getBody().path("accessToken").asText();}
