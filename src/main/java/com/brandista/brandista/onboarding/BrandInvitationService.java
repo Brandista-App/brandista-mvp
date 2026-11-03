@@ -303,7 +303,8 @@ public class BrandInvitationService {
                 row.getObject("expected_membership_version",Long.class),row.getObject("replaces_invitation_id",Long.class),row.getObject("accepted_user_id",Long.class));
     }
     private LocalDateTime timestamp(java.sql.ResultSet row,String column) throws java.sql.SQLException { var value=row.getTimestamp(column); return value==null?null:value.toLocalDateTime(); }
-    private static LocalDateTime now() { return LocalDateTime.now(Clock.systemUTC()); }
+    // DATETIME(6) precision: truncation prevents DB rounding an immediate expiry into the future.
+    private static LocalDateTime now() { return LocalDateTime.now(Clock.systemUTC()).truncatedTo(java.time.temporal.ChronoUnit.MICROS); }
     private String hash(String token) {
         try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.US_ASCII))); }
         catch(NoSuchAlgorithmException unavailable) { throw new IllegalStateException("Invitation hashing unavailable."); }
