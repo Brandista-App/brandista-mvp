@@ -20,6 +20,8 @@ public class BrandInvitationController {
             @RequestParam(defaultValue="50") @Min(1) @Max(100) int size) { return service.list(id,page,size); }
     @PostMapping("/brand-invitations/{id}/revoke")
     public BrandInvitationService.Status revoke(@PathVariable @Positive long id) { return service.revoke(id); }
+    @PostMapping("/brand-invitations/{id}/expire")
+    public BrandInvitationService.Status expire(@PathVariable @Positive long id) { return service.expire(id); }
     @PostMapping("/brand-invitations/{id}/reissue") @ResponseStatus(HttpStatus.CREATED)
     public BrandInvitationService.Status reissue(@PathVariable @Positive long id) { return service.reissue(id); }
     @GetMapping("/brand-applications/{id}/onboarding")

@@ -91,6 +91,17 @@ public class BrandInvitationService {
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     @Transactional(isolation=Isolation.READ_COMMITTED)
+    public Status expire(long id) {
+        policy.superAdmin(Operation.INVITATION_EXPIRED,null,null,id);
+        Invitation invitation=find(id);
+        if(!invitation.state().equals("PENDING"))throw conflict(Operation.INVITATION_EXPIRED,invitation,"Only a pending invitation can be expired.");
+        jdbc.update("UPDATE brand_admin_invitations SET expires_at=? WHERE id=?",now(),id);
+        audit.onboarding(Operation.INVITATION_EXPIRED,null,invitation.brand,id,invitation.application,Outcome.SUCCESS,Reason.COMPLETED);
+        return safeStatus(find(id));
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Transactional(isolation=Isolation.READ_COMMITTED)
     public Page list(long applicationId,int page,int size) {
         policy.superAdmin(Operation.PRIVILEGED_ACCESS,applicationId,null,null);
         application(applicationId);

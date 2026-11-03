@@ -146,6 +146,13 @@ class MerchantActivationIntegrationTests {
         jdbc.update("UPDATE merchant_invitation_delivery SET state='SENDING',attempts=6,lease_until=?,next_attempt_at=? WHERE invitation_id=?",LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),LocalDateTime.now(Clock.systemUTC()).minusMinutes(3),invitation);
         delivery.process();assertThat(state()).isEqualTo("FAILED");verifyNoInteractions(provider);
     }
+    @Test void onlySuperAdminCanExpireAnInvitationAndExpiredLinksCannotRegister(){
+        String path="/api/v1/super-admin/brand-invitations/"+invitation+"/expire";
+        assertThat(call(HttpMethod.POST,path,null,null).getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
+        assertThat(call(HttpMethod.POST,path,admin,null).getBody().path("status").asText()).isEqualTo("EXPIRED");
+        assertThat(complete(raw,email,password,true).getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        delivery.process();assertThat(state()).isEqualTo("CANCELLED");verifyNoInteractions(provider);
+    }
     @Test
     @org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable(named="MERCHANT_BROWSER_ADMIN_ROOT",matches=".+")
     void realBrowserAcceptanceLoginWorkspaceAndReplay() throws Exception {
