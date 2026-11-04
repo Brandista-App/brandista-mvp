@@ -55,12 +55,17 @@ and `termsVersion:"merchant-v1-2026-11"`; update any operator scripts before use
    | `MERCHANT_INVITATION_TOKEN_KEY_BASE64` | Base64 of 32 cryptographically random bytes, separate from JWT secret |
    | `RESEND_API_KEY` | Backend secret with email send/read and domain-read access for this account |
    | `RESEND_DOMAIN_ID` | The verified sender domain's ID |
-   | `MERCHANT_SENDER_EMAIL` | Plain mailbox on that exact domain, e.g. `partners@mail.brandistaapp.com` |
+   | `MERCHANT_SENDER_EMAIL` | `marketing@brandistaapp.com`; sent as `Brandista <marketing@brandistaapp.com>` |
    | `MERCHANT_REGISTRATION_ORIGIN` | Actual admin HTTPS origin, no trailing slash/path/query, e.g. `https://admin.brandistaapp.com` |
    | `CORS_ALLOWED_ORIGINS` | Include the exact registration/admin HTTPS origin, preserve existing permitted clients |
 
    Existing datasource/JWT/TLS settings stay required. Configure secret values through
    the hosting secret store after approval. Never include credentials in PRs.
+   The configured domain ID must refer to verified `brandistaapp.com`, not the
+   separate `mail.brandistaapp.com` identity. Add only the provider-issued DKIM and
+   dedicated bounce-subdomain records; preserve Google Workspace root MX/SPF/DKIM.
+   Keep receiving disabled in Resend. The controlled test recipient must be a
+   separately authorized operator-controlled inbox, never the official sender.
 5. Deploy backend first, then admin built with `VITE_API_BASE_URL` pointing to the
    deployed HTTPS `/api/v1`. SPA fallback must serve `/accept-invitation` and
    `/merchant-terms`; preserve Referrer-Policy no-referrer and disable analytics/session
