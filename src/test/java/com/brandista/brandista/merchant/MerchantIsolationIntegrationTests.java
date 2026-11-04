@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT, properties={"brandista.invitations.auto-on-approval=false",
         "spring.datasource.url=jdbc:h2:mem:merchant-test;MODE=MySQL;DB_CLOSE_DELAY=-1;LOCK_TIMEOUT=10000",
         "spring.datasource.username=sa", "spring.datasource.password="})
 class MerchantIsolationIntegrationTests {

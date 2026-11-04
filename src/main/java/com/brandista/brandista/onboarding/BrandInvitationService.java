@@ -20,7 +20,8 @@ import static org.springframework.http.HttpStatus.*;
 @Service
 public class BrandInvitationService {
     public record Status(long id,long applicationId,long brandId,String recipientEmail,String status,
-                         LocalDateTime createdAt,LocalDateTime expiresAt,Long replacesInvitationId,Long acceptedUserId) { }
+                         LocalDateTime createdAt,LocalDateTime expiresAt,Long replacesInvitationId,Long acceptedUserId,DeliveryStatus delivery) { }
+    public record DeliveryStatus(String state,int attempts,String errorCode,String providerId) { }
     public record Page(List<Status> content,int page,int size,long totalElements) { }
     public record State(long applicationId,String applicationStatus,Long brandId,String brandStatus,boolean activationEligible) { }
     public record Accepted(long invitationId,long brandId,long membershipId) { }
@@ -28,7 +29,7 @@ public class BrandInvitationService {
     private record Invitation(long id,long application,long brand,String email,LocalDateTime created,LocalDateTime expires,
                               LocalDateTime revoked,LocalDateTime accepted,Long expectedVersion,Long replaces,Long acceptedUser) {
         String state() { return accepted!=null?"ACCEPTED":revoked!=null?"REVOKED":!expires.isAfter(now())?"EXPIRED":"PENDING"; }
-        Status safe() { return new Status(id,application,brand,email,state(),created,expires,replaces,acceptedUser); }
+        Status safe() { return new Status(id,application,brand,email,state(),created,expires,replaces,acceptedUser,null); }
     }
     private final JdbcTemplate jdbc;
     private final BrandAccess access;
@@ -39,13 +40,16 @@ public class BrandInvitationService {
     private final InvitationRateLimiter limiter;
     private final TransactionTemplate acceptance;
     private final Duration ttl;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwords;
+    private final InvitationTokens tokens;
+    private final MerchantInvitationDelivery emails;
     private final SecureRandom random=new SecureRandom();
 
     public BrandInvitationService(JdbcTemplate jdbc,BrandAccess access,OnboardingPolicy policy,SecurityInvariant invariant,
             SecurityAudit audit,InvitationDelivery delivery,InvitationRateLimiter limiter,PlatformTransactionManager manager,
-            @Value("${brandista.invitations.ttl:PT24H}") Duration ttl) {
+            @Value("${brandista.invitations.ttl:PT48H}") Duration ttl, InvitationTokens tokens, MerchantInvitationDelivery emails, org.springframework.security.crypto.password.PasswordEncoder passwords) {
         this.jdbc=jdbc; this.access=access; this.policy=policy; this.invariant=invariant; this.audit=audit;
-        this.delivery=delivery; this.limiter=limiter; this.ttl=ttl;
+        this.delivery=delivery; this.limiter=limiter; this.ttl=Duration.ofHours(48); this.tokens=tokens;this.emails=emails;this.passwords=passwords;
         if(ttl.compareTo(Duration.ofMinutes(5))<0 || ttl.compareTo(Duration.ofDays(7))>0)
             throw new IllegalArgumentException("Invitation TTL must be between five minutes and seven days.");
         acceptance=new TransactionTemplate(manager);
@@ -65,6 +69,7 @@ public class BrandInvitationService {
     public Status reissue(long id) {
         policy.superAdmin(Operation.INVITATION_REISSUED,null,null,id);
         Invitation previous=find(id);
+        if(previous.created.plusMinutes(1).isAfter(now())) throw new OnboardingFailure(TOO_MANY_REQUESTS,"Wait one minute before resending an invitation.");
         if(previous.accepted!=null || previous.revoked!=null) throw conflict(Operation.INVITATION_REISSUED,previous,"Invitation cannot be reissued.");
         jdbc.update("UPDATE brand_admin_invitations SET revoked_at=? WHERE id=?",now(),id);
         audit.onboarding(Operation.INVITATION_REVOKED,null,previous.brand,id,previous.application,Outcome.SUCCESS,Reason.COMPLETED);
@@ -81,7 +86,18 @@ public class BrandInvitationService {
         if(invitation.accepted!=null || invitation.revoked!=null) throw conflict(Operation.INVITATION_REVOKED,invitation,"Invitation is not pending.");
         jdbc.update("UPDATE brand_admin_invitations SET revoked_at=? WHERE id=?",now(),id);
         audit.onboarding(Operation.INVITATION_REVOKED,null,invitation.brand,id,invitation.application,Outcome.SUCCESS,Reason.COMPLETED);
-        return find(id).safe();
+        return safeStatus(find(id));
+    }
+
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @Transactional(isolation=Isolation.READ_COMMITTED)
+    public Status expire(long id) {
+        policy.superAdmin(Operation.INVITATION_EXPIRED,null,null,id);
+        Invitation invitation=find(id);
+        if(!invitation.state().equals("PENDING"))throw conflict(Operation.INVITATION_EXPIRED,invitation,"Only a pending invitation can be expired.");
+        jdbc.update("UPDATE brand_admin_invitations SET expires_at=? WHERE id=?",now(),id);
+        audit.onboarding(Operation.INVITATION_EXPIRED,null,invitation.brand,id,invitation.application,Outcome.SUCCESS,Reason.COMPLETED);
+        return safeStatus(find(id));
     }
 
     @PreAuthorize("hasRole('SUPER_ADMIN')")
@@ -92,7 +108,7 @@ public class BrandInvitationService {
         if(page<0 || size<1 || size>100 || page>100000) throw new OnboardingFailure(BAD_REQUEST,"Invalid pagination.");
         var rows=jdbc.query("SELECT * FROM brand_admin_invitations WHERE application_id=? ORDER BY id DESC LIMIT ? OFFSET ?",
                 (row,index)->map(row),applicationId,size,(long)page*size);
-        return new Page(rows.stream().map(Invitation::safe).toList(),page,size,
+        return new Page(rows.stream().map(this::safeStatus).toList(),page,size,
                 jdbc.queryForObject("SELECT COUNT(*) FROM brand_admin_invitations WHERE application_id=?",Long.class,applicationId));
     }
 
@@ -126,9 +142,67 @@ public class BrandInvitationService {
         return result;
     }
 
+    public static final String TERMS_VERSION="merchant-v1-2026-11";
+    public record Preview(String brandName,String recipientEmail,LocalDateTime expiresAt,String termsVersion,boolean existingAccount) { }
+
+    @Transactional(isolation=Isolation.READ_COMMITTED)
+    public void publicBudget(String remote,boolean registration) {
+        invariant.lock();
+        String bucket=InvitationTokens.hash((registration?"register:":"verify:")+remote);
+        var rows=jdbc.queryForList("SELECT window_started_at,attempts FROM merchant_registration_limits WHERE bucket_hash=? FOR UPDATE",bucket);
+        if(rows.isEmpty())jdbc.update("INSERT INTO merchant_registration_limits(bucket_hash,window_started_at,attempts) VALUES(?,?,1)",bucket,now());
+        else {
+            Object window=rows.getFirst().get("window_started_at");
+            var started=window instanceof java.sql.Timestamp stamp?stamp.toLocalDateTime():(LocalDateTime)window;
+            int count=((Number)rows.getFirst().get("attempts")).intValue();
+            if(started.plusMinutes(1).isAfter(now())&&count>=(registration?5:30))throw new OnboardingFailure(TOO_MANY_REQUESTS,"Please wait before trying again.");
+            jdbc.update("UPDATE merchant_registration_limits SET attempts=?,window_started_at=? WHERE bucket_hash=?",started.plusMinutes(1).isAfter(now())?count+1:1,started.plusMinutes(1).isAfter(now())?started:now(),bucket);
+        }
+        jdbc.update("DELETE FROM merchant_registration_limits WHERE window_started_at<?",now().minusDays(1));
+    }
+    private Invitation usable(String token) {
+        if(token==null||!token.matches("[A-Za-z0-9_-]{43}"))throw invalidInvitation();
+        var rows=jdbc.query("SELECT * FROM brand_admin_invitations WHERE token_hash=? FOR UPDATE",(r,n)->map(r),hash(token));
+        if(rows.isEmpty())throw invalidInvitation();
+        Invitation invite=rows.getFirst();
+        if(!invite.state().equals("PENDING")||jdbc.queryForObject("SELECT COUNT(*) FROM brand_applications WHERE id=? AND brand_id=? AND contact_email=? AND status='APPROVED'",Long.class,invite.application,invite.brand,invite.email)!=1)throw invalidInvitation();
+        return invite;
+    }
+    private OnboardingFailure invalidInvitation(){return new OnboardingFailure(BAD_REQUEST,"Invitation is unavailable, expired, or already used. Request a new invitation from Brandista.");}
+    @Transactional(isolation=Isolation.READ_COMMITTED)
+    public Preview preview(String token) {
+        Invitation invite=usable(token);
+        return new Preview(jdbc.queryForObject("SELECT name FROM brands WHERE id=?",String.class,invite.brand),invite.email,invite.expires,TERMS_VERSION,
+            jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE email=?",Long.class,invite.email)>0);
+    }
+    @Transactional(isolation=Isolation.READ_COMMITTED)
+    public Accepted register(MerchantRegistrationController.Register request) {
+        invariant.lock();
+        Invitation invite=usable(request.token());
+        if(!request.termsAccepted()||!TERMS_VERSION.equals(request.termsVersion())||!invite.email.equals(com.brandista.brandista.user.EmailNormalizer.normalize(request.email())))throw invalidInvitation();
+        var users=jdbc.queryForList("SELECT id,password_hash,status,role FROM users WHERE email=? FOR UPDATE",invite.email);
+        long user;
+        if(users.isEmpty()) {
+            // The unique email constraint also handles a concurrent ordinary registration.
+            try {jdbc.update("INSERT INTO users(email,password_hash,role,status,created_at,updated_at) VALUES(?,?,'CUSTOMER','ENABLED',?,?)",invite.email,passwords.encode(request.password()),now(),now());}
+            catch(org.springframework.dao.DataIntegrityViolationException concurrent){throw new OnboardingFailure(CONFLICT,"Account already exists. Verify the invitation again and enter the existing account password.");}
+            user=jdbc.queryForObject("SELECT id FROM users WHERE email=?",Long.class,invite.email);
+        } else {
+            var account=users.getFirst();
+            if(!"ENABLED".equals(account.get("status"))||!passwords.matches(request.password(),(String)account.get("password_hash")))throw invalidInvitation();
+            user=((Number)account.get("id")).longValue();
+        }
+        Accepted result=acceptWithin(user,request.token());
+        if(result==null)throw invalidInvitation();
+        jdbc.update("UPDATE brand_admin_invitations SET terms_version=?,terms_accepted_at=? WHERE id=?",TERMS_VERSION,now(),invite.id);
+        jdbc.update("UPDATE brands SET status='ACTIVE',updated_at=? WHERE id=?",now(),invite.brand);
+        audit.onboarding(Operation.BRAND_ACTIVATED,user,invite.brand,invite.id,invite.application,Outcome.SUCCESS,Reason.COMPLETED);
+        return result;
+    }
+
     private Accepted acceptWithin(long user,String token) {
         invariant.lock();
-        access.currentUser(); // Account status may have changed after the quota transaction.
+        if(jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE id=? AND status='ENABLED'",Long.class,user)!=1)return rejected(user,null);
         if(token==null || !token.matches("[A-Za-z0-9_-]{43}")) return rejected(user,null);
         var matches=jdbc.query("SELECT * FROM brand_admin_invitations WHERE token_hash=? FOR UPDATE",(row,index)->map(row),hash(token));
         if(matches.isEmpty()) return rejected(user,null);
@@ -148,11 +222,14 @@ public class BrandInvitationService {
         jdbc.update("UPDATE brand_admin_invitations SET accepted_at=?,accepted_user_id=?,membership_id=?,accepted_membership_version=? WHERE id=?",
                 now(),user,membership,version,invitation.id);
         if(changed) audit.onboarding(Operation.BRAND_MEMBERSHIP_GRANTED,user,invitation.brand,invitation.id,invitation.application,Outcome.SUCCESS,Reason.COMPLETED);
+        jdbc.update("UPDATE brand_admin_invitations SET terms_version=?,terms_accepted_at=? WHERE id=?",TERMS_VERSION,now(),invitation.id);
         audit.onboarding(Operation.INVITATION_ACCEPTED,user,invitation.brand,invitation.id,invitation.application,Outcome.SUCCESS,Reason.COMPLETED);
         return new Accepted(invitation.id,invitation.brand,membership);
     }
 
     private Status issue(Application app,Long replaces) {
+        if(emails.enabled() && policy.eligible(app.brand))
+            throw new OnboardingFailure(CONFLICT,"This application already has an accepted invitation.");
         if(jdbc.queryForObject("SELECT COUNT(*) FROM brand_admin_invitations WHERE brand_id=? AND recipient_email=? AND accepted_at IS NULL "
                 + "AND revoked_at IS NULL AND expires_at>?",Long.class,app.brand,app.email,now())>0) {
             audit.rejectedOnboarding(Operation.INVITATION_CREATED,null,app.brand,null,app.id,Reason.ALREADY_GRANTED);
@@ -161,19 +238,29 @@ public class BrandInvitationService {
         var versions=jdbc.queryForList("SELECT m.version FROM brand_admin_memberships m JOIN users u ON u.id=m.user_id WHERE u.email=? AND m.brand_id=?",Long.class,app.email,app.brand);
         Long expected=versions.isEmpty()?null:versions.getFirst();
         byte[] entropy=new byte[32]; random.nextBytes(entropy);
-        String token=Base64.getUrlEncoder().withoutPadding().encodeToString(entropy); Arrays.fill(entropy,(byte)0);
+        String nonce=tokens.configured()?tokens.nonce():null;
+        String token=nonce==null?Base64.getUrlEncoder().withoutPadding().encodeToString(entropy):tokens.token(nonce); Arrays.fill(entropy,(byte)0);
         String digest=hash(token);
         LocalDateTime created=now();
         jdbc.update("INSERT INTO brand_admin_invitations(application_id,brand_id,recipient_email,token_hash,created_by,created_at,expires_at,expected_membership_version,replaces_invitation_id) "
                 + "VALUES(?,?,?,?,?,?,?,?,?)",app.id,app.brand,app.email,digest,access.currentUser(),created,created.plus(ttl),expected,replaces);
         long id=jdbc.queryForObject("SELECT id FROM brand_admin_invitations WHERE token_hash=?",Long.class,digest);
-        try { delivery.deliver(id,app.email,token); }
+        jdbc.update("UPDATE brand_admin_invitations SET delivery_nonce=? WHERE id=?",nonce,id);
+        try { if(emails.enabled()) emails.enqueue(id); else delivery.deliver(id,app.email,token); }
         catch(RuntimeException unavailable) {
             audit.rejectedOnboarding(Operation.INVITATION_CREATED,null,app.brand,null,app.id,Reason.DELIVERY_UNAVAILABLE);
             throw new OnboardingFailure(SERVICE_UNAVAILABLE,"Invitation delivery is unavailable.");
         }
         audit.onboarding(Operation.INVITATION_CREATED,null,app.brand,id,app.id,Outcome.SUCCESS,Reason.COMPLETED);
-        return find(id).safe();
+        return safeStatus(find(id));
+    }
+
+    private Status safeStatus(Invitation invitation) {
+        var base=invitation.safe();
+        var rows=jdbc.query("SELECT state,attempts,error_code,provider_id FROM merchant_invitation_delivery WHERE invitation_id=?",
+            (r,n)->new DeliveryStatus(r.getString(1),r.getInt(2),r.getString(3),r.getString(4)),invitation.id);
+        return new Status(base.id(),base.applicationId(),base.brandId(),base.recipientEmail(),base.status(),base.createdAt(),base.expiresAt(),base.replacesInvitationId(),base.acceptedUserId(),
+            rows.isEmpty()?new DeliveryStatus("NOT_TRACKED",0,null,null):rows.getFirst());
     }
 
     private Accepted rejected(long user,Invitation invitation) {
@@ -216,7 +303,8 @@ public class BrandInvitationService {
                 row.getObject("expected_membership_version",Long.class),row.getObject("replaces_invitation_id",Long.class),row.getObject("accepted_user_id",Long.class));
     }
     private LocalDateTime timestamp(java.sql.ResultSet row,String column) throws java.sql.SQLException { var value=row.getTimestamp(column); return value==null?null:value.toLocalDateTime(); }
-    private static LocalDateTime now() { return LocalDateTime.now(Clock.systemUTC()); }
+    // DATETIME(6) precision: truncation prevents DB rounding an immediate expiry into the future.
+    private static LocalDateTime now() { return LocalDateTime.now(Clock.systemUTC()).truncatedTo(java.time.temporal.ChronoUnit.MICROS); }
     private String hash(String token) {
         try { return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.US_ASCII))); }
         catch(NoSuchAlgorithmException unavailable) { throw new IllegalStateException("Invitation hashing unavailable."); }

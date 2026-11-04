@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @EnabledIfEnvironmentVariable(named="BRANDISTA_PROD001_LOAD",matches="1")
 @ActiveProfiles("production")
 @AutoConfigureObservability
-@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={
+@SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT,properties={"brandista.invitations.auto-on-approval=false",
         "server.address=127.0.0.1",
         "spring.jpa.properties.hibernate.session_factory.statement_inspector=com.brandista.brandista.production.Perf001SqlProbe",
         "management.server.port=0", "management.endpoints.web.exposure.include=health,metrics,prometheus",

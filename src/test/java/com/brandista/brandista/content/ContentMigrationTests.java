@@ -21,11 +21,11 @@ class ContentMigrationTests {
   try(var connection=source.getConnection()){ScriptUtils.executeSqlScript(connection,new ClassPathResource("db/brand-membership-upgrade-fixture.sql"));}
   Flyway.configure().dataSource(source).target("14").load().migrate();
   var db=new JdbcTemplate(source);var before=snapshot(db);
-  assertThat(Flyway.configure().dataSource(source).load().migrate().migrationsExecuted).isEqualTo(1);
+  assertThat(Flyway.configure().dataSource(source).target("15").load().migrate().migrationsExecuted).isEqualTo(1);
   assertThat(snapshot(db)).isEqualTo(before);
   assertThat(db.queryForObject("SELECT version FROM app_content WHERE id=1",Long.class)).isZero();
   assertThat(db.queryForObject("SELECT published FROM app_content WHERE id=1",String.class)).isNull();
-  assertThat(Flyway.configure().dataSource(source).load().migrate().migrationsExecuted).isZero();
+  assertThat(Flyway.configure().dataSource(source).target("15").load().migrate().migrationsExecuted).isZero();
   // Exercises the UTF-8 indexed image URL column on real MySQL as well as H2.
   db.update("INSERT INTO app_content_images(url,actor,created_at) VALUES(?,'fixture',CURRENT_TIMESTAMP)","https://images.example.test/app-content/fixture.png");
  }
