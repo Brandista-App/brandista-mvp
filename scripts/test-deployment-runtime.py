@@ -148,8 +148,8 @@ try:
     migrator, base = launch("migrate", "brandista_migrator", migration_password, options=True)
     wait_ready(migrator, base)
     history = sql("SELECT version,success FROM brandista.flyway_schema_history ORDER BY installed_rank").stdout
-    if history.strip().splitlines() != [f"{version}\t1" for version in range(1, 16)]:
-        raise AssertionError("Flyway V1-V15 did not all succeed")
+    if history.strip().splitlines() != [f"{version}\t1" for version in range(1, 17)]:
+        raise AssertionError("Flyway V1-V16 did not all succeed")
     (EVIDENCE / "flyway-history.tsv").write_text(history)
     run("docker", "stop", migrator)
     tables = sql("SHOW TABLES FROM brandista").stdout.splitlines()

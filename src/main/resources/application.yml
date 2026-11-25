@@ -21,6 +21,14 @@ server:
   port: ${SERVER_PORT:8080}
 
 brandista:
+  invitations:
+    auto-on-approval: ${MERCHANT_AUTO_INVITE_ON_APPROVAL:true}
+    email-enabled: ${MERCHANT_EMAIL_ENABLED:false}
+    token-key-base64: ${MERCHANT_INVITATION_TOKEN_KEY_BASE64:}
+    resend-api-key: ${RESEND_API_KEY:}
+    resend-domain-id: ${RESEND_DOMAIN_ID:}
+    sender-email: ${MERCHANT_SENDER_EMAIL:}
+    registration-origin: ${MERCHANT_REGISTRATION_ORIGIN:}
   checkout:
     cod-enabled: ${COD_CHECKOUT_ENABLED:false}
   security:

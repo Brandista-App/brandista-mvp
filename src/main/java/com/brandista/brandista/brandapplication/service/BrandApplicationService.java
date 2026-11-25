@@ -23,12 +23,16 @@ public class BrandApplicationService {
     private final BrandRepository brandRepository;
     private final com.brandista.brandista.onboarding.OnboardingPolicy onboarding;
     private final com.brandista.brandista.privilege.SecurityAudit audit;
+    private final com.brandista.brandista.onboarding.BrandInvitationService invitations;
+    private final boolean autoInvite;
 
     public BrandApplicationService(BrandApplicationRepository applicationRepository, BrandRepository brandRepository,
-            com.brandista.brandista.onboarding.OnboardingPolicy onboarding, com.brandista.brandista.privilege.SecurityAudit audit) {
+            com.brandista.brandista.onboarding.OnboardingPolicy onboarding, com.brandista.brandista.privilege.SecurityAudit audit,
+            com.brandista.brandista.onboarding.BrandInvitationService invitations,
+            @org.springframework.beans.factory.annotation.Value("${brandista.invitations.auto-on-approval:true}") boolean autoInvite) {
         this.applicationRepository = applicationRepository;
         this.brandRepository = brandRepository;
-        this.onboarding=onboarding; this.audit=audit;
+        this.onboarding=onboarding; this.audit=audit;this.invitations=invitations;this.autoInvite=autoInvite;
     }
 
     @Transactional
@@ -87,6 +91,7 @@ public class BrandApplicationService {
         audit.onboarding(com.brandista.brandista.privilege.SecurityAudit.Operation.APPLICATION_REVIEWED,null,
                 approvedBrand==null?null:approvedBrand.getId(),null,id,com.brandista.brandista.privilege.SecurityAudit.Outcome.SUCCESS,
                 com.brandista.brandista.privilege.SecurityAudit.Reason.COMPLETED);
+        if(approvedBrand!=null && autoInvite) invitations.create(id);
         return toResponse(saved);
     }
 

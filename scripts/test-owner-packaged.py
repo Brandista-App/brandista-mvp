@@ -207,7 +207,7 @@ try:
                      OWNER_FIXTURE_PASSWORD=DB_PASSWORD,OWNER_FIXTURE_STORE_PASSWORD=STORE_PASSWORD)
     classpath=os.pathsep.join([str(TARGET/'test-classes'),str(TARGET/'classes'),str(libs/'*')])
     run(['java','-cp',classpath,'com.brandista.operator.OwnerPackagedFixtureMain'],env=fixture_env)
-    record(args.shell+': real TLS MySQL, verified PKCS12 CA and Flyway V1-V15 fixture')
+    record(args.shell+': real TLS MySQL, verified PKCS12 CA and Flyway V1-V16 fixture')
 
     direct=['java','-Dloader.main=com.brandista.operator.OwnerProvisioningMain','-cp',str(jar),
             'org.springframework.boot.loader.launch.PropertiesLauncher','--host','localhost','--port',str(port),'--truststore',str(store)]

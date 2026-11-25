@@ -42,7 +42,9 @@ try {
     Write-Output "Synthetic invitation $($payload.invitationId) for $($payload.recipientEmail)."
     $jwt = Read-Masked 'Recipient customer access JWT (already registered and logged in)'
     $headers = @{ Authorization = "Bearer $jwt" }
-    $body = @{ token = $payload.token } | ConvertTo-Json -Compress
+    $consent = Read-Host 'After reading merchant terms merchant-v1-2026-11, type ACCEPT to record consent'
+    if ($consent -cne 'ACCEPT') { throw 'Merchant terms were not accepted.' }
+    $body = @{ token = $payload.token; termsAccepted = $true; termsVersion = 'merchant-v1-2026-11' } | ConvertTo-Json -Compress
     $endpoint = $ApiBase.AbsoluteUri.TrimEnd('/') + '/api/v1/brand-invitations/accept'
     $result = Invoke-RestMethod -Method Post -Uri $endpoint -Headers $headers -ContentType 'application/json' -Body $body -MaximumRedirection 0
     Write-Output "Accepted invitation $($result.invitationId), brand $($result.brandId), membership $($result.membershipId). Brand activation remains a separate super-admin action."

@@ -1,0 +1,73 @@
+name: Merchant activation
+on:
+  pull_request:
+    paths: ['src/**', 'scripts/test-merchant-*', 'pom.xml', '.github/workflows/merchant-activation.yml']
+permissions:
+  contents: read
+jobs:
+  mysql-preservation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4.11
+        env:
+          MYSQL_ROOT_PASSWORD: merchant-fixture-only
+          MYSQL_DATABASE: brandista_merchant_verify
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pmerchant-fixture-only"
+          --health-interval=5s --health-timeout=5s --health-retries=30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: ./mvnw --batch-mode --no-transfer-progress -Dtest=MerchantActivationMigrationTests test
+        env:
+          MERCHANT_TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/brandista_merchant_verify?useSSL=false&allowPublicKeyRetrieval=true
+          MERCHANT_TEST_MYSQL_PASSWORD: merchant-fixture-only
+      - run: mysql -h 127.0.0.1 -u root -pmerchant-fixture-only -e 'CREATE DATABASE brandista_merchant_api_verify'
+      - name: Real MySQL merchant approval, delivery state, registration and isolation
+        run: ./mvnw --batch-mode --no-transfer-progress -Dtest=MerchantActivationIntegrationTests test
+        env:
+          MERCHANT_API_TEST_MYSQL_URL: jdbc:mysql://127.0.0.1:3306/brandista_merchant_api_verify?useSSL=false&allowPublicKeyRetrieval=true
+          MERCHANT_TEST_MYSQL_PASSWORD: merchant-fixture-only
+  browser-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: Brandista-App/brandista-admin
+          ref: 0253253c4ea9c6541a21cf6b931a96c111dcb08f
+          path: target/admin-source
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24'
+      - run: npm ci --prefix target/admin-source
+      - run: npm install --prefix target/browser-qa --no-save playwright@1.62.1
+      - run: node target/browser-qa/node_modules/playwright/cli.js install --with-deps chromium
+      - name: Real browser and backend merchant acceptance
+        run: ./mvnw --batch-mode --no-transfer-progress -Dtest=MerchantActivationIntegrationTests test
+        env:
+          MERCHANT_BROWSER_ADMIN_ROOT: ${{ github.workspace }}/target/admin-source
+          MERCHANT_BROWSER_PLAYWRIGHT: ${{ github.workspace }}/target/browser-qa/node_modules/playwright/index.mjs
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: merchant-browser-evidence
+          path: |
+            target/merchant-browser/
+            target/merchant-browser.log
+            target/surefire-reports/TEST-*.xml
+          retention-days: 14

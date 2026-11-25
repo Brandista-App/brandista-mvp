@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/brand-invitations")
 @PreAuthorize("isAuthenticated()")
 public class BrandInvitationAcceptanceController {
-    public record Acceptance(@NotBlank @Size(max=256) String token) {
+    public record Acceptance(@NotBlank @Size(max=256) String token, @AssertTrue boolean termsAccepted,
+        @NotBlank @Pattern(regexp="merchant-v1-2026-11") String termsVersion) {
         @Override public String toString() { return "Acceptance[token=REDACTED]"; }
     }
     private final BrandInvitationService service;
